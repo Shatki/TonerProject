@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+<head>
+    <script type="text/javascript"src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+    <meta charset="UTF-8"/>
+    <title>Page Title</title>
+    <link rel="profile" href="http://gmpg.org/xfn/11"/>
+    <style type="text/css">body {
+        font: 62.5%/1.6 Verdana, Tahoma, sans-serif;
+        color: #333333;
+    }
+
+    h1, h2 {
+        color: #ff6600;
+    }
+
+    #content {
+        margin: 30px auto;
+        width: 600px;
+    }
+
+    .box {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 0 2px #ccc;
+    }</style>
+
+    <script>
+    // мы пытаемся найтивсе элементы <h2> на странице
+    // и изменить цвет шрифта на красный
+    $(function(){
+        $("h2").css("color", "red");
+    });
+    </script>
+</head>
+<body>
+<div id="content" class="wrapper box">
+    <hgroup><h1>Page Title</h1>
+
+        <h2>Page Description</h2></hgroup>
+    <article><h2>Article Title</h2>
+
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.Nunc urna metus, ultricies eu, congue vel,
+            laoreet...</p></article>
+    <article><h2>Article Title</h2>
+
+        <p>Morbi malesuada, ante at feugiat tincidunt, enim massagravida metus, commodolacinia massa diam vel
+            eros...</p></article>
+    <footer>&copy;copyright 2012</footer>
+</div>
+</body>
+</html>

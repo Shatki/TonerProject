@@ -1,0 +1,159 @@
+{% load staticfiles %}
+<!DOCTYPE HTML>
+<html lang=”ru”>
+{% block head %}
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!--Обязательный файл стилей для каждого шаблона-->
+        <link rel="stylesheet" href="{% static 'css/foundation.css' %}" type="text/css"/>
+        <link rel="stylesheet" href="{% static 'foundation-icons/foundation-icons.css' %}" type="text/css"/>
+        <!-- Initialize Foundation CSS -->
+        <!-- <script type="text/javascript"src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>-->
+        <script src={% static "js/vendor/jquery.js" %}></script>
+
+        <script src={% static "js/foundation/foundation.js" %}></script>
+        <script src={% static "js/foundation/foundation.reveal.js" %}></script>
+
+        <script src={% static "js/vendor/modernizr.js" %}></script>
+        <script src={% static "js/vendor/fastclick.js" %}></script>
+        <!--Initialize Top Bar Style -->
+        <script src={% static "js/foundation/foundation.topbar.js" %}></script>
+
+        <!--/Обязательный файл стилей для каждого шаблона-->
+        <title>
+            {% block title %}
+            {% endblock %}
+        </title>
+    </head>
+    <body>
+    <header>
+    {% block topbar %}
+
+        <div class="contain-to-grid">
+            <nav class="top-bar" data-topbar role="navigation">
+
+                {% block logo %}
+                    <ul class="title-area">
+                        <li class="name">
+                            <h1><a href="/">Toner project</a></h1>
+                        </li>
+                        <!-- Заменить на логотип перед продакшеном-->
+                        <li class="toggle-topbar menu-icon"><a href="#"></a></li>
+                    </ul>
+                {% endblock %}
+
+                <section class="top-bar-section">
+                    <!-- Левая секция меню -->
+                    {% block menu %}
+
+                        <ul class="left">
+                        <li><a href="/blog/">Блог</a></li>
+                        <li class="active"><a href="#">Активная кнопка</a></li>
+                        <li class="has-dropdown">
+                            <a href="#">Главное меню</a>
+                            <ul class="dropdown">
+                                <li><a href="#">Первая</a></li>
+                                <li class="active"><a href="#">Активная</a></li>
+                            </ul>
+                        </li>
+                        </ul>
+                    {% endblock %}
+
+                    {% block auth %}
+                        <ul onclick="loadloginform()" class="right">
+                            <li class="divider"></li>
+                            {%  if username %}
+                                <li><a href="/auth/logout/">Выйти ({{ username }})</a></li>
+                            {%  else %}
+                                <li><a href="#" data-reveal-id="loginModal">Войти/Регистрация</a></li>
+                            {% endif %}
+                        </ul>
+                    {% endblock %}
+
+                </section>
+            </nav>
+        </div>
+
+    {% endblock %}
+{% endblock %}
+
+</header>
+
+{% block page %}
+    <div class ="row">
+        {% block content %}
+            {% block article %}
+            {% endblock %}
+        {% endblock %}
+
+        {% block sidebar %}
+	{% endblock %}
+
+    </div>
+{% endblock %}
+
+
+
+{% block footer %}
+    <div class ="row">
+        {% block copyright %}
+            <!--Подвал сайта-->
+            <div align="center" class="copyright"> 2015  год. Все права защищены.
+                <h6>Cайт разработал<a href="https://vk.com/selidim" target="_blank"> Селивёрстов Дмитрий</a><h6>
+            </div>
+            <!--/Подвал сайта-->
+        {% endblock %}
+    </div>
+{% endblock %}
+
+{% block authform %}
+    <div id="loginModal" class="reveal-modal remove-whitespace" data-reveal>
+        <span id="login"></span>
+    </div>
+    <div id="registerModal" class="reveal-modal tiny" data-reveal aria-labelledby="registerModalTitle" aria-hidden="true" role="dialog">
+        <span id="register"></span>
+    </div>
+
+{% endblock %}
+
+{% block mainscripts %}
+    <!--Для работы Foundation CSS-->
+    <script type="text/javascript">
+        $(document).foundation();
+
+        function loadloginform(){
+            $.ajax({
+                type: "GET",
+                url: "/auth/login/form/",
+                success: function(mydata){
+                    $("#login").html(mydata);
+                }
+            });
+            return false;
+        }
+
+        function loadregisterform(){
+            $.ajax({
+                type: "GET",
+                url: "/auth/register/form/",
+                success: function(mydata){
+                    $("#register").html(mydata);
+                }
+            });
+            return false;
+        }
+
+
+    </script>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+
+</html>
+
+<!-- Include default block -->
+
+

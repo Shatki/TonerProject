@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    <h4>{{ article.article_date }}</h4>
+    <h2>{{ article.article_title }}</h2>
+    <p>{{ article.article_text }}</p>
+
+    {% block like %}
+        {% include "likes.html" %}
+    {% endblock %}
+
+    <hr>
+    <div class="large-offset-1 large-8 columns">
+        <p>Комментарии</p>
+        {% for comment in comments %}
+
+            {{ comment.comments_text }}<hr>
+        {% endfor %}
+        {% if username %}
+            <form action="/blog/article{{ article.id }}/addcomment" method="post">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" class="button" value="Добавить комментарий">
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {% include "likescripts.html" %}
+{% endblock %}

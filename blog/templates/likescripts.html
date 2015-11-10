@@ -1,0 +1,25 @@
+{% block scripts %}
+    <script type="text/javascript">
+        $('div p a').click(function(event){
+            event.preventDefault();
+        })
+
+        function addLike(articlenum){
+            //alert('/blog/article'+articlenum+'/addlike/');
+            $.ajax({
+                type: "GET",
+                url:"/blog/article"+articlenum+"/addlike/",
+                //data:{
+                //    'article_id':articlenum,  // Необязательная штука, дублер
+                //},
+                dataType: "html",
+                cache: false,
+                success: function(data){
+                    if (data) {
+                        document.getElementById("like" + articlenum).textContent = data;
+                    }
+                }
+            });
+        }
+    </script>
+{% endblock %}

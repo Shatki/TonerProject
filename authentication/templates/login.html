@@ -1,0 +1,109 @@
+<div class="row">
+    <div class="large-6 columns auth-plain">
+        <div class="signup-panel left-solid">
+            <p class="welcome">Вход для пользователей</p>
+            <form name="loginform" id="loginform">
+                {% csrf_token %}
+                <div class="row collapse">
+                    <div class="small-2  columns">
+                            <span class="prefix">
+                                <i class="fi-torso"></i>
+                            </span>
+                    </div>
+                    <div class="small-10  columns">
+                        <input type="text" id="username" name="username" placeholder="логин">
+                    </div>
+                </div>
+                <div class="row collapse">
+                    <div class="small-2 columns ">
+                            <span class="prefix">
+                                <i class="fi-lock"></i>
+                            </span>
+                    </div>
+                    <div class="small-10 columns ">
+                        <input type="password" id="password" name="password" placeholder="пароль">
+                    </div>
+                </div>
+            </form>
+            <input class="button" type="submit" id="login-btn" value="Войти">
+        </div>
+    </div>
+
+    <div class="large-6 columns auth-plain">
+        <div onclick="loadregisterform()" class="signup-panel newusers">
+            <p class="welcome">Еще не зарегистрированы?</p>
+            <p>Зарегистрирйтесь в нашей системе для получиния более удобного управления заказами, счетами и другими возможностями</p><br>
+            <a  href="#" data-reveal-id="registerModal" class="secondary button">Регистрация</a>
+            </br>
+        </div>
+    </div>
+</div>
+<a class="close-reveal-modal">&#215;</a>
+
+
+<script>
+    $(document).ready(function(){
+        $('#login-btn').click(function() {
+            var data = $("form").serialize();
+            $.ajax({
+                url: '/auth/login/',
+                method: 'POST',
+                data: data,
+                cache: false,
+                success: function (data) {
+                    if (data != 'ok') {
+                        // Пока кокой-то деревянный способ
+                        document.getElementById("username").style.backgroundColor='#ff8888';
+                        document.getElementById("username").style.borderColor = '#cc0000';
+                        document.getElementById("password").style.backgroundColor='#ff8888';
+                        document.getElementById("password").style.borderColor = '#cc0000';
+                    } else {
+                        location.reload();
+                    }
+                }
+            });
+        });
+
+        $('form').change(function(){
+            //Восстанавливаем значения стиля после индикации ошибки
+            document.getElementById("username").style.backgroundColor='#ffffff';
+            document.getElementById("username").style.borderColor = '#cccccc';
+            document.getElementById("password").style.backgroundColor='#ffffff';
+            document.getElementById("password").style.borderColor = '#cccccc';
+        });
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie != '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            }
+        });
+
+        function checkRegisterData(){
+            alert('Проверяем регистрацию!')
+        }
+
+
+
+
+    });
+
+</script>
+
