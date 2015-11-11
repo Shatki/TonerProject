@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from authentication.models import Account
 
 # Create your models here.
 class Article(models.Model):
@@ -18,7 +18,7 @@ class Likes(models.Model):
         db_table = 'likes'
     likes_article = models.ForeignKey(Article)
     likes_date = models.DateTimeField(auto_now_add=True)
-    likes_user = models.ForeignKey(User)
+    likes_user = models.ForeignKey(Account)
 
 
 # noinspection PyDocstring
