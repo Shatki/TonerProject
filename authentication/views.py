@@ -18,9 +18,9 @@ def loadregisterform(request):
 @ensure_csrf_cookie
 def login(request):
     if request.POST:
-        username = request.POST.get('username', '')
+        email = request.POST.get('email', '')
         password = request.POST.get('password', '')
-        user = auth.authenticate(username=username, password=password)
+        user = auth.authenticate(email=email, password=password)
         if user is not None:
             auth.login(request, user)
             return HttpResponse('ok', content_type='text/html')
@@ -44,7 +44,7 @@ def register(request):
         newuser_form = UserCreationForm(request.POST)
         if newuser_form.is_valid():
             newuser_form.save()
-            newuser = auth.authenticate(username=newuser_form.cleaned_data['username'], password=newuser_form.cleaned_data['password2'])
+            newuser = auth.authenticate(email=newuser_form.cleaned_data['email'], password=newuser_form.cleaned_data['password2'])
             auth.login(request, newuser)
             return redirect(return_path)
         else:

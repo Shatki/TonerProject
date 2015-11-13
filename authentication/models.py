@@ -1,5 +1,8 @@
+from django.contrib.auth import user_logged_in
+from django.core.validators import RegexValidator
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
 
 # Класс менеджера должен переопределить методы create_user() и create_superuser().
 class AccountManager(BaseUserManager):
@@ -14,6 +17,8 @@ class AccountManager(BaseUserManager):
         )
 
         account.set_password(password)
+        account.is_staff = False
+        account.is_company = False
         account.save()
 
         return account
@@ -24,22 +29,30 @@ class AccountManager(BaseUserManager):
         account.is_admin = True
         account.save()
 
-class Account(AbstractBaseUser):
-    #Авторизация будет происходить по E-mail
-    email = models.EmailField(unique=True)
+class Account(AbstractBaseUser, PermissionsMixin):
+    alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message='Only alphanumeric characters are allowed.')
+
     # username нам  необходим для отображении записей и страницы действий
-    username = models.CharField(max_length=40, unique=True)
+    username = models.CharField(unique=True, max_length=30, validators=[alphanumeric])
+
+    #Авторизация будет происходить по E-mail
+    email = models.EmailField(verbose_name='email field', unique=True, max_length=255)
+
 
     # Имя - не является обязательным
     first_name = models.CharField(max_length=40, blank=True)
     # Фамилия - также не обязательна
     last_name = models.CharField(max_length=40, blank=True)
+    # Наименование компании - не обязательна для физ лиц
+    company_name = models.CharField(max_length=100, blank=True)
 
     # слоган или статус - куда же без него. Наследство от соц. сетей
     tagline = models.CharField(max_length=140, blank=True)
 
     # Атрибут суперпользователя
     is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False, null=False)
+    is_company = models.BooleanField(default=False, null=False)
 
     # Сохраняем время создания и обновления аккаунта пользователя.
     # Устанавливая auto_now_add=True, мы говорим Джанго автоматически
@@ -48,13 +61,17 @@ class Account(AbstractBaseUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    user_photo = models.FileField(upload_to='/profile/', blank=False, default='/static/img/profile/defaultprofileimage.jpg')
+
     objects = AccountManager()
 
     # Имя пользователя мы будем выводить в нескольких местах.
     #  Так как это поле необязательно, мы включаем его в список REQUIRED_FIELDS.
     #  Обычно достаточно указать required=True, но так как мы заменяем модель User,
     #  Джанго требует явно определить это поле.
+    # логинимся по email
     USERNAME_FIELD = 'email'
+    # обязательное поле
     REQUIRED_FIELDS = ['username', ]
 
     def __str__(self):
