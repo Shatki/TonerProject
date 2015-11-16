@@ -32,7 +32,7 @@ def article(request, article_id=1):
     args['comments'] = Comments.objects.filter(comments_article_id=article_id)
     args['form'] = comment_form
     args['username'] = auth.get_user(request).username
-    return (render_to_response('article.html', args))
+    return render_to_response('article.html', args)
 
 
 

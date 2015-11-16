@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render_to_response, redirect
+import os
+from django.contrib.auth import get_user_model
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.contrib import auth
 from django.contrib.auth.forms import UserCreationForm
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
+from TonerProject.settings import STATIC_URL
 
 
 def loadloginform(request):
@@ -50,3 +53,23 @@ def register(request):
         else:
             args['form'] = newuser_form
     return render_to_response(return_path, args)
+
+def dispatch_user(request, username, **kwargs):
+    user_for_profile = get_object_or_404(get_user_model(), username=username)
+    if user_for_profile == request.user:
+        return profile(request, username, kwargs)
+    else:
+        return public_profile(request, username, kwargs)
+
+def profile(request, username, param):
+    # Тут код личного профиля
+    return HttpResponse(u'<http>Private profile of user: %s </http>' % username, content_type='text/html')
+
+def public_profile(request, username, param):
+    # Тут код публичного профиля
+    return HttpResponse(u'<http>Public profile of user: %s </http>' % username, content_type='text/html')
+
+def get_photo(request, username):
+    # Тут код отдачи фотографии
+    # HttpResponse.content = '/Volumes/Developer/Projects/TonerProject/media/profile/defaultprofileimage.jpg'
+    return redirect(os.path.join(STATIC_URL, "profile/" + username + ".jpg"))

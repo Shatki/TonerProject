@@ -63,7 +63,17 @@
                         <ul onclick="loadloginform()" class="right">
                             <li class="divider"></li>
                             {%  if username %}
-                                <li><a href="/auth/logout/">Выйти ({{ username }})</a></li>
+                                <li>
+                                    <a href="#">
+                                        {% block photo %}
+                                            <img src="/{{ username }}/photo" width="50px" height="50px"/>
+                                        {% endblock photo %}
+                                    </a>
+                                 </li>
+                                <li>
+
+                                    <a href="/auth/logout/">Выйти ({{ username }})</a>
+                                </li>
                             {%  else %}
                                 <li><a href="#" data-reveal-id="loginModal">Войти/Регистрация</a></li>
                             {% endif %}
@@ -99,7 +109,7 @@
         {% block copyright %}
             <!--Подвал сайта-->
             <div align="center" class="copyright"> 2015  год. Все права защищены.
-                <h6>Cайт разработал<a href="https://vk.com/selidim" target="_blank"> Селивёрстов Дмитрий</a><h6>
+                <h6>Cайт разработал<a href="https://vk.com/selidim" target="_blank"> Селивёрстов Дмитрий</a></h6>
             </div>
             <!--/Подвал сайта-->
         {% endblock %}

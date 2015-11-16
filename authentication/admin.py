@@ -54,7 +54,7 @@ class AccountChangeForm(forms.ModelForm):
     def clean_password(self):
         return self.initial['password']
 
-
+@admin.register(Account)
 class AccountAdmin(UserAdmin):
     list_display = ('username',
                     'email',
@@ -68,11 +68,11 @@ class AccountAdmin(UserAdmin):
                    'is_company',
                    )
     fieldsets = (
-             (None, {'fields': ('email', 'password')}),
+             (None, {'fields': ('email', 'username', 'password')}),
             ('Personal info', {'fields': ('email', 'first_name', 'last_name', 'company_name',
                                              'user_photo', 'tagline')}),
             ('Permissions', {'fields': ('is_admin', 'is_staff', 'is_company', 'groups', 'user_permissions')}),
-            ('Important dates', {'fields': ('last_login', 'date_joined')}),
+            ('Important dates', {'fields': ('last_login',)}),
     )
 
 
@@ -91,7 +91,6 @@ class AccountAdmin(UserAdmin):
 
     form = AccountChangeForm
     add_form = AccountCreationForm
-    # change_password_form = AdminPasswordChangeForm
 
-admin.site.register(Account, AccountAdmin)
 admin.site.unregister(Group)
+

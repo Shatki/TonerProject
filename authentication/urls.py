@@ -9,5 +9,5 @@ urlpatterns = [
     url(r'^register/form/$', 'authentication.views.loadregisterform'),
     url(r'^login/$', 'authentication.views.login'),
     url(r'^logout/$', 'authentication.views.logout'),
-    url(r'^register/$', 'authentication.views.register')
+    url(r'^register/$', 'authentication.views.register'),
     ]

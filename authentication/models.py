@@ -1,7 +1,6 @@
-from django.contrib.auth import user_logged_in
-from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.validators import RegexValidator
 
 
 # Класс менеджера должен переопределить методы create_user() и create_superuser().
@@ -19,24 +18,27 @@ class AccountManager(BaseUserManager):
         account.set_password(password)
         account.is_staff = False
         account.is_company = False
-        account.save()
+        account.save(using=self._db)
 
         return account
 
     def create_superuser(self, email, password, **kwargs):
         account = self.create_user(email, password, **kwargs)
-
+        account.is_superuser = True
         account.is_admin = True
-        account.save()
+        account.is_staff = True
+        account.save(using=self._db)
+        return account
+
 
 class Account(AbstractBaseUser, PermissionsMixin):
-    alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message='Only alphanumeric characters are allowed.')
+    alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message=u'Только буквенноцифровые символы допустимы.')
 
     # username нам  необходим для отображении записей и страницы действий
-    username = models.CharField(unique=True, max_length=30, validators=[alphanumeric])
+    username = models.CharField(unique=True, max_length=30, db_index=True, validators=[alphanumeric])
 
     #Авторизация будет происходить по E-mail
-    email = models.EmailField(verbose_name='email field', unique=True, max_length=255)
+    email = models.EmailField(verbose_name=u'Электронная почта', unique=True, max_length=255)
 
 
     # Имя - не является обязательным
@@ -58,10 +60,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # Устанавливая auto_now_add=True, мы говорим Джанго автоматически
     # ставить время при создании, причем далее поле будет нередактируемым.
     #  Аналогично и auto_now=True, разница в том, что поле каждый раз обновляется с обновлением объекта
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
-    user_photo = models.FileField(upload_to='/profile/', blank=False, default='/static/img/profile/defaultprofileimage.jpg')
+    user_photo = models.FileField(upload_to='/profile/', blank=False, default='/profile/defaultprofileimage.jpg')
 
     objects = AccountManager()
 
@@ -72,7 +74,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # логинимся по email
     USERNAME_FIELD = 'email'
     # обязательное поле
-    REQUIRED_FIELDS = ['username', ]
+    REQUIRED_FIELDS = ['username',]
 
     def __str__(self):
         return self.email
@@ -82,3 +84,12 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.first_name
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+
+    def get_user_photo(self):
+        return self.user_photo
