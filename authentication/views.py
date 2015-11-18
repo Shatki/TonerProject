@@ -63,7 +63,10 @@ def dispatch_user(request, username, **kwargs):
 
 def profile(request, username, param):
     # Тут код личного профиля
-    return HttpResponse(u'<http>Private profile of user: %s </http>' % username, content_type='text/html')
+    args = {}
+    args['username'] = request.user.username
+    args.update(csrf(request))
+    return render_to_response('profile.html', args)
 
 def public_profile(request, username, param):
     # Тут код публичного профиля

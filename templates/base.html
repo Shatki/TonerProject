@@ -8,11 +8,13 @@
         <link rel="stylesheet" href="{% static 'css/foundation.css' %}" type="text/css"/>
         <link rel="stylesheet" href="{% static 'foundation-icons/foundation-icons.css' %}" type="text/css"/>
         <!-- Initialize Foundation CSS -->
+        <link rel="stylesheet" href="{% static 'css/tonerproject.css' %}" type="text/css"/>
         <!-- <script type="text/javascript"src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>-->
         <script src={% static "js/vendor/jquery.js" %}></script>
 
         <script src={% static "js/foundation/foundation.js" %}></script>
         <script src={% static "js/foundation/foundation.reveal.js" %}></script>
+        <script src={% static "js/foundation/foundation.orbit.js" %}></script>
 
         <script src={% static "js/vendor/modernizr.js" %}></script>
         <script src={% static "js/vendor/fastclick.js" %}></script>
@@ -63,10 +65,10 @@
                         <ul onclick="loadloginform()" class="right">
                             <li class="divider"></li>
                             {%  if username %}
-                                <li>
-                                    <a href="#">
+                                <li class="header_person">
+                                    <a href="/{{ username }}">
                                         {% block photo %}
-                                            <img src="/{{ username }}/photo" width="50px" height="50px"/>
+                                            <img class="photo" src="/{{ username }}/photo" width="50px" height="50px"/>
                                         {% endblock photo %}
                                     </a>
                                  </li>
@@ -117,10 +119,10 @@
 {% endblock %}
 
 {% block authform %}
-    <div id="loginModal" class="reveal-modal remove-whitespace" data-reveal>
+    <div id="loginModal" class="reveal-modal remove-whitespace" data-reveal="">
         <span id="login"></span>
     </div>
-    <div id="registerModal" class="reveal-modal tiny" data-reveal aria-labelledby="registerModalTitle" aria-hidden="true" role="dialog">
+    <div id="registerModal" class="reveal-modal tiny" data-reveal="" aria-labelledby="registerModalTitle" aria-hidden="true" role="dialog">
         <span id="register"></span>
     </div>
 
