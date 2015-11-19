@@ -1,16 +1,23 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
+
 {% block content %}
     <!--Профильная панель -->
+    <p></p>
     <div class="row panels">
         <!--Фото слева -->
         <div class="large-6 columns">
             <img class="profile-photo" src="/{{ username }}/photo" width="400"/>
         </div>
         <div class="large-6 columns">
-            <label class="auth-plain">Input Label
+           <p class="welcome">Персональные данные</p>
+            <label class="">Имя пользователя:
                 <input type="text" placeholder="Имя пользователя" />
+            </label>
+
+            <label class="">E-mail:
+                <input type="text" placeholder="Электронная почта" />
             </label>
         </div>
 
@@ -18,7 +25,7 @@
     </div>
 
 
-    <div class="row">
+    <div class="row panels">
         <div class="large-4 columns">
             <label>Input Label
                 <input type="text" placeholder="large-4.columns" />
