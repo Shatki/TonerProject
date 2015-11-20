@@ -5,14 +5,14 @@ from django.core.validators import RegexValidator
 
 # Класс менеджера должен переопределить методы create_user() и create_superuser().
 class AccountManager(BaseUserManager):
-    def create_user(self, email, password=None, **kwargs):
-        if not email:
-            raise ValueError('User must have a valid email address.')
-        if not kwargs.get('username'):
-            raise ValueError('User must have a valid username.')
+    def create_user(self, username, password=None, **kwargs):
+        if not username:
+            raise ValueError('User must have a valid username')
+        if not kwargs.get('email'):
+            raise ValueError('User must have a valid username address.')
 
         account = self.model(
-            email=self.normalize_email(email), username=kwargs.get('username')
+            email=self.normalize_email(kwargs.get('email')), username=username,
         )
 
         account.set_password(password)
@@ -22,8 +22,8 @@ class AccountManager(BaseUserManager):
 
         return account
 
-    def create_superuser(self, email, password, **kwargs):
-        account = self.create_user(email, password, **kwargs)
+    def create_superuser(self, username, password, **kwargs):
+        account = self.create_user(username, password, **kwargs)
         account.is_superuser = True
         account.is_admin = True
         account.is_staff = True
@@ -72,9 +72,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
     #  Обычно достаточно указать required=True, но так как мы заменяем модель User,
     #  Джанго требует явно определить это поле.
     # логинимся по email
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'username'
     # обязательное поле
-    REQUIRED_FIELDS = ['username',]
+    REQUIRED_FIELDS = ['email', ]
 
     def __str__(self):
         return self.email

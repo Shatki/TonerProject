@@ -16,6 +16,9 @@ Including another URLconf
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 import homepage.views
+import authentication.views
+import dashboard.views
+
 
 urlpatterns = [
     # Examples:
@@ -23,9 +26,9 @@ urlpatterns = [
     url(r'^blog/', include('blog.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^auth/', include('authentication.urls')),
-    url(r'^manager/', 'dashboard.views.manager'),
-    url(r'^test/', 'dashboard.views.testpage'),
-    url(r'^(?P<username>\w+)/photo', 'authentication.views.get_photo'),
-    url(r'^(?P<username>\w+)', 'authentication.views.dispatch_user'),
-    url(r'^$', 'homepage.views.home_page'),
+    # url(r'^manager/', dashboard.views.manager),
+    # url(r'^test/', dashboard.views.testpage),
+    url(r'^(?P<username>\w+)/photo', authentication.views.get_photo),
+    url(r'^(?P<username>\w+)', authentication.views.dispatch_user),
+    url(r'^$', homepage.views.home_page),
 ]

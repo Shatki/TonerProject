@@ -10,16 +10,13 @@
         <!-- Initialize Foundation CSS -->
         <link rel="stylesheet" href="{% static 'css/tonerproject.css' %}" type="text/css"/>
         <!-- <script type="text/javascript"src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>-->
-        <script src={% static "js/vendor/jquery.js" %}></script>
-
-        <script src={% static "js/foundation/foundation.js" %}></script>
-        <script src={% static "js/foundation/foundation.reveal.js" %}></script>
-        <script src={% static "js/foundation/foundation.orbit.js" %}></script>
+        <script src={% static "js/vendor/jquery.min.js" %}></script>
+        <script src={% static "js/foundation.min.js" %}></script>
 
         <script src={% static "js/vendor/modernizr.js" %}></script>
         <script src={% static "js/vendor/fastclick.js" %}></script>
         <!--Initialize Top Bar Style -->
-        <script src={% static "js/foundation/foundation.topbar.js" %}></script>
+
 
         <!--/Обязательный файл стилей для каждого шаблона-->
         <title>
@@ -77,7 +74,9 @@
                                     <a href="/auth/logout/">Выйти ({{ username }})</a>
                                 </li>
                             {%  else %}
-                                <li><a href="#" data-reveal-id="loginModal">Войти/Регистрация</a></li>
+                                <li>
+                                    <a href="#" data-toggle="loginModal">Войти/Регистрация</a>
+                                </li>
                             {% endif %}
                         </ul>
                     {% endblock %}
@@ -119,11 +118,17 @@
 {% endblock %}
 
 {% block authform %}
-    <div id="loginModal" class="reveal-modal remove-whitespace" data-reveal="">
+    <div id="loginModal" class="large reveal" data-reveal>
         <span id="login"></span>
+        <button class="close-button" data-close aria-label="Close reveal" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-    <div id="registerModal" class="reveal-modal tiny" data-reveal="" aria-labelledby="registerModalTitle" aria-hidden="true" role="dialog">
+    <div id="registerModal" class="large reveal" data-reveal>
         <span id="register"></span>
+        <button class="close-button" data-close aria-label="Close reveal" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 
 {% endblock %}

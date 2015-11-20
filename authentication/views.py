@@ -21,9 +21,9 @@ def loadregisterform(request):
 @ensure_csrf_cookie
 def login(request):
     if request.POST:
-        email = request.POST.get('email', '')
+        login = request.POST.get('username', '')
         password = request.POST.get('password', '')
-        user = auth.authenticate(email=email, password=password)
+        user = auth.authenticate(username=login, password=password)
         if user is not None:
             auth.login(request, user)
             return HttpResponse('ok', content_type='text/html')
