@@ -1,0 +1,184 @@
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+    font-weight: lighter;
+}
+
+body {
+    -moz-osx-font-smoothing: grayscale;
+    background-repeat: repeat;
+    background-position: 0 0;
+    background-image: none;
+    background-color: #fefefe;
+    background-attachment: scroll;
+    color: #0a0a0a;
+    font-weight: normal;
+    line-height: 1.5;
+}
+
+label {
+    font-size: 13px;
+    font-weight: 200;
+    text-align: left;
+}
+
+a {
+    color: #c5c5c5;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #333333;
+}
+
+i {
+    font-size: 30px;
+    line-height: 50px;
+    color: #999;
+}
+
+input:not([type]), input[type="text"], input[type="password"], input[type="date"], input[type="datetime"],
+input[type="datetime-local"], input[type="month"], input[type="week"], input[type="email"], input[type="number"],
+input[type="search"], input[type="tel"], input[type="time"], input[type="url"], input[type="color"], textarea {
+    -moz-appearance: none;
+    background-color: #ffffff;
+    border-color: #cccccc;
+    border-radius: 0;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    box-sizing: border-box;
+    color: #444444;
+    display: block;
+    font-family: inherit;
+    font-size: 0.77778rem;
+    height: 2.05556rem;
+    margin: 0 0 0.88889rem;
+    padding: 0.44444rem;
+    transition: border-color 0.15s linear 0s, background 0.15s linear 0s;
+    width: 100%;
+}
+
+*::-moz-placeholder {
+    color: #aaaaaa;
+}
+
+h1 {
+    font-family: inherit !important;
+    font-size: 26px;
+    text-align: center;
+    margin-left: 0;
+    line-height: 1.6;
+    margin-bottom: 1.25em;
+    text-rendering: optimizelegibility;
+}
+
+p {
+    font-size: 13px;
+    font-weight: 200;
+    text-align: center;
+}
+
+button, .button {
+    -moz-appearance: none;
+    background-color: #008cba;
+    border-color: #007095;
+    border-radius: 0;
+    border-style: solid;
+    border-width: 0;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif !important;
+    font-size: 0.88889rem;
+    font-weight: normal;
+    line-height: normal;
+    margin: 0 0 1.11111rem;
+    padding: 0.88889rem 1.77778rem 0.94444rem;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 300ms ease-out 0s;
+}
+
+/* Styles for modal dialogs */
+.modal-dialog {
+    left: 0;
+    top: 0px;
+    margin: -150px auto;
+    max-width: 55.5556rem;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #666666;
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    display: none;
+    padding: 1.66667rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1005;
+
+}
+
+#overlay {
+    z-index: 3; /* пoдлoжкa дoлжнa быть выше слoев элементoв сaйтa, нo ниже слoя мoдaльнoгo oкнa */
+    position: fixed; /* всегдa перекрывaет весь сaйт */
+    background-color: #000; /* чернaя */
+    opacity: 0.8; /* нo немнoгo прoзрaчнa */
+    -moz-opacity: 0.8; /* фикс прозрачности для старых браузеров */
+    filter: alpha(opacity=80);
+    width: 100%;
+    height: 100%; /* рaзмерoм вo весь экрaн */
+    top: 0; /* сверху и слевa 0, oбязaтельные свoйствa! */
+    left: 0;
+    cursor: pointer;
+    display: none; /* в oбычнoм сoстoянии её нет) */
+}
+
+.modal-dialog:target {
+    display: block;
+    pointer-events: auto;
+}
+
+.modal-close {
+    color: #aaaaaa;
+    cursor: pointer;
+    font-size: 2.22222rem;
+    font-weight: bold;
+    line-height: 1;
+    position: absolute;
+    right: 1.22222rem;
+    text-decoration: none;
+    top: 0.55556rem;
+}
+
+.photo {
+    border-radius: 50%;
+    float: left;
+    height: 50px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    width: 50px;
+}
+
+.profile-photo {
+    border-radius: 1%;
+    float: left;
+    height: 500px;
+    width: 500px;
+}
+
+/* Стили основных панелей */
+.panel {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #d8d8d8;
+    background: #fff;
+    color: #333333;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}

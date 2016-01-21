@@ -1,61 +1,14 @@
-<div class="row">
+<p class="welcome">Регистрация</p>
+{% csrf_token %}
+<form>
+    <input type="text" name="username" placeholder="Логин">
+    <input type="password" name="password" placeholder="пароль">
+    <input type="password" name="password-confirm" placeholder="повторите пароль">
+    <br>
+    <input type="email" name="email" placeholder="Email">
+    <input type="tel" name="tel" placeholder="телефон">
+</form>
 
-    <div class="signup-panel left-solid">
-        <p id="registerModalTitle" class="welcome">Регистрация</p>
+<input class="button" type="submit" id="register-btn" value="Зарегистрироваться">
 
-        {% csrf_token %}
-
-        <form>
-            <div class="row collapse">
-                <div class="small-2  columns">
-                    <span class="prefix"><i class="fi-torso"></i></span>
-                </div>
-                <div class="small-10  columns">
-                    <input type="text" name="username" placeholder="Логин">
-                </div>
-            </div>
-
-            <div class="row collapse">
-                <div class="small-2 columns ">
-                    <span class="prefix"><i class="fi-lock"></i></span>
-                </div>
-                <div class="small-10 columns ">
-                    <input type="password" name="password" placeholder="пароль">
-                </div>
-            </div>
-
-            <div class="row collapse">
-                <div class="small-2 columns ">
-                    <span class="prefix"><i class="fi-lock"></i></span>
-                </div>
-                <div class="small-10 columns ">
-                    <input type="password" name="password-confirm" placeholder="повторите пароль">
-                </div>
-            </div>
-
-            <br>
-
-            <div class="row collapse">
-                <div class="small-2 columns">
-                    <span class="prefix"><i class="fi-mail"></i></span>
-                </div>
-                <div class="small-10  columns">
-                    <input type="email" name="email" placeholder="Email">
-                </div>
-            </div>
-
-            <div class="row collapse">
-                <div class="small-2 columns">
-                    <span class="prefix"><i class="fi-telephone-accessible"></i></span>
-                </div>
-                <div class="small-10  columns">
-                    <input type="tel" name="tel" placeholder="телефон">
-                </div>
-            </div>
-        </form>
-
-        <input class="button" type="submit" id="register-btn" value="Зарегистрироваться">
-
-        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    </div>
-</div>
+<a href="#" class="modal-close">&#215;</a>

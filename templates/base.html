@@ -1,24 +1,14 @@
 {% load staticfiles %}
+
 <!DOCTYPE HTML>
 <html lang=”ru”>
 {% block head %}
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!--Обязательный файл стилей для каждого шаблона-->
-        <link rel="stylesheet" href="{% static 'css/foundation.css' %}" type="text/css"/>
-        <link rel="stylesheet" href="{% static 'foundation-icons/foundation-icons.css' %}" type="text/css"/>
-        <!-- Initialize Foundation CSS -->
-        <link rel="stylesheet" href="{% static 'css/tonerproject.css' %}" type="text/css"/>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css"/>
         <!-- <script type="text/javascript"src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>-->
         <script src={% static "js/vendor/jquery.min.js" %}></script>
-        <script src={% static "js/foundation.min.js" %}></script>
-
-        <script src={% static "js/vendor/modernizr.js" %}></script>
-        <script src={% static "js/vendor/fastclick.js" %}></script>
-        <!--Initialize Top Bar Style -->
-
-
-        <!--/Обязательный файл стилей для каждого шаблона-->
         <title>
             {% block title %}
             {% endblock %}
@@ -29,15 +19,17 @@
     {% block topbar %}
 
         <div class="contain-to-grid">
-            <nav class="top-bar" data-topbar role="navigation">
+            <nav class="top-bar">
 
                 {% block logo %}
-                    <ul class="title-area">
+                    <ul class="logo">
                         <li class="name">
                             <h1><a href="/">Toner project</a></h1>
                         </li>
                         <!-- Заменить на логотип перед продакшеном-->
-                        <li class="toggle-topbar menu-icon"><a href="#"></a></li>
+                        <li class="toggle-topbar menu-icon">
+                            <a href="#"></a>
+                        </li>
                     </ul>
                 {% endblock %}
 
@@ -45,17 +37,6 @@
                     <!-- Левая секция меню -->
                     {% block menu %}
 
-                        <ul class="left">
-                        <li><a href="/blog/">Блог</a></li>
-                        <li class="active"><a href="#">Активная кнопка</a></li>
-                        <li class="has-dropdown">
-                            <a href="#">Главное меню</a>
-                            <ul class="dropdown">
-                                <li><a href="#">Первая</a></li>
-                                <li class="active"><a href="#">Активная</a></li>
-                            </ul>
-                        </li>
-                        </ul>
                     {% endblock %}
 
                     {% block auth %}
@@ -75,7 +56,7 @@
                                 </li>
                             {%  else %}
                                 <li>
-                                    <a href="#" data-toggle="loginModal">Войти/Регистрация</a>
+                                    <a id="login" href="#">Войти/Регистрация</a>
                                 </li>
                             {% endif %}
                         </ul>
@@ -118,32 +99,44 @@
 {% endblock %}
 
 {% block authform %}
-    <div id="loginModal" class="large reveal" data-reveal>
-        <span id="login"></span>
-        <button class="close-button" data-close aria-label="Close reveal" type="button">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div id="registerModal" class="large reveal" data-reveal>
-        <span id="register"></span>
-        <button class="close-button" data-close aria-label="Close reveal" type="button">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div id="login" class="modal-dialog">
+        <div id="signin-form" class="modal-form"></div>
+        <a href="#" title="Закрыть" class="modal-close"><span aria-hidden="true">&times;</span></a>
     </div>
 
 {% endblock %}
 
 {% block mainscripts %}
-    <!--Для работы Foundation CSS-->
+    <!--Для работы модальной форм-->
     <script type="text/javascript">
-        $(document).foundation();
+        $(document).ready(function () { // вся мaгия пoсле зaгрузки стрaницы
+            $('a#login').click(function (event) { // лoвим клик пo ссылки с id="login"
+                event.preventDefault(); // выключaем стaндaртную рoль элементa
+                $('#overlay').fadeIn(400, // снaчaлa плaвнo пoкaзывaем темную пoдлoжку
+                        function () { // пoсле выпoлнения предъидущей aнимaции
+                            $('.modal-dialog')
+                                    .css('display', 'block') // убирaем у мoдaльнoгo oкнa display: none;
+                                    .animate({opacity: 1, top: '50%'}, 200); // плaвнo прибaвляем прoзрaчнoсть oднoвременнo сo съезжaнием вниз
+                        });
+            });
+            /* Зaкрытие мoдaльнoгo oкнa, тут делaем тo же сaмoе нo в oбрaтнoм пoрядке */
+            $('.modal-close, #overlay').click(function () { // лoвим клик пo крестику или пoдлoжке
+                $('.modal-dialog')
+                        .animate({opacity: 0, top: '45%'}, 200,  // плaвнo меняем прoзрaчнoсть нa 0 и oднoвременнo двигaем oкнo вверх
+                        function () { // пoсле aнимaции
+                            $(this).css('display', 'none'); // делaем ему display: none;
+                            $('#overlay').fadeOut(400); // скрывaем пoдлoжку
+                        }
+                );
+            });
+        });
 
         function loadloginform(){
             $.ajax({
                 type: "GET",
                 url: "/auth/login/form/",
                 success: function(mydata){
-                    $("#login").html(mydata);
+                    $("#signin-form").html(mydata);
                 }
             });
             return false;
@@ -154,7 +147,7 @@
                 type: "GET",
                 url: "/auth/register/form/",
                 success: function(mydata){
-                    $("#register").html(mydata);
+                    $("#signin-form").html(mydata);
                 }
             });
             return false;
@@ -166,7 +159,8 @@
 
 {% block scripts %}
 {% endblock %}
-
+<div id="overlay"></div>
+<!-- Пoдлoжкa -->
 </body>
 
 </html>

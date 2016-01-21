@@ -8,13 +8,15 @@
     <div class="row panels">
         <!--Фото слева -->
         <div class="large-6 columns">
-            <img class="profile-photo" src="/{{ username }}/photo" width="400"/>
+            <img class="profile-photo" src="/{{ username }}/photo" width="400" alt="Фото в профиле"
+                 title="Изменить фото..."/>
         </div>
+        <!--Панель данных слева -->
         <div class="large-6 columns">
             <p class="welcome">Персональные данные</p>
         </div>
         <div class="large-3 columns">
-            <label class="">Имя пользователя:
+            <label class="">Логин:
                 <input type="text" placeholder='Логин, e-mail или номер телефона'/>
             </label>
         </div>
@@ -22,65 +24,75 @@
             <label class="">E-mail:
                 <input type="text" placeholder="Электронная почта" />
             </label>
-
         </div>
 
-
-    </div>
-
-
-    <div class="row panels">
-        <div class="large-4 columns">
-            <label>Input Label
-                <input type="text" placeholder="large-4.columns" />
+        <div class="large-3 columns ">
+            <label class="">Имя пользователя:
+                <input type="text" placeholder='Имя'/>
             </label>
         </div>
-        <div class="large-4 columns">
-            <label>Input Label
-                <input type="text" placeholder="large-4.columns" />
+        <div class="large-3 columns">
+            <label class="">Фамилия:
+                <input type="text" placeholder="Фамилия"/>
             </label>
         </div>
-        <div class="large-4 columns">
-            <div class="row collapse">
-                <label>Input Label</label>
-                <div class="small-9 columns">
-                    <input type="text" placeholder="small-9.columns" />
-                </div>
-                <div class="small-3 columns">
-                    <span class="postfix">.com</span>
-                </div>
-            </div>
+
+        <div class="large-6 columns">
+            <label class="">Tag-Line:
+                <input type="text" placeholder="Что у Вас нового?"/>
+            </label>
         </div>
-    </div>
-    <div class="row">
-        <div class="large-12 columns">
-            <label>Select Box
+        <!-- радиосвич компания или нет -->
+        <div class="large-6 columns">
+            <label>Кем Вы являетесь?</label>
+            <input type="radio" name="is_company" value="Частное лицо" id="simple_user" checked><label
+                for="simple_user">Частное лицо</label>
+            <input type="radio" name="is_company" value="Организация" id="company"><label
+                for="company">Организация</label>
+        </div>
+        <!--Данные компании -->
+        <div class="large-6 columns">
+            <label class="">Наименование организации:
+                <input type="text" placeholder="Полное юридическое наименование организации для документов"/>
+            </label>
+        </div>
+
+        <div class="large-2 columns">
+            <label class="">Расчетный счет:
+                <input type="text" placeholder="Электронная почта"/>
+            </label>
+        </div>
+
+        <div class="large-2 columns ">
+            <label class="">ИНН:
+                <input type="text" placeholder='Имя'/>
+            </label>
+        </div>
+        <div class="large-2 columns">
+            <label class="">БИК:
+                <input type="text" placeholder="Фамилия"/>
+            </label>
+        </div>
+
+        <div class="large-6 columns">
+            <label>Банк в котором открыт расчетный счёт:
                 <select>
-                    <option value="husker">Husker</option>
-                    <option value="starbuck">Starbuck</option>
-                    <option value="hotdog">Hot Dog</option>
-                    <option value="apollo">Apollo</option>
+                    <option value="SB">Волго-Вятский банк Сбербанка России</option>
+                    <option value="RKC">РКЦ банка России</option>
+                    <option value="Ellips">ОАО АКБ "Эллипс банк"</option>
                 </select>
             </label>
         </div>
+
+
     </div>
+
     <div class="row">
-        <div class="large-6 columns">
-            <label>Choose Your Favorite</label>
-            <input type="radio" name="pokemon" value="Red" id="pokemonRed"><label for="pokemonRed">Red</label>
-            <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label for="pokemonBlue">Blue</label>
-        </div>
-        <div class="large-6 columns">
+
+    <div class="large-6 columns">
             <label>Check these out</label>
             <input id="checkbox1" type="checkbox"><label for="checkbox1">Checkbox 1</label>
             <input id="checkbox2" type="checkbox"><label for="checkbox2">Checkbox 2</label>
-        </div>
-    </div>
-    <div class="row">
-        <div class="large-12 columns">
-            <label>Textarea Label
-                <textarea placeholder="small-12.columns"></textarea>
-            </label>
         </div>
     </div>
 
