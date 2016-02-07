@@ -1,26 +1,49 @@
 <div class="signin">
-    <h1>Вход для пользователей</h1>
+    <div class="row-50">
+        <div class="modal-content">
+            <h1>Вход для пользователей</h1>
 
-    <form name="login-form" id="login-form">
-        {% csrf_token %}
-        <input type="text" id="username" name="username" placeholder="Введите логин e-mail или номер телефона"
-               width=100>
-        <input type="password" id="password" name="password" placeholder="Ваш пароль">
-    </form>
-    <input class="button" type="submit" id="login-btn" value="Войти">
+            <form name="login-form" id="login-form">
+                {% csrf_token %}
+                <div class="simply-block">
+                    <div class="input-label">
+                        <span class="prefix">
+                            <i class="icon-label-user">!!!</i>
+                        </span>
+                    </div>
+                    <div class="column">
+                        <input type="text" id="username" name="username"
+                               placeholder="Введите логин e-mail или номер телефона"
+                               width=100>
+                    </div>
+                </div>
+                <div class="simply-block">
+                    <div class="input-label">
+                        <span class="prefix">
+                            <i class="icon-label-mail">!!!</i>
+                        </span>
+                    </div>
+                    <div class="column">
+                        <input type="password" id="password" name="password" placeholder="Ваш пароль">
+                    </div>
+                </div>
+            </form>
+            <input class="button" type="submit" id="login-btn" value="Войти">
+        </div>
+    </div>
 
+
+    <div class="row-50">
+        <div class="modal-content">
+            <h1>Еще не зарегистрированы?</h1>
+
+            <p>Зарегистрирйтесь в нашей системе для получиния более удобного управления заказами, счетами и другими
+                возможностями</p>
+            <br>
+            <input class="button" type="submit" id="reg-btn" onclick="loadregisterform()" value="Регистрация">
+        </div>
+    </div>
 </div>
-
-<div class="newuser">
-    <h1>Еще не зарегистрированы?</h1>
-
-    <p>Зарегистрирйтесь в нашей системе для получиния более удобного управления заказами, счетами и другими
-        возможностями</p><br>
-    <input class="button" type="submit" id="reg-btn" onclick="loadregisterform()" value="Регистрация">
-    </br>
-</div>
-
-<a href="#" class="modal-close">&#215;</a>
 
 <script>
     $(document).ready(function(){
@@ -81,11 +104,6 @@
         function checkRegisterData(){
             alert('Проверяем регистрацию!')
         }
-
-
-
-
     });
-
 </script>
 
