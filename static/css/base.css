@@ -814,7 +814,6 @@ input[type="checkbox"] {
     width: 100%;
     text-align: left;
     position: relative;
-    border-bottom: 1px solid #15191d;
 }
 
 .hero-content {
@@ -843,7 +842,7 @@ input[type="checkbox"] {
     /* for css animations */
     filter: alpha(opacity=0);
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-
+    opacity: 0;
     zoom: 1;
 }
 
@@ -868,7 +867,7 @@ input[type="checkbox"] {
     /* for css animations */
     filter: alpha(opacity=0);
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-
+    opacity: 0;
     zoom: 1;
 }
 
