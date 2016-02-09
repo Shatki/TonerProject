@@ -1,11 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'dashboard.html' %}
 {% load staticfiles %}
-
 
 {% block content %}
     <!--Профильная панель -->
     <p></p>
-    <div class="row panels">
+    <div class="row">
         <!--Фото слева -->
         <div class="large-6 columns">
             <img class="profile-photo" src="/{{ username }}/photo" width="400" alt="Фото в профиле"
@@ -85,15 +84,6 @@
         </div>
 
 
-    </div>
-
-    <div class="row">
-
-    <div class="large-6 columns">
-            <label>Check these out</label>
-            <input id="checkbox1" type="checkbox"><label for="checkbox1">Checkbox 1</label>
-            <input id="checkbox2" type="checkbox"><label for="checkbox2">Checkbox 2</label>
-        </div>
     </div>
 
 {% endblock content %}

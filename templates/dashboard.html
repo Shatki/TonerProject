@@ -1,231 +1,172 @@
 {% load staticfiles %}
-<!DOCTYPE HTML>
-<html lang=”ru”>
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="ru"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="ru"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!-->
+<html class="no-js" lang="ru"> <!--<![endif]-->
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--Обязательный файл стилей для каждого шаблона-->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css"/>
-    <!-- <script type="text/javascript"src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>-->
-    <script src={% static "js/vendor/jquery.min.js" %}></script>
-    <title>
-        {% block title %}
-        {% endblock %}
-    </title>
+
+    <!--- Basic Page Needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>Toner project</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="{% static 'css/default.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dialogs.css' %}">
+    <link rel="stylesheet" href="{% static 'css/media-queries.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+
+    <!-- Script
+    ================================================== -->
+    <script src="{% static 'js/modernizr.js' %}"></script>
+
+    <!-- Favicons
+     ================================================== -->
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}">
+
 </head>
 
 <body>
-<div class="page">
-    <header>
-        <div class="logo">
-            <a href="/">Toner project</a>
-        </div>
+<header id="dashboard">
 
-    </header>
+    <nav id="nav-wrap">
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
-        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
-        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
-        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
-        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
-        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
-        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
-        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
-        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
+        <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+        <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
-        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
-        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
-        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
-        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
-        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
-        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
-        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
-        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
-
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
-        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
-        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
-        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
-        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
-        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
-        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
-        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
-        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
-
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
-        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
-        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
-        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
-        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
-        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
-        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
-        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
-        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
-
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
-        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
-        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
-        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
-        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
-        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
-        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
-        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
-        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
-
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
-        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
-        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
-        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
-        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
-        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
-        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
-        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
-        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
-
-</div>
-
-{% block scripts %}
-{% endblock %}
-<div id="overlay"></div>
-<!-- Пoдлoжкa -->
-</body>
-
-<div class="contain-to-grid">
-    <nav class="top-bar">
-
-        {% block logo %}
-            <ul class="logo">
-                <li class="name">
-                    <h1><a href="/">Toner project</a></h1>
+        <ul id="nav" class="nav">
+            <li class="current"><a class="smoothscroll" href="#home">Home</a></li>
+            <li><a class="smoothscroll" href="#about">О компании</a></li>
+            <li><a class="smoothscroll" href="#resume">Услуги</a></li>
+            <li><a class="smoothscroll" href="#portfolio">Наши работы</a></li>
+            <li><a class="smoothscroll" href="#testimonials">Отзывы</a></li>
+            <li><a class="smoothscroll" href="#contact">Контакты</a></li>
+            {% if username %}
+                <li onclick="loadloginform()"><a href="/auth/logout/">Выйти ({{ username }})</a>
+                    <a href="/{{ username }}"><img class="photo" src="/{{ username }}/photo"/></a>
                 </li>
-                <!-- Заменить на логотип перед продакшеном-->
-                <li class="toggle-topbar menu-icon">
-                    <a href="#"></a>
+            {% else %}
+                <li onclick="loadloginform()"><a id="login" href="#">Вход в систему</a></li>
+            {% endif %}
+        </ul>
+        <!-- end #nav -->
+
+    </nav>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
+        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
+        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
+        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
+        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
+        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
+        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
+        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
+        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
+        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
+        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
+        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
+        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
+        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
+        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
+        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
+        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
+        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
+        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
+        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
+        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
+        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
+        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
+        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
+        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
+        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
+        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
+        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
+        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
+        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
+        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
+        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
+        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
+        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
+        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
+        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
+        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
+        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
+        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
+        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
+        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat
+        molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus
+        molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris
+        iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et
+        justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
+        orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla
+        at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate,
+        ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent
+        taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed.</p>
+
+</header>
+<!-- footer   ================================================== -->
+<footer>
+
+    <div class="row">
+
+        <div class="twelve columns">
+
+            <ul class="social-links">
+                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                <li><a href="#"><i class="fa fa-instagram"></i></a></li>
+                <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+                <li><a href="#"><i class="fa fa-skype"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                <li>&copy; 2014 CeeVee</li>
+                <li>Design by <a title="Styleshout" href="http://www.styleshout.com/">Styleshout</a></li>
+                <li>Sponsored by <a rel="nofollow"
+                                    href="http://www.a2hosting.com/?utm___source=styleshoutdemo&utm_medium=__cpm&utm_content=&utm_campaign=">A2Hosting</a>
                 </li>
             </ul>
-        {% endblock %}
 
-        <section class="top-bar-section">
-            <!-- Левая секция меню  <a href="/{{ username }}"><img class="photo" src="/{{ username }}/photo"/></a> -->
-            {% block menu %}
+        </div>
 
-            {% endblock %}
-
-            {% block auth %}
-                <ul onclick="loadloginform()" class="right">
-                    <li class="divider"></li>
-                    {% if username %}
-                        <li class="header_person">
-                            {% block photo %}
-
-                            {% endblock photo %}
-                        </li>
-                        <li>
-
-                            <a href="/auth/logout/">Выйти ({{ username }})</a>
-                        </li>
-                    {% else %}
-                        <li>
-                            <a id="login" href="#">Войти/Регистрация</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            {% endblock %}
-
-        </section>
-    </nav>
-</div>
-
-
-
-{% block topbar %}
-{% endblock %}
-
-{% block page %}
-    <div class="row">
-        {% block content %}
-            {% block article %}
-            {% endblock %}
-        {% endblock %}
-
-        {% block sidebar %}
-        {% endblock %}
+        <div id="go-top"><a class="smoothscroll" title="Back to Top" href="#home"><i class="icon-up-open"></i></a></div>
 
     </div>
-{% endblock %}
 
-{% block footer %}
-    <div class="row">
-        {% block copyright %}
-            <!--Подвал сайта-->
-            <div align="center" class="copyright"> 2015 год. Все права защищены.
-                <h6>Cайт разработал<a href="https://vk.com/selidim" target="_blank"> Селивёрстов Дмитрий</a></h6>
-            </div>
-            <!--/Подвал сайта-->
-        {% endblock %}
-    </div>
-{% endblock %}
+</footer>
+<!-- Footer End-->
+
+<!-- Java Script   ================================================== -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="{% static 'js/jquery-1.10.2.min.js' %}"><\/script>')</script>
+<script type="text/javascript" src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
+
+<script src="{% static 'js/jquery.flexslider.js' %}"></script>
+<script src="{% static 'js/waypoints.js' %}"></script>
+<script src="{% static 'js/jquery.fittext.js' %}"></script>
+<script src="{% static 'js/magnific-popup.js' %}"></script>
+<script src="{% static 'js/init.js' %}"></script>
+</body>
 
 </html>
-
-<!-- Include default block -->
-{% block authform %}
-    <div id="login" class="modal-dialog">
-        <div id="signin-form" class="modal-form"></div>
-        <a href="#" title="Закрыть" class="modal-close">&times</a>
-    </div>
-
-{% endblock %}
-
-
-{% block mainscripts %}
-    <!--Для работы модальной форм-->
-    <script type="text/javascript">
-        $(document).ready(function () { // вся мaгия пoсле зaгрузки стрaницы
-            $('a#login').click(function (event) { // лoвим клик пo ссылки с id="login"
-                event.preventDefault(); // выключaем стaндaртную рoль элементa
-                $('#overlay').fadeIn(400, // снaчaлa плaвнo пoкaзывaем темную пoдлoжку
-                        function () { // пoсле выпoлнения предъидущей aнимaции
-                            $('.modal-dialog')
-                                    .css('display', 'block') // убирaем у мoдaльнoгo oкнa display: none;
-                                    .animate({opacity: 1, top: '50%'}, 200); // плaвнo прибaвляем прoзрaчнoсть oднoвременнo сo съезжaнием вниз
-                        });
-            });
-            /* Зaкрытие мoдaльнoгo oкнa, тут делaем тo же сaмoе нo в oбрaтнoм пoрядке */
-            $('.modal-close, #overlay').click(function () { // лoвим клик пo крестику или пoдлoжке
-                $('.modal-dialog')
-                        .animate({opacity: 0, top: '45%'}, 200,  // плaвнo меняем прoзрaчнoсть нa 0 и oднoвременнo двигaем oкнo вверх
-                        function () { // пoсле aнимaции
-                            $(this).css('display', 'none'); // делaем ему display: none;
-                            $('#overlay').fadeOut(400); // скрывaем пoдлoжку
-                        }
-                );
-            });
-        });
-
-        function loadloginform() {
-            $.ajax({
-                type: "GET",
-                url: "/auth/login/form/",
-                success: function (mydata) {
-                    $("#signin-form").html(mydata);
-                }
-            });
-            return false;
-        }
-
-        function loadregisterform() {
-            $.ajax({
-                type: "GET",
-                url: "/auth/register/form/",
-                success: function (mydata) {
-                    $("#signin-form").html(mydata);
-                }
-            });
-            return false;
-        }
-
-
-    </script>
-{% endblock %}
-

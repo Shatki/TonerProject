@@ -1,49 +1,42 @@
-<div class="signin">
-    <div class="row-50">
-        <div class="modal-content">
-            <h1>Вход для пользователей</h1>
+<div class="row">
+    <div class="six columns">
+        <div>
+            <label>Вход для пользователей</label>
 
-            <form name="login-form" id="login-form">
-                {% csrf_token %}
-                <div class="simply-block">
-                    <div class="input-label">
-                        <span class="prefix">
-                            <i class="icon-label-user">!!!</i>
-                        </span>
-                    </div>
-                    <div class="column">
-                        <input type="text" id="username" name="username"
-                               placeholder="Введите логин e-mail или номер телефона"
-                               width=100>
-                    </div>
-                </div>
-                <div class="simply-block">
-                    <div class="input-label">
-                        <span class="prefix">
-                            <i class="icon-label-mail">!!!</i>
-                        </span>
-                    </div>
-                    <div class="column">
-                        <input type="password" id="password" name="password" placeholder="Ваш пароль">
-                    </div>
-                </div>
-            </form>
-            <input class="button" type="submit" id="login-btn" value="Войти">
+            <div>
+                <form name="login-form" id="login-form">
+                    {% csrf_token %}
+                    <input type="text" id="username" name="username"
+                           placeholder="Введите логин e-mail или номер телефона"
+                           width=100>
+                    <input type="password" id="password" name="password" placeholder="Ваш пароль">
+                </form>
+            </div>
         </div>
     </div>
 
 
-    <div class="row-50">
-        <div class="modal-content">
-            <h1>Еще не зарегистрированы?</h1>
+    <div class="six columns">
+        <div>
+            <label>Еще не зарегистрированы?</label>
 
-            <p>Зарегистрирйтесь в нашей системе для получиния более удобного управления заказами, счетами и другими
-                возможностями</p>
-            <br>
-            <input class="button" type="submit" id="reg-btn" onclick="loadregisterform()" value="Регистрация">
+            <div>
+                <p>Зарегистрируйтесь в нашей системе для получиния более удобного управления заказами, счетами и другими
+                    возможностями</p>
+            </div>
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="six columns">
+        <input class="button" type="submit" id="login-btn" value="Войти">
+    </div>
+    <div class="six columns">
+        <input class="button" type="submit" id="reg-btn" onclick="loadregisterform()" value="Регистрация">
+    </div>
+</div>
+
+
 
 <script>
     $(document).ready(function(){

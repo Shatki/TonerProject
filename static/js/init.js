@@ -6,6 +6,72 @@
 
 jQuery(document).ready(function ($) {
 
+    "use strict";
+
+    /*---------------------------------------------------- */
+    /* Preloader
+     ------------------------------------------------------ */
+    $(window).load(function () {
+
+        // will first fade out the loading animation
+        $("#loader").fadeOut("slow", function () {
+
+            // will fade out the whole DIV that covers the website.
+            $("#preloader").delay(300).fadeOut("slow");
+
+        });
+
+    });
+
+
+    /*----------------------------------------------------*/
+    /* Flexslider
+     /*----------------------------------------------------*/
+    $(window).load(function () {
+
+        $('#hero-slider').flexslider({
+            namespace: "flex-",
+            controlsContainer: ".hero-container",
+            animation: 'fade',
+            controlNav: true,
+            directionNav: false,
+            smoothHeight: true,
+            slideshowSpeed: 7000,
+            animationSpeed: 600,
+            randomize: false,
+            before: function (slider) {
+                $(slider).find(".animated").each(function () {
+                    $(this).removeAttr("class");
+                });
+            },
+            start: function (slider) {
+                $(slider).find(".flex-active-slide")
+                    .find("h1").addClass("animated fadeInDown show")
+                    .next().addClass("animated fadeInUp show");
+
+                $(window).trigger('resize');
+            },
+            after: function (slider) {
+                $(slider).find(".flex-active-slide")
+                    .find("h1").addClass("animated fadeInDown show")
+                    .next().addClass("animated fadeInUp show");
+            }
+        });
+
+        $('#testimonial-slider').flexslider({
+            namespace: "flex-",
+            controlsContainer: "",
+            animation: 'slide',
+            controlNav: true,
+            directionNav: false,
+            smoothHeight: true,
+            slideshowSpeed: 7000,
+            animationSpeed: 600,
+            randomize: false,
+        });
+
+    });
+
     /*----------------------------------------------------*/
     /* FitText Settings
      ------------------------------------------------------ */
@@ -115,22 +181,6 @@ jQuery(document).ready(function ($) {
     $(document).on('click', '.popup-modal-dismiss', function (e) {
         e.preventDefault();
         $.magnificPopup.close();
-    });
-
-
-    /*----------------------------------------------------*/
-    /*	Flexslider
-     /*----------------------------------------------------*/
-    $('.flexslider').flexslider({
-        namespace: "flex-",
-        controlsContainer: ".flex-container",
-        animation: 'slide',
-        controlNav: true,
-        directionNav: false,
-        smoothHeight: true,
-        slideshowSpeed: 7000,
-        animationSpeed: 600,
-        randomize: false,
     });
 
     /*----------------------------------------------------*/
