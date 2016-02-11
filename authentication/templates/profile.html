@@ -1,5 +1,26 @@
-{% extends 'dashboard.html' %}
+{% extends 'base.html' %}
 {% load staticfiles %}
+
+{% block nav %}
+    <ul id="nav" class="nav">
+        <li><a class="logo" href="/">Toner Project</a></li>
+        <li class="current"><a class="smoothscroll" href="#home">Home</a></li>
+        <li><a class="smoothscroll" href="#about">О компании</a></li>
+        <li><a class="smoothscroll" href="#resume">Услуги</a></li>
+        <li><a class="smoothscroll" href="#portfolio">Наши работы</a></li>
+        <li><a class="smoothscroll" href="#testimonials">Отзывы</a></li>
+        <li><a class="smoothscroll" href="#contact">Контакты</a></li>
+        {% if username %}
+            <li><a href="/auth/logout/">Выйти</a>
+                <a href="/{{ username }}"><img class="photo" title="{{ username }}" src="/{{ username }}/photo"/></a>
+            </li>
+        {% else %}
+            <li id="loadloginform"><a id="login" href="#">Вход в систему</a></li>
+        {% endif %}
+    </ul>
+{% endblock nav %}
+
+
 
 {% block content %}
     <!--Профильная панель -->
@@ -83,7 +104,5 @@
             </label>
         </div>
 
-
     </div>
-
 {% endblock content %}
