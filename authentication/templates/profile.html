@@ -22,87 +22,90 @@
 
 
 
-{% block content %}
+{% block banner %}
     <!--Профильная панель -->
-    <p></p>
-    <div class="row">
-        <!--Фото слева -->
-        <div class="large-6 columns">
-            <img class="profile-photo" src="/{{ username }}/photo" width="400" alt="Фото в профиле"
-                 title="Изменить фото..."/>
-        </div>
-        <!--Панель данных слева -->
-        <div class="large-6 columns">
-            <p class="welcome">Персональные данные</p>
-        </div>
-        <div class="large-3 columns">
-            <label class="">Логин:
-                <input type="text" placeholder='Логин, e-mail или номер телефона'/>
-            </label>
-        </div>
-        <div class="large-3 columns">
-            <label class="">E-mail:
-                <input type="text" placeholder="Электронная почта" />
-            </label>
-        </div>
+    <div id="person" class="row">
+        <div class="twelve columns">
+            <div class="panel">
+                <!--Фото слева -->
+                <div class="four columns">
+                    <img class="profile-photo" src="/{{ username }}/photo" alt="Фото в профиле"
+                         title="Изменить фото..."/>
+                </div>
+                <!--Панель данных слева -->
+                <div class="eight columns">
+                    <h1>Персональные данные</h1>
+                </div>
+                <div class="four columns">
+                    <label class="">Логин*:
+                        <input type="text" placeholder='Логин, e-mail или номер телефона'/>
+                    </label>
+                </div>
+                <div class="four columns">
+                    <label class="">E-mail*:
+                        <input type="text" placeholder="Электронная почта"/>
+                    </label>
+                </div>
 
-        <div class="large-3 columns ">
-            <label class="">Имя пользователя:
-                <input type="text" placeholder='Имя'/>
-            </label>
-        </div>
-        <div class="large-3 columns">
-            <label class="">Фамилия:
-                <input type="text" placeholder="Фамилия"/>
-            </label>
-        </div>
+                <div class="four columns ">
+                    <label class="">Имя пользователя*:
+                        <input type="text" placeholder='Имя'/>
+                    </label>
+                </div>
+                <div class="four columns">
+                    <label class="">Фамилия*:
+                        <input type="text" placeholder="Фамилия"/>
+                    </label>
+                </div>
 
-        <div class="large-6 columns">
-            <label class="">Tag-Line:
-                <input type="text" placeholder="Что у Вас нового?"/>
-            </label>
-        </div>
-        <!-- радиосвич компания или нет -->
-        <div class="large-6 columns">
-            <label>Кем Вы являетесь?</label>
-            <input type="radio" name="is_company" value="Частное лицо" id="simple_user" checked><label
-                for="simple_user">Частное лицо</label>
-            <input type="radio" name="is_company" value="Организация" id="company"><label
-                for="company">Организация</label>
-        </div>
-        <!--Данные компании -->
-        <div class="large-6 columns">
-            <label class="">Наименование организации:
-                <input type="text" placeholder="Полное юридическое наименование организации для документов"/>
-            </label>
-        </div>
+                <div class="twelve columns">
+                    <label class="">Tag-Line:
+                        <input type="text" placeholder="Что у Вас нового?"/>
+                    </label>
+                </div>
+                <!-- радиосвич компания или нет -->
+                <div class="four columns">
+                    <label>Кем Вы являетесь?</label>
+                    <input type="radio" name="is_company" value="Частное лицо" id="simple_user" checked><label
+                        for="simple_user">Частное лицо</label>
+                    <input type="radio" name="is_company" value="Организация" id="company"><label
+                        for="company">Организация</label>
+                </div>
+                <!--Данные компании -->
+                <div class="large-6 columns">
+                    <label class="">Наименование организации:
+                        <input type="text" placeholder="Полное юридическое наименование организации для документов"/>
+                    </label>
+                </div>
 
-        <div class="large-2 columns">
-            <label class="">Расчетный счет:
-                <input type="text" placeholder="Электронная почта"/>
-            </label>
-        </div>
+                <div class="large-2 columns">
+                    <label class="">Расчетный счет:
+                        <input type="text" placeholder="Электронная почта"/>
+                    </label>
+                </div>
 
-        <div class="large-2 columns ">
-            <label class="">ИНН:
-                <input type="text" placeholder='Имя'/>
-            </label>
-        </div>
-        <div class="large-2 columns">
-            <label class="">БИК:
-                <input type="text" placeholder="Фамилия"/>
-            </label>
-        </div>
+                <div class="large-2 columns ">
+                    <label class="">ИНН:
+                        <input type="text" placeholder='Имя'/>
+                    </label>
+                </div>
+                <div class="large-2 columns">
+                    <label class="">БИК:
+                        <input type="text" placeholder="Фамилия"/>
+                    </label>
+                </div>
 
-        <div class="large-6 columns">
-            <label>Банк в котором открыт расчетный счёт:
-                <select>
-                    <option value="SB">Волго-Вятский банк Сбербанка России</option>
-                    <option value="RKC">РКЦ банка России</option>
-                    <option value="Ellips">ОАО АКБ "Эллипс банк"</option>
-                </select>
-            </label>
+                <div class="large-6 columns">
+                    <label>Банк в котором открыт расчетный счёт:
+                        <select>
+                            <option value="SB">Волго-Вятский банк Сбербанка России</option>
+                            <option value="RKC">РКЦ банка России</option>
+                            <option value="Ellips">ОАО АКБ "Эллипс банк"</option>
+                        </select>
+                    </label>
+                </div>
         </div>
-
+        </div>
     </div>
-{% endblock content %}
+
+{% endblock banner %}

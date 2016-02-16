@@ -55,13 +55,12 @@
 
                 </nav>
                 <!-- end #nav-wrap -->
-
-
-                <div class="row banner" id="hero">
+                <div class="banner">
                     {% block banner %}
                         <!-- Banner block -->
                     {% endblock banner %}
                 </div>
+
             </header>
             <!-- Header End -->
         {% endblock header %}
@@ -69,6 +68,11 @@
         {% block content %}
             <!-- Content block here -->
         {% endblock content %}
+
+        {% block footer %}
+            <!-- Footer block here -->
+        {% endblock footer %}
+
 
         <!-- Пoдлoжкa -->
         <div id="overlay"></div>
