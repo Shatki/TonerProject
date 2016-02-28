@@ -4,7 +4,10 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
-from .models import Account
+from .models import Account, Bank
+
+admin.site.register(Bank)
+
 
 class AccountCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
@@ -38,6 +41,16 @@ class AccountCreationForm(forms.ModelForm):
             user.save()
         return user
 
+
+class BankChangeForm(forms.ModelForm):
+    class Meta:
+        model = Bank
+        fields = ('bank_name',
+                  'bank_address',
+                  'bank_account',
+                  'bank_bik',)
+
+
 class AccountChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(label='password', help_text='There is no way to see this password.')
 
@@ -54,9 +67,21 @@ class AccountChangeForm(forms.ModelForm):
     def clean_password(self):
         return self.initial['password']
 
+
+class BankAdmin(UserAdmin):
+    list_display = ('bank_name',
+                    'bank_address',
+                    'bank_account',
+                    'bank_bik',)
+    ordering = ('bank_name',)
+
+
+
 @admin.register(Account)
 class AccountAdmin(UserAdmin):
-    list_display = ('username',
+    list_display = ('company_name',
+                    'company_phone',
+                    'username',
                     'email',
                     'is_staff',
                     'is_admin',
@@ -68,13 +93,17 @@ class AccountAdmin(UserAdmin):
                    'is_company',
                    )
     fieldsets = (
-             (None, {'fields': ('email', 'username', 'password')}),
-            ('Personal info', {'fields': ('email', 'first_name', 'last_name', 'company_name',
-                                             'user_photo', 'tagline')}),
-            ('Permissions', {'fields': ('is_admin', 'is_staff', 'is_company', 'groups', 'user_permissions')}),
-            ('Important dates', {'fields': ('last_login',)}),
-    )
+        (None, {'fields': ('email', 'username', 'password')}),
+        ('Personal info', {'fields': ('email', 'first_name', 'last_name',
+                                      'user_photo', 'tagline')}),
+        ('Company info', {'fields': ('company_name', 'company_boss_first_name',
+                                     'company_boss_second_name', 'company_boss_last_name',
+                                     'company_inn', 'company_ogrn', 'company_okpo', 'company_okato',
+                                     'company_phone', 'user_bank', 'user_bank_account')}),
 
+        ('Permissions', {'fields': ('is_admin', 'is_staff', 'is_company', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login',)}),
+    )
 
     add_fieldsets = (
         (None, {
@@ -92,5 +121,5 @@ class AccountAdmin(UserAdmin):
     form = AccountChangeForm
     add_form = AccountCreationForm
 
-admin.site.unregister(Group)
 
+admin.site.unregister(Group)

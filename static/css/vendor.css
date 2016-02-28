@@ -4089,3 +4089,220 @@ img.mfp-img {
     -webkit-animation-name: slideOutUp;
     animation-name: slideOutUp;
 }
+
+/*
+ * Selecter v3.2.4 - 2015-04-04
+ * A jQuery plugin for replacing default select elements. Part of the Formstone Library.
+ * http://classic.formstone.it/selecter/
+ *
+ * Copyright 2015 Ben Plum; MIT Licensed
+ */
+
+.selecter {
+    position: relative;
+    display: block;
+    padding: 0;
+    margin: 0;
+    z-index: 1;
+    width: 100%;
+}
+
+.selecter:focus {
+    background: #fff url(../img/select-arrow-open.png) 98% center no-repeat;
+    box-shadow: none;
+    outline: none;
+}
+
+.selecter,
+.selecter * {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+.selecter,
+.selecter *,
+.selecter *:before,
+.selecter *:after {
+    box-sizing: border-box;
+}
+
+.selecter-element {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    z-index: -1;
+}
+
+.selecter-element,
+.selecter-element:focus {
+    outline: none;
+    color: #777;
+    background: #fff url(../img/select-arrow-open.png) 98% center no-repeat;
+}
+
+.no-opacity .selecter-element {
+    left: -999999px;
+}
+
+.selecter-selected {
+    position: relative;
+    background: #fff url(../img/select-arrow-open.png) 98% center no-repeat;
+    border: 1px solid #cccccc;
+    color: #333;
+    cursor: pointer;
+    display: block;
+    font-size: 16px;
+    margin: 0;
+    overflow: hidden;
+    padding: 15px;
+    text-overflow: clip;
+    z-index: 2;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1) inset;
+}
+
+.selecter-selected:after {
+}
+
+.no-touch .selecter-selected:hover {
+    background: #f5f5f5 url(../img/select-arrow-open.png) 98% center no-repeat;
+    color: #777;
+}
+
+.no-touch .selecter.disabled .selecter-selected:hover {
+    color: #777;
+}
+
+.selecter-options {
+    width: 100%;
+    max-height: 260px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: none;
+    margin: 0;
+    overflow: auto;
+    overflow-x: hidden;
+    padding: 0;
+    z-index: 50;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.selecter-options.scroller {
+    position: absolute;
+}
+
+.no-opacity .selecter-options {
+    width: auto;
+}
+
+.selecter-group {
+    border-bottom: 1px solid #cccccc;
+    color: #999999;
+    display: block;
+    font-size: 16px;
+    padding: 15px;
+    text-transform: uppercase;
+}
+
+.selecter-item {
+    width: 100%;
+    background: #ffffff;
+    border-bottom: 1px solid #cccccc;
+    color: #222222;
+    cursor: pointer;
+    display: block;
+    font-size: 16px;
+    margin: 0;
+    overflow: hidden;
+    padding: 15px;
+    text-decoration: none;
+    text-overflow: ellipsis;
+}
+
+.selecter-item.placeholder {
+    display: none;
+}
+
+.selecter-item.selected {
+    background: #eeeeee;
+}
+
+.selecter-item.disabled {
+    color: #999999;
+    cursor: default;
+}
+
+.selecter-item:first-child {
+    border-radius: 0;
+}
+
+.selecter-item:last-child {
+    border-bottom: 0;
+}
+
+.no-touch .selecter-item:hover,
+.no-touch .selecter-item.selected:hover {
+    color: #777;
+    background: #f5f5f5;
+
+}
+
+.selecter-item.disabled,
+.no-touch .selecter-item.disabled:hover {
+    color: #cccccc;
+    background-color: #ffffff;
+}
+
+.selecter.open {
+    z-index: 3;
+}
+
+.selecter.open .selecter-selected {
+    z-index: 51;
+    background: #f5f5f5 url(../img/select-arrow-close.png) 98% center no-repeat;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.selecter.cover .selecter-options {
+    border-width: 1px;
+    top: 0;
+}
+
+.selecter.cover .selecter-options .selecter-item.first {
+}
+
+.selecter.cover.open .selecter-selected {
+    z-index: 49;
+}
+
+.selecter.bottom .selecter-options {
+    top: auto;
+    bottom: 100%;
+    border-width: 1px 1px 0;
+}
+
+.selecter.bottom .selecter-item:last-child {
+    border: none;
+}
+
+.selecter.bottom .cover .selecter-options {
+    top: auto;
+    bottom: 0;
+}
+
+.selecter.multiple .selecter-options {
+    width: 100%;
+    position: static;
+    border-width: 1px;
+    display: block;
+    box-shadow: none;
+}
+
+.selecter-options.scroller .scroller-content {
+    max-height: 260px;
+    padding: 0;
+}

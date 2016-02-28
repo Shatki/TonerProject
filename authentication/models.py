@@ -3,6 +3,17 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.validators import RegexValidator
 
 
+class Bank(models.Model):
+    # alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message=u'Только буквенноцифровые символы допустимы.')
+    numeric = RegexValidator(r'^[0-9]*$', message=u'Только цифровые символы допустимы.')
+    bank_name = models.CharField(unique=True, max_length=100, db_index=True, blank=False)
+    bank_address = models.CharField(max_length=100)  # адрес банка
+    bank_account = models.CharField(unique=True, max_length=20, db_index=True, validators=[numeric])  # Кор счет
+    bank_bik = models.CharField(unique=True, max_length=9, db_index=True, validators=[numeric])  # Кор счет
+    # для отображения в списках
+    def __str__(self):
+        return self.bank_name
+
 # Класс менеджера должен переопределить методы create_user() и create_superuser().
 class AccountManager(BaseUserManager):
     def create_user(self, username, password=None, **kwargs):
@@ -33,24 +44,38 @@ class AccountManager(BaseUserManager):
 
 class Account(AbstractBaseUser, PermissionsMixin):
     alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message=u'Только буквенноцифровые символы допустимы.')
+    numeric = RegexValidator(r'^[0-9]*$', message=u'Только цифровые символы допустимы.')
+    phone = RegexValidator(regex='^\d{10}$', message=u'Укажите правильный номер телефона')
 
+    #### ДАННЫЕ ПОЛЬЗОВАТЕЛЯ #########
     # username нам  необходим для отображении записей и страницы действий
     username = models.CharField(unique=True, max_length=30, db_index=True, validators=[alphanumeric])
-
     #Авторизация будет происходить по E-mail
     email = models.EmailField(verbose_name=u'Электронная почта', unique=True, max_length=255)
-
-
     # Имя - не является обязательным
     first_name = models.CharField(max_length=40, blank=True)
     # Фамилия - также не обязательна
     last_name = models.CharField(max_length=40, blank=True)
-    # Наименование компании - не обязательна для физ лиц
-    company_name = models.CharField(max_length=100, blank=True)
-
     # слоган или статус - куда же без него. Наследство от соц. сетей
     tagline = models.CharField(max_length=140, blank=True)
+    user_photo = models.FileField(upload_to='/profile/', blank=False, default='/profile/defaultprofileimage.jpg')
 
+    #### ДАННЫЕ Организации #########
+    # Наименование компании - не обязательна для физ лиц
+    company_name = models.CharField(max_length=100, blank=True)
+    company_boss_first_name = models.CharField(max_length=40, blank=True)  # Имя
+    company_boss_second_name = models.CharField(max_length=40, blank=True)  # Отчество
+    company_boss_last_name = models.CharField(max_length=40, blank=True)  # Фамилия
+    company_inn = models.CharField(unique=True, max_length=12, db_index=True, validators=[numeric])  # ИНН
+    company_ogrn = models.CharField(unique=True, max_length=15, db_index=True, validators=[numeric])  # ОГРН
+    company_okpo = models.CharField(max_length=9, db_index=True, validators=[numeric])  # ОКПО
+    company_okato = models.CharField(max_length=11, db_index=True, validators=[numeric])  # ОКАТО
+    company_address = models.CharField(max_length=100)
+    company_phone = models.CharField(max_length=10, validators=[phone])
+    user_bank = models.ForeignKey(Bank)
+    user_bank_account = models.CharField(unique=True, max_length=20, db_index=True, validators=[numeric])  # счет
+
+    #### АТРИБУТЫ #########
     # Атрибут суперпользователя
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False, null=False)
@@ -63,7 +88,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
-    user_photo = models.FileField(upload_to='/profile/', blank=False, default='/profile/defaultprofileimage.jpg')
+
 
     objects = AccountManager()
 
@@ -82,6 +107,12 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         return ' '.join([self.first_name, self.last_name])
 
+    def get_boss_full_name(self):
+        return ' '.join([self.company_boss_first_name, self.company_boss_second_name, self.company_boss_last_name])
+
+    def get_boss_short_name(self):
+        return ' '.join([self.company_boss_first_name, self.company_boss_second_name])
+
     def get_short_name(self):
         return self.first_name
 
@@ -93,3 +124,4 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def get_user_photo(self):
         return self.user_photo
+

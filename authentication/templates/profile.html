@@ -68,7 +68,7 @@
 
                     <div class="eight columns">
                         <label class="">Tag-Line:
-                            <input type="text" placeholder="Что у Вас нового?"/>
+                            <input type="text" placeholder="Тут можно оставить себе заметку или задачу на будущее"/>
                         </label>
                     </div>
 
@@ -84,10 +84,36 @@
                     </div>
 
                     <div class="three columns ">
-                        <label class="">ИНН:
-                            <input type="text" placeholder='ИНН'/>
+                        <label class="">Телефон:
+                            <input type="text" placeholder='Контактный телефон'/>
                         </label>
                     </div>
+
+                    <div class="four columns ">
+                        <label class="">Имя руководителя:
+                            <input type="text" placeholder='Имя'/>
+                        </label>
+                    </div>
+
+                    <div class="four columns ">
+                        <label class="">Отчество руководителя:
+                            <input type="text" placeholder='Отчество'/>
+                        </label>
+                    </div>
+
+                    <div class="four columns">
+                        <label class="">Фамилия руководителя:
+                            <input type="text" placeholder="Фамилия"/>
+                        </label>
+                    </div>
+
+                    <div class="twelve columns">
+                        <label class="">Юридический организации:
+                            <input type="text"
+                                   placeholder="Юридический адрес организации для документов"/>
+                        </label>
+                    </div>
+
 
                     <div class="four columns">
                         <label class="">Расчетный счет:
@@ -96,17 +122,11 @@
                     </div>
 
 
-                    <div class="two columns">
-                        <label class="">БИК:
-                            <input type="text" placeholder="БИК"/>
-                        </label>
-                    </div>
-
-                    <div class="six columns">
+                    <div class="eight columns">
                         <label>Банк в котором открыт расчетный счёт: </label>
 
                         <form action="#">
-                            <select class="turnintodropdown">
+                            <select class="selecter">
                                 <option value="SB">Волго-Вятский банк Сбербанка России</option>
                                 <option value="RKC">РКЦ банка России</option>
                                 <option value="Ellips">ОАО АКБ "Эллипс банк"</option>
@@ -114,7 +134,45 @@
 
                         </form>
                     </div>
+
+                    <div class="three columns ">
+                        <label class="">ИНН:
+                            <input type="text" placeholder='ИНН'/>
+                        </label>
+                    </div>
+
+
+                    <div class="two columns">
+                        <label class="">КПП:
+                            <input type="text" placeholder="КПП"/>
+                        </label>
+                    </div>
+
+
+                    <div class="three columns">
+                        <label class="">ОГРН:
+                            <input type="text" placeholder="ОГРН"/>
+                        </label>
+                    </div>
+
+
+                    <div class="two columns">
+                        <label class="">ОКПО:
+                            <input type="text" placeholder="ОКПО"/>
+                        </label>
+                    </div>
+
+                    <div class="two columns">
+                        <label class="">ОКАТО:
+                            <input type="text" placeholder="ОКАТО"/>
+                        </label>
+                    </div>
                 </div>
+
+                <div class="four columns">
+                    <input class="button" type="submit" id="save-btn" value="Сохранить изменения">
+                </div>
+
             </div>
         </div>
     </div>
@@ -123,13 +181,19 @@
     <script type="text/javascript">
         function diplay_hide(blockId) {
             if ($(blockId).css('display') == 'none') {
-                $(blockId).animate({height: 'show'}, 1000);
+                $(blockId).animate({
+                    height: 'show'
+                }, 2000);
             }
             else {
-                $(blockId).animate({height: 'hide'}, 1000);
+                $(blockId).animate({
+                    height: 'hide'
+
+                }, 2000);
             }
         }
     </script>
+
 
 
 {% endblock banner %}

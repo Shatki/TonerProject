@@ -251,6 +251,11 @@ jQuery(document).ready(function ($) {
         return false;
     });
 
+    /*----------------------------------------------------*/
+    /*	SELICTER ----> select sustom
+     ------------------------------------------------------*/
+    $('select').selecter();
+
 });
 
 
