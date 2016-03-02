@@ -10,9 +10,9 @@
         <li><a class="smoothscroll" href="#portfolio">Наши работы</a></li>
         <li><a class="smoothscroll" href="#testimonials">Отзывы</a></li>
         <li><a class="smoothscroll" href="#contact">Контакты</a></li>
-        {% if username %}
+        {% if userprofile.username %}
             <li><a href="/auth/logout/">Выйти</a>
-                <a href="/{{ username }}"><img class="photo" title="{{ username }}" src="/{{ username }}/photo"/></a>
+                <a href="/{{ username }}"><img class="photo" title="{{ userprofile.username }}" src="/{{ userprofile.username }}/photo"/></a>
             </li>
         {% else %}
             <li id="loadloginform"><a id="login" href="#">Вход в систему</a></li>
@@ -30,11 +30,15 @@
                 <div id="person-block">
                     <!--Фото слева -->
                     <div class="four columns">
-                        <img class="profile-photo" src="/{{ username }}/photo" alt="Фото в профиле"
+                        <img class="profile-photo" src="/{{ userprofile.username }}/photo" alt="Профильное фото"
                              title="Изменить фото..."/>
                         <!-- радиосвич компания или нет -->
 
                         <input class="checkbox" type="checkbox" onchange="diplay_hide('#company-block');return false;"
+                               name="userprofile_is_company"
+                               {% if userprofile.is_company %}
+                                    checked
+                               {% endif %}
                                id="iscompany" value="Частное лицо">
                         <label for="person">Я представляю организацию</label>
 
@@ -46,31 +50,31 @@
                     </div>
                     <div class="four columns">
                         <label class="">Логин*:
-                            <input type="text" placeholder='Логин, e-mail или номер телефона'/>
+                            <input type="text" name="userprofile_username" value="{{ userprofile.username }}" placeholder='Логин, e-mail или номер телефона'/>
                         </label>
                     </div>
                     <div class="four columns">
                         <label class="">E-mail*:
-                            <input type="text" placeholder="Электронная почта"/>
+                            <input type="text" name="userprofile_email" value="{{ userprofile.email }}" placeholder="Электронная почта"/>
                         </label>
                     </div>
 
                     <div class="four columns ">
                         <label class="">Имя пользователя*:
-                            <input type="text" name="user_first_name" value='{{ user_first_name }}' placeholder='Имя'
+                            <input type="text" name="userprofile_first_name" value='{{ userprofile.first_name }}' placeholder='Имя'
                                    autocomplete="on">
                         </label>
                     </div>
 
                     <div class="four columns">
                         <label class="">Фамилия*:
-                            <input type="text" placeholder="Фамилия"/>
+                            <input type="text" name="userprofile_last_name" value="{{ userprofile.last_name }}" placeholder="Фамилия"/>
                         </label>
                     </div>
 
                     <div class="eight columns">
                         <label class="">Tag-Line:
-                            <input type="text" placeholder="Тут можно оставить себе заметку или задачу на будущее"/>
+                            <input type="text" name="userprofile_tagline" value="{{ userprofile.tagline }}" placeholder="Тут можно оставить себе заметку или задачу на будущее"/>
                         </label>
                     </div>
 
@@ -80,38 +84,42 @@
                     <!--Данные компании -->
                     <div class="nine columns">
                         <label class="">Полное наименование организации:
-                            <input type="text"
+                            <input type="text" name = "userprofile_company_name" value="{{ userprofile.company_name }}"
                                    placeholder="Полное юридическое наименование организации для документов"/>
                         </label>
                     </div>
 
-                    <div class="three columns ">
+                    <div class="three columns">
                         <label class="">Телефон:
-                            <input type="text" placeholder='Контактный телефон'/>
+                            <input type="text" name="userprofile_company_phone" placeholder='Контактный телефон'
+                                   value="{{ userprofile.company_phone }}"/>
                         </label>
                     </div>
 
                     <div class="four columns ">
                         <label class="">Имя руководителя:
-                            <input type="text" placeholder='Имя'/>
+                            <input type="text" name="userprofile_company_boss_first_name" placeholder='Имя'
+                                   value="{{ userprofile.company_boss_first_name }}"/>
                         </label>
                     </div>
 
                     <div class="four columns ">
                         <label class="">Отчество руководителя:
-                            <input type="text" placeholder='Отчество'/>
+                            <input type="text" name="userprofile_company_boss_second_name" placeholder='Отчество'
+                             value="{{ userprofile.company_boss_second_name }}"/>
                         </label>
                     </div>
 
                     <div class="four columns">
                         <label class="">Фамилия руководителя:
-                            <input type="text" placeholder="Фамилия"/>
+                            <input type="text" name="userprofile_company_boss_last_name" placeholder="Фамилия"
+                            value="{{ userprofile.company_boss_last_name }}"/>
                         </label>
                     </div>
 
                     <div class="twelve columns">
                         <label class="">Юридический организации:
-                            <input type="text"
+                            <input type="text" name="userprofile_company_address" value="{{ userprofile.company_address}}"
                                    placeholder="Юридический адрес организации для документов"/>
                         </label>
                     </div>
@@ -119,10 +127,9 @@
 
                     <div class="four columns">
                         <label class="">Расчетный счет:
-                            <input type="text" placeholder="Расчетный счёт"/>
+                            <input type="text" name="" placeholder="Расчетный счёт"/>
                         </label>
                     </div>
-
 
                     <div class="eight columns">
                         <label>Банк в котором открыт расчетный счёт: </label>

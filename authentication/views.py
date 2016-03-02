@@ -64,8 +64,9 @@ def dispatch_user(request, username, **kwargs):
 def profile(request, username, param):
     # Тут код личного профиля
     args = {}
-    args['username'] = request.user.username
-    args['user_first_name'] = request.user.first_name
+    args['userprofile'] = request.user
+    args['banks']=request.user.username
+    # args['user_first_name'] = request.user.first_name
     args.update(csrf(request))
     return render_to_response('profile.html', args)
 
