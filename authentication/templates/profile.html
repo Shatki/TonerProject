@@ -57,9 +57,11 @@
 
                     <div class="four columns ">
                         <label class="">Имя пользователя*:
-                            <input type="text" placeholder='Имя'/>
+                            <input type="text" name="user_first_name" value='{{ user_first_name }}' placeholder='Имя'
+                                   autocomplete="on">
                         </label>
                     </div>
+
                     <div class="four columns">
                         <label class="">Фамилия*:
                             <input type="text" placeholder="Фамилия"/>
