@@ -9,6 +9,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
 from TonerProject.settings import STATIC_URL
+from authentication.models import Bank
 
 
 def loadloginform(request):
@@ -36,7 +37,7 @@ def login(request):
 def logout(request):
     return_path = request.META.get('HTTP_REFERER', '/')
     auth.logout(request)
-    return redirect(return_path)  #потом переделать
+    return redirect(return_path)
 
 def register(request):
     return_path = request.META.get('HTTP_REFERER', '/')
@@ -65,7 +66,7 @@ def profile(request, username, param):
     # Тут код личного профиля
     args = {}
     args['userprofile'] = request.user
-    args['banks']=request.user.username
+    args['banks'] = Bank.objects.all()
     # args['user_first_name'] = request.user.first_name
     args.update(csrf(request))
     return render_to_response('profile.html', args)

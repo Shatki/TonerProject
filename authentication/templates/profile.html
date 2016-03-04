@@ -136,9 +136,9 @@
 
                         <form action="#">
                             <select class="selecter">
-                                <option value="SB">Волго-Вятский банк Сбербанка России</option>
-                                <option value="RKC">РКЦ банка России</option>
-                                <option value="Ellips">ОАО АКБ "Эллипс банк"</option>
+                                {% for bank in banks %}
+                                    <option value="">{{ bank.bank_name }}</option>
+                                {% endfor %}
                             </select>
 
                         </form>
