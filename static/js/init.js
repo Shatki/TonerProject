@@ -252,9 +252,22 @@ jQuery(document).ready(function ($) {
     });
 
     /*----------------------------------------------------*/
-    /*	SELICTER ----> select sustom
+    /*	SELECTER ----> select system
      ------------------------------------------------------*/
     $('select').selecter();
+
+    /*----------------------------------------------------*/
+    /*	is_company визуализатор блока
+     ------------------------------------------------------*/
+    $('#iscompany').change(function () {
+        <!-- Скрипт плавного открытия и закрытия блока -->
+        if ($('#iscompany').prop('checked')) {
+            $('#company-block').animate({height: 'show'}, 2000);
+        }
+        else {
+            $('#company-block').animate({height: 'hide'}, 2000);
+        }
+    });
 
 });
 
