@@ -79,3 +79,7 @@ def get_photo(request, username):
     # Тут код отдачи фотографии
     # HttpResponse.content = '/Volumes/Developer/Projects/TonerProject/media/profile/defaultprofileimage.jpg'
     return redirect(os.path.join(STATIC_URL, "profile/" + username + ".jpg"))
+
+
+def change_user_info(request):
+    return HttpResponse(u'<http>Public profile data of user has changed</http>', content_type='text/html')

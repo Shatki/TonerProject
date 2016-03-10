@@ -59,3 +59,23 @@ $('#loadregisterform').on('click', function () {
     });
     return false;
 });
+
+
+$('#save-btn').click(function () {
+    var data = $('DIV #personalinfo').serialize();
+    $.ajax({
+        url: '/auth/changeuserinfo/',
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function (data) {
+            if (data != 'ok') {
+                // Пока кокой-то деревянный способ
+                alert(data);
+            } else {
+                location.href = "#";
+                location.reload();
+            }
+        }
+    });
+});

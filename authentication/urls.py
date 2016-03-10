@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^login/$', authentication.views.login),
     url(r'^logout/$', authentication.views.logout),
     url(r'^register/$', authentication.views.register),
+    url(r'^changeuserinfo/$', authentication.views.change_user_info),
     ]
