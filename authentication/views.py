@@ -82,4 +82,11 @@ def get_photo(request, username):
 
 
 def change_user_info(request):
-    return HttpResponse(u'<http>Public profile data of user has changed</http>', content_type='text/html')
+    if request.user.is_authenticated() and request.POST:
+        # Пользователь аутентифицирован
+        user_for_change = request.user
+        user_for_change.username = request.POST.get('userprofile_username')
+        user_for_change.save()
+        return HttpResponse(u'Ok', content_type='text/html')
+    else:
+        return HttpResponse(u'Bad User', content_type='text/html')
