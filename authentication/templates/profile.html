@@ -41,7 +41,7 @@
                                         {% if userprofile.is_company %}
                                        checked
                                         {% endif %}
-                                       id="iscompany" value="Частное лицо">
+                                       id="iscompany" value="yes">
                                 <label for="person">Я представляю организацию</label>
 
                             </div>
@@ -159,7 +159,7 @@
 
                             <div class="eight columns">
                                 <label>Банк в котором открыт расчетный счёт: </label>
-                                <select name="userprofile_bank" class="selecter" action="#">
+                                <select name="userprofile_user_bank" class="selecter" action="#">
                                     {% for bank in banks %}
                                         {% if bank.bank_name == userprofile.user_bank.bank_name %}
                                             <option selected>{{ bank.bank_name }}</option>

@@ -82,8 +82,7 @@ $('form#contactForm button.submit').click(function () {
 function checkRegisterData() {
     alert('Проверяем регистрацию!')
 }
-
-$('#loadloginform').on('click', function () {
+$(document).on('click', '#loadloginform', function () {
     $.ajax({
         type: "GET",
         url: "/auth/login/form/",
@@ -95,7 +94,7 @@ $('#loadloginform').on('click', function () {
 });
 
 
-$('#loadregisterform').on('click', function () {
+$(document).on('click', '#loadregisterform', function () {
     $.ajax({
         type: "GET",
         url: "/auth/register/form/",
@@ -105,6 +104,38 @@ $('#loadregisterform').on('click', function () {
     });
     return false;
 });
+
+$(document).on('click', '#login-btn', function () {
+    var data = $("form").serialize();
+    $.ajax({
+        url: '/auth/login/',
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function (data) {
+            if (data != 'ok') {
+                // Пока кокой-то деревянный способ
+                document.getElementById("username").style.backgroundColor = '#ff8888';
+                document.getElementById("username").style.borderColor = '#cc0000';
+                document.getElementById("password").style.backgroundColor = '#ff8888';
+                document.getElementById("password").style.borderColor = '#cc0000';
+            } else {
+                location.href = "#";
+                location.reload();
+            }
+        }
+    });
+});
+
+$(document).on('click', 'form', function () {
+    //Восстанавливаем значения стиля после индикации ошибки
+    document.getElementById("username").style.backgroundColor = '#ffffff';
+    document.getElementById("username").style.borderColor = '#cccccc';
+    document.getElementById("password").style.backgroundColor = '#ffffff';
+    document.getElementById("password").style.borderColor = '#cccccc';
+});
+
+
 
 /*----------------------------------------------------*/
 /*	Personal info form
@@ -118,7 +149,7 @@ $('#save-btn').click(function () {
         data: data,
         cache: false,
         success: function (data) {
-            if (data != 'ok') {
+            if (data != 'Данные успешно изменены') {
                 // Пока кокой-то деревянный способ
                 alert(data);
             } else {

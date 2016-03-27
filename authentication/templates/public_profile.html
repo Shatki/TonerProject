@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block header %}
+    <div class="userprofile">
+        <nav id="nav-wrap">
+            <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+            <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+            {% block nav %}
+                <ul id="nav" class="nav">
+                    <li><a class="logo" href="/">Toner Project</a></li>
+                    <li class="current"><a class="smoothscroll" href="#personalinfo">Профиль</a></li>
+                    <li><a class="smoothscroll" href="#testimonials">Отзывы</a></li>
+                    <li><a class="smoothscroll" href="#contact">Контакты</a></li>
+                    {% if userprofile.username %}
+                        <li><a href="/auth/logout/">Выйти</a>
+                            <a href="/{{ username }}"><img class="photo" title="{{ public_username }}"
+                                                           src="/{{ public_username }}/photo"/></a>
+                        </li>
+                    {% else %}
+                        <li id="loadloginform"><a id="login" href="#">Вход в систему</a></li>
+                    {% endif %}
+                </ul>
+            {% endblock nav %}
+            <!-- end #nav -->
+        </nav>
+
+        {% block banner %}
+            <!--Профильная панель -->
+            <form id="personalinfo" class="row">
+                <div class="twelve columns">
+                    <div class="panel">
+                        <div id="person-block">
+                            <!--Фото слева -->
+                            <div class="four columns">
+                                <img class="profile-photo" src="/{{ public_username }}/photo" alt="Профильное фото"
+                                     title="Фото пользователя"/>
+
+                            </div>
+
+                            <!--Панель данных слева -->
+                            <div class="eight columns">
+                                <h1>Персональные данные</h1>
+                            </div>
+                            <div class="four columns">
+                                <label class="">Логин:</label>
+                                <input type="text" name="userprofile_username" value="{{ public_username }}"
+                                       disabled placeholder='Логин, e-mail или номер телефона'/>
+                            </div>
+                            <div class="four columns">
+                                <label class="">Контактный телефон:</label>
+                                <input type="text" name="userprofile_company_phone" value="{{ public_company_phone }}"
+                                       disabled placeholder="Номер телефона"/>
+                            </div>
+
+                            <div class="four columns ">
+                                <label class="">Имя пользователя:</label>
+                                <input type="text" name="userprofile_first_name" value='{{ public_first_name }}'
+                                       disabled placeholder='Имя' autocomplete="on">
+                            </div>
+
+                            <div class="four columns">
+                                <label class="">Фамилия:</label>
+                                <input type="text" name="userprofile_last_name" value="{{ public_last_name }}"
+                                       disabled placeholder="Фамилия"/>
+                            </div>
+
+                            <div class="eight columns">
+                                <label class="">Наименование организации:</label>
+                                <input type="text" name="userprofile_company_name" value="{{ public_company_name }}"
+                                       disabled
+                                       placeholder="Полное юридическое наименование организации для документов"/>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {% endblock banner %}
+    </div>
+
+{% endblock header %}
