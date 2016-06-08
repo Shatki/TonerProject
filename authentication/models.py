@@ -18,13 +18,13 @@ class Bank(models.Model):
 class AccountManager(BaseUserManager):
     def create_user(self, username, password=None, **kwargs):
         if not username:
-            raise ValueError('User must have a valid username')
-        if not kwargs.get('email'):
-            raise ValueError('User must have a valid username address.')
+            raise ValueError('Имя пользователя обязательно')
 
-        account = self.model(
-            email=self.normalize_email(kwargs.get('email')), username=username,
-        )
+        account = self.model(username=username)
+        if kwargs.get('email'):
+            account.email = self.normalize_email(kwargs.get('email')),
+        if kwargs.get('phone'):
+            account.company_phone = kwargs.get('phone')
 
         account.set_password(password)
         account.is_staff = False
@@ -49,31 +49,33 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     #### ДАННЫЕ ПОЛЬЗОВАТЕЛЯ #########
     # username нам  необходим для отображении записей и страницы действий
-    username = models.CharField(unique=True, max_length=30, db_index=True, validators=[alphanumeric])
+    username = models.CharField(verbose_name=u'Логин', unique=True, max_length=30, db_index=True,
+                                validators=[alphanumeric])
     #Авторизация будет происходить по E-mail
     email = models.EmailField(verbose_name=u'Электронная почта', unique=True, max_length=255)
     # Имя - не является обязательным
-    first_name = models.CharField(max_length=40, blank=True)
+    first_name = models.CharField(verbose_name=u'Имя пользователя', max_length=40, blank=True, null=True)
     # Фамилия - также не обязательна
-    last_name = models.CharField(max_length=40, blank=True)
+    last_name = models.CharField(verbose_name=u'Фамилия пользователя', max_length=40, blank=True, null=True)
     # слоган или статус - куда же без него. Наследство от соц. сетей
-    tagline = models.CharField(max_length=140, blank=True)
-    user_photo = models.FileField(upload_to='/profile/', blank=False, default='/profile/defaultprofileimage.jpg')
+    tagline = models.CharField(verbose_name=u'Статус', max_length=140, blank=True, null=True)
+    user_photo = models.FileField(verbose_name=u'Аватар', upload_to='/profile/', blank=True, null=True,
+                                  default='/profile/defaultprofileimage.jpg')
 
     #### ДАННЫЕ Организации #########
     # Наименование компании - не обязательна для физ лиц
-    company_name = models.CharField(max_length=100, blank=True)
-    company_boss_first_name = models.CharField(max_length=40, blank=True)  # Имя
-    company_boss_second_name = models.CharField(max_length=40, blank=True)  # Отчество
-    company_boss_last_name = models.CharField(max_length=40, blank=True)  # Фамилия
-    company_inn = models.CharField(unique=True, max_length=12, db_index=True, validators=[numeric])  # ИНН
-    company_ogrn = models.CharField(unique=True, max_length=15, db_index=True, validators=[numeric])  # ОГРН
-    company_okpo = models.CharField(max_length=9, db_index=True, validators=[numeric])  # ОКПО
-    company_okato = models.CharField(max_length=11, db_index=True, validators=[numeric])  # ОКАТО
-    company_address = models.CharField(max_length=100)
-    company_phone = models.CharField(max_length=10, validators=[phone])
-    user_bank = models.ForeignKey(Bank)
-    user_bank_account = models.CharField(unique=True, max_length=20, db_index=True, validators=[numeric])  # счет
+    company_name = models.CharField(verbose_name=u'Наименование компании', max_length=100, blank=True, null=True)
+    company_boss_first_name = models.CharField(max_length=40, blank=True, null=True)  # Имя
+    company_boss_second_name = models.CharField(max_length=40, blank=True, null=True)  # Отчество
+    company_boss_last_name = models.CharField(max_length=40, blank=True, null=True)  # Фамилия
+    company_inn = models.CharField(unique=True, max_length=12, validators=[numeric], null=True)  # ИНН
+    company_ogrn = models.CharField(unique=True, max_length=15, validators=[numeric], null=True)  # ОГРН
+    company_okpo = models.CharField(max_length=9, validators=[numeric], null=True)  # ОКПО
+    company_okato = models.CharField(max_length=11, validators=[numeric], null=True)  # ОКАТО
+    company_address = models.CharField(max_length=100, null=True)
+    company_phone = models.CharField(max_length=10, validators=[phone], null=True)
+    user_bank = models.ForeignKey(Bank, blank=True, null=True)
+    user_bank_account = models.CharField(max_length=20, validators=[numeric], null=True)  # счет
 
     #### АТРИБУТЫ #########
     # Атрибут суперпользователя
@@ -125,3 +127,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def get_user_photo(self):
         return self.user_photo
 
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'

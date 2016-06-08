@@ -15,7 +15,7 @@ class AccountCreationForm(forms.ModelForm):
 
     class Meta:
         model = Account
-        fields = ('email', 'username')
+        fields = ('username', 'email')
 
     def clean_username(self):
         username = self.cleaned_data['username']
@@ -31,7 +31,7 @@ class AccountCreationForm(forms.ModelForm):
         password2 = self.cleaned_data.get('password2')
 
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError('Passwords do not match.')
+            raise forms.ValidationError('Пароли не совпадают')
         return password2
 
     def save(self, commit=True):

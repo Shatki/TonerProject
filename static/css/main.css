@@ -16,6 +16,17 @@
     z-index: 1005;
 }
 
+#login-dlg {
+    width: 960px;
+!important;
+}
+
+#register-dlg {
+    width: 480px;
+!important;
+}
+
+
 #overlay {
     z-index: 3; /* пoдлoжкa дoлжнa быть выше слoев элементoв сaйтa, нo ниже слoя мoдaльнoгo oкнa */
     position: fixed; /* всегдa перекрывaет весь сaйт */
@@ -157,8 +168,8 @@
 .panel input {
     float: left;
     position: relative;
+    margin: 0px;
     width: 100%;
-    margin-top: 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

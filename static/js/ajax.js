@@ -78,35 +78,33 @@ $('form#contactForm button.submit').click(function () {
 /*----------------------------------------------------*/
 /*	Login/Register form
  ------------------------------------------------------*/
-
-function checkRegisterData() {
-    alert('Проверяем регистрацию!')
-}
+// Загрузка формы авторизации в модальное окно
 $(document).on('click', '#loadloginform', function () {
     $.ajax({
         type: "GET",
         url: "/auth/login/form/",
         success: function (mydata) {
-            $("#signin-form").html(mydata);
+            $("#login-form").html(mydata);
         }
     });
     return false;
 });
 
-
+// Загрузка формы регистрации в модальное окно
 $(document).on('click', '#loadregisterform', function () {
     $.ajax({
         type: "GET",
         url: "/auth/register/form/",
         success: function (mydata) {
-            $("#signin-form").html(mydata);
+            $("#register-form").html(mydata);
         }
     });
     return false;
 });
 
+// Отправка данных из формы авторизации
 $(document).on('click', '#login-btn', function () {
-    var data = $("form").serialize();
+    var data = $("form#login-form").serialize();
     $.ajax({
         url: '/auth/login/',
         method: 'POST',
@@ -125,16 +123,40 @@ $(document).on('click', '#login-btn', function () {
             }
         }
     });
+    return false;
 });
 
+// Дополнительно: возвращает стиль элементов к исходному после индикации ошибки
 $(document).on('click', 'form', function () {
     //Восстанавливаем значения стиля после индикации ошибки
     document.getElementById("username").style.backgroundColor = '#ffffff';
     document.getElementById("username").style.borderColor = '#cccccc';
     document.getElementById("password").style.backgroundColor = '#ffffff';
     document.getElementById("password").style.borderColor = '#cccccc';
+    return false;
 });
 
+// Отправка данных из формы регистрации нового пользователя
+$(document).on('click', '#register-btn', function () {
+    var data = $("form#register-form").serialize();
+    $.ajax({
+        url: '/auth/register/',
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function (data) {
+            if (data == 'Ok') {
+                // Пока кокой-то деревянный способ
+                alert('Данные получены');
+            } else {
+                alert(data);
+                // location.href = "#";
+                // location.reload();
+            }
+        }
+    });
+    return false;
+});
 
 
 /*----------------------------------------------------*/
@@ -149,9 +171,9 @@ $('#save-btn').click(function () {
         data: data,
         cache: false,
         success: function (data) {
-            if (data != 'Данные успешно изменены') {
+            if (data != 'Ok') {
                 // Пока кокой-то деревянный способ
-                alert(data);
+                alert('Данные успешно изменены');
             } else {
                 location.href = "#";
                 location.reload();

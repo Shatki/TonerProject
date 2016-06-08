@@ -40,20 +40,30 @@ def logout(request):
     return redirect(return_path)
 
 def register(request):
-    return_path = request.META.get('HTTP_REFERER', '/')
+    # return_path = request.META.get('HTTP_REFERER', '/')
     args = {}
     args.update(csrf(request))
-    # args['form'] = UserCreationForm()
     if request.POST:
-        newuser_form = UserCreationForm(request.POST)
-        if newuser_form.is_valid():
-            newuser_form.save()
-            newuser = auth.authenticate(email=newuser_form.cleaned_data['email'], password=newuser_form.cleaned_data['password2'])
-            auth.login(request, newuser)
-            return redirect(return_path)
-        else:
-            args['form'] = newuser_form
-    return render_to_response(return_path, args)
+        # Тут проверка на совпадение паролей
+        if request.POST.get('password') != request.POST.get('password-confirm'):
+            return HttpResponse(u'Bad Password', content_type='text/html')
+
+        # Валидация выше если все удачно создаем пользователя
+        new_user = Account.objects.create_user(username=request.POST.get('username'),
+                                               password=request.POST.get('password-confirm'),
+                                               email=request.POST.get('email'), )
+
+        new_user.save()
+        auth.login(request, auth.authenticate(
+            username=new_user.username,
+            password=new_user.password))
+        return HttpResponse(u'Ok', content_type='text/html')
+    else:
+        return HttpResponse(u'Bad POST request', content_type='text/html')
+    return HttpResponse(u'Unknown Bad', content_type='text/html')
+
+
+    # render_to_response(return_path, args)
 
 def dispatch_user(request, username, **kwargs):
     user_for_profile = get_object_or_404(get_user_model(), username=username)
@@ -89,7 +99,6 @@ def get_photo(request, username):
     # Тут код отдачи фотографии
     # HttpResponse.content = '/Volumes/Developer/Projects/TonerProject/media/profile/defaultprofileimage.jpg'
     return redirect(os.path.join(STATIC_URL, "profile/" + username + ".jpg"))
-
 
 def change_user_info(request):
     if request.user.is_authenticated() and request.POST:
@@ -213,7 +222,7 @@ def change_user_info(request):
 
         # изменение профиля тут
         user_for_change.save()
-        return HttpResponse(u'Данные успешно изменены', content_type='text/html')
+        return HttpResponse(u'Ok', content_type='text/html')
 
     else:
         return HttpResponse(u'Bad User', content_type='text/html')

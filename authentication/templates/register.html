@@ -1,14 +1,23 @@
-<label>Регистрация</label>
-{% csrf_token %}
-<form>
-    <input type="text" name="username" placeholder="Логин">
-    <input type="password" name="password" placeholder="пароль">
-    <input type="password" name="password-confirm" placeholder="повторите пароль">
-    <br>
-    <input type="email" name="email" placeholder="Email">
-    <input type="tel" name="tel" placeholder="телефон">
-</form>
+<div class="row" id="register-dlg">
+    <label>Регистрация</label>
+    {% csrf_token %}
+    <form name="register-form" id="register-form">
+        <div class="nine columns centered">
+            <input type="text" name="username" placeholder="Логин">
 
-<input class="button" type="submit" id="register-btn" value="Зарегистрироваться">
+            <input type="email" name="email" placeholder="Email">
 
-<a href="#" class="modal-close">&#215;</a>
+            <input type="tel" name="tel" placeholder="телефон">
+
+            <input type="password" name="password" placeholder="пароль">
+
+            <input type="password" name="password-confirm" placeholder="повторите пароль">
+
+            <input class="button" type="submit" id="register-btn" value="Зарегистрироваться">
+        </div>
+        <div class="six columns">
+        </div>
+    </form>
+
+    <a href="#" class="modal-close">&#215;</a>
+</div>
