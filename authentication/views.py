@@ -3,6 +3,7 @@ import os
 from django.contrib.auth import get_user_model
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import HttpResponse
+from django.template.context_processors import csrf
 from django.template.loader import get_template
 from django.contrib import auth
 from django.views.decorators.csrf import ensure_csrf_cookie

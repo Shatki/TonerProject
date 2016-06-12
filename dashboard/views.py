@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response, redirect
 from django.contrib import auth
+from django.template.context_processors import csrf
 from authentication.views import login
 
 # Create your views here.
