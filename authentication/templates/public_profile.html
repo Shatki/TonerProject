@@ -11,8 +11,8 @@
         <li><a class="smoothscroll" href="#contact">Контакты</a></li>
         {% if userprofile.username %}
             <li><a href="/auth/logout/">Выйти</a>
-                <a href="/{{ public_username }}"><img class="photo" title="{{ public_username }}"
-                                                      src="/{{ public_username }}/photo"/></a>
+                <a href="/{{ userprofile.username }}"><img class="photo" title="{{ userprofile.username }}"
+                                                           src="/{{ userprofile.username }}/photo"/></a>
             </li>
         {% else %}
             <li id="loadloginform"><a id="singin" href="#">Вход в систему</a></li>

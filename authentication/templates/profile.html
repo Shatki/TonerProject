@@ -41,7 +41,7 @@
                                         {% if userprofile.is_company %}
                                        checked
                                         {% endif %}
-                                       id="iscompany" value="yes">
+                                       id="iscompany">
                                 <label for="person">Я представляю организацию</label>
 
                             </div>
@@ -82,7 +82,13 @@
 
                         </div>
 
-                        <div id="company-block">
+                        <div id="company-block"
+                                {% if userprofile.is_company %}
+                             style="display: block;"
+                                {% else %}
+                             style="display: none;"
+                                {% endif %}
+                                >
                             <!--Данные компании -->
                             <div class="nine columns">
                                 <label class="">Полное наименование организации:</label>
@@ -181,5 +187,4 @@
             </form>
         {% endblock banner %}
     </div>
-
 {% endblock header %}

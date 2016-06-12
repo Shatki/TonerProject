@@ -22,7 +22,7 @@ class AccountManager(BaseUserManager):
 
         account = self.model(username=username)
         if kwargs.get('email'):
-            account.email = self.normalize_email(kwargs.get('email')),
+            account.email = kwargs.get('email'),
         if kwargs.get('phone'):
             account.company_phone = kwargs.get('phone')
 
@@ -59,7 +59,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(verbose_name=u'Фамилия пользователя', max_length=40, blank=True, null=True)
     # слоган или статус - куда же без него. Наследство от соц. сетей
     tagline = models.CharField(verbose_name=u'Статус', max_length=140, blank=True, null=True)
-    user_photo = models.FileField(verbose_name=u'Аватар', upload_to='/profile/', blank=True, null=True,
+    user_photo = models.FilePathField(verbose_name=u'Аватар', blank=True, null=True,
                                   default='/profile/defaultprofileimage.jpg')
 
     #### ДАННЫЕ Организации #########
@@ -104,7 +104,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['email', ]
 
     def __str__(self):
-        return self.email
+        return self.username
 
     def get_full_name(self):
         return ' '.join([self.first_name, self.last_name])
@@ -124,7 +124,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
 
-    def get_user_photo(self):
+    def get_photo(self):
         return self.user_photo
 
     class Meta:

@@ -27,7 +27,7 @@ def login(request):
         user = auth.authenticate(username=login, password=password)
         if user is not None:
             auth.login(request, user)
-            return HttpResponse('ok', content_type='text/html')
+            return HttpResponse('Ok', content_type='text/html')
         else:
             return HttpResponse('Неверный логин/пароль', content_type='text/html')
     else:
@@ -39,28 +39,53 @@ def logout(request):
     auth.logout(request)
     return redirect(return_path)
 
+
+@ensure_csrf_cookie
 def register(request):
     # return_path = request.META.get('HTTP_REFERER', '/')
     args = {}
     args.update(csrf(request))
     if request.POST:
-        # Тут проверка на совпадение паролей
-        if request.POST.get('password') != request.POST.get('password-confirm'):
-            return HttpResponse(u'Bad Password', content_type='text/html')
+        # Проверка на уникальность username
+        try:
+            if Account.objects.get(username=request.POST.get('username')):
+                return HttpResponse(u'Username is not unique', content_type='text/html')
 
-        # Валидация выше если все удачно создаем пользователя
-        new_user = Account.objects.create_user(username=request.POST.get('username'),
-                                               password=request.POST.get('password-confirm'),
-                                               email=request.POST.get('email'), )
+        except Account.DoesNotExist:
+            # Имя не занято
+            try:
+                # Проверка на уникальность email
+                if Account.objects.get(email=request.POST.get('email')):
+                    return HttpResponse(u'Email is not unique', content_type='text/html')
+            except Account.DoesNotExist:
+                # email не использован
 
-        new_user.save()
-        auth.login(request, auth.authenticate(
-            username=new_user.username,
-            password=new_user.password))
-        return HttpResponse(u'Ok', content_type='text/html')
+                # Тут проверка на совпадение паролей
+                if request.POST.get('password') != request.POST.get('password-confirm'):
+                    return HttpResponse(u'Bad Password or Passwords are different', content_type='text/html')
+
+                # Валидация выше - если все удачно создаем пользователя
+                new_user = Account.objects.create_user(username=request.POST.get('username'),
+                                                       password=request.POST.get('password-confirm'),
+                                                       email=request.POST.get('email'), )
+                new_user.save()
+
+                # Сразу же логинимся
+                user = auth.authenticate(username=request.POST.get('username'),
+                                         password=request.POST.get('password-confirm'), )
+                if user is not None:
+                    auth.login(request, user)
+                    return HttpResponse(u'Ok', content_type='text/html')
+                else:
+                    return HttpResponse(u'Can\'t authenticate new user' + user, content_type='text/html')
+            except:
+                return HttpResponse(u'login error', content_type='text/html')
+
+        except:
+            return HttpResponse(sys.exc_info(), content_type='text/html')
     else:
         return HttpResponse(u'Bad POST request', content_type='text/html')
-    return HttpResponse(u'Unknown Bad', content_type='text/html')
+    return HttpResponse(u'Unknown error', content_type='text/html')
 
 
     # render_to_response(return_path, args)
@@ -72,6 +97,8 @@ def dispatch_user(request, username, **kwargs):
     else:
         return public_profile(request, username, kwargs)
 
+
+@ensure_csrf_cookie
 def profile(request, username, param):
     # Тут код личного профиля
     args = {}
@@ -80,6 +107,8 @@ def profile(request, username, param):
     args.update(csrf(request))
     return render_to_response('profile.html', args)
 
+
+@ensure_csrf_cookie
 def public_profile(request, username, param):
     # Тут код публичного профиля
     public_profile = Account.objects.get(username=username)
@@ -98,7 +127,11 @@ def public_profile(request, username, param):
 def get_photo(request, username):
     # Тут код отдачи фотографии
     # HttpResponse.content = '/Volumes/Developer/Projects/TonerProject/media/profile/defaultprofileimage.jpg'
-    return redirect(os.path.join(STATIC_URL, "profile/" + username + ".jpg"))
+    try:
+        user = Account.objects.get(username=username)
+    except:
+        return redirect(os.path.join(STATIC_URL, "profile/defaultprofileimage.jpg"))
+    return redirect(os.path.join(STATIC_URL, user.get_photo()))
 
 def change_user_info(request):
     if request.user.is_authenticated() and request.POST:
@@ -136,7 +169,8 @@ def change_user_info(request):
         if not user_for_change.last_name.isalpha():
             return HttpResponse(u'Фамилия пользователя может состоять только из букв', content_type='text/html')
 
-            # tag_line     не проверяется
+        # tag_line     не проверяется
+        user_for_change.tagline = request.POST.get('userprofile_tagline')
 
         if request.POST.get('userprofile_is_company') == 'yes':
             user_for_change.is_company = True
@@ -173,7 +207,11 @@ def change_user_info(request):
             if not user_for_change.company_phone.isdigit():
                 return HttpResponse(u'Телефон должен состоять только из цифр', content_type='text/html')
 
-            # company_address     не проверяется
+            # company_address
+            user_for_change.company_address = request.POST.get('userprofile_company_address')
+            if len(user_for_change.company_address) > 100:
+                return HttpResponse(u'Адрес организации не должен превышать 100 знаков', content_type='text/html')
+
 
             # company_inn
             user_for_change.company_inn = request.POST.get('userprofile_company_inn')
@@ -196,10 +234,10 @@ def change_user_info(request):
             if not user_for_change.company_okpo.isdigit():
                 return HttpResponse(u'ОКПО должен состоять только из цифр', content_type='text/html')
 
-            # company_okpo
+            # company_okato
             user_for_change.company_okato = request.POST.get('userprofile_company_okato')
             if len(user_for_change.company_okato) != 11:
-                return HttpResponse(u'ОКАТО организации должен состоять из 9 цифр', content_type='text/html')
+                return HttpResponse(u'ОКАТО организации должен состоять из 11 цифр', content_type='text/html')
             if not user_for_change.company_okato.isdigit():
                 return HttpResponse(u'ОКАТО должен состоять только из цифр', content_type='text/html')
 
@@ -225,4 +263,4 @@ def change_user_info(request):
         return HttpResponse(u'Ok', content_type='text/html')
 
     else:
-        return HttpResponse(u'Bad User', content_type='text/html')
+        return HttpResponse(u'Bad change User data', content_type='text/html')

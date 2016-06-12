@@ -111,7 +111,7 @@ $(document).on('click', '#login-btn', function () {
         data: data,
         cache: false,
         success: function (data) {
-            if (data != 'ok') {
+            if (data != 'Ok') {
                 // Пока кокой-то деревянный способ
                 document.getElementById("username").style.backgroundColor = '#ff8888';
                 document.getElementById("username").style.borderColor = '#cc0000';
@@ -147,7 +147,9 @@ $(document).on('click', '#register-btn', function () {
         success: function (data) {
             if (data == 'Ok') {
                 // Пока кокой-то деревянный способ
-                alert('Данные получены');
+                //alert('Данные получены');
+                location.href = "#";
+                location.reload();
             } else {
                 alert(data);
                 // location.href = "#";
@@ -171,12 +173,12 @@ $('#save-btn').click(function () {
         data: data,
         cache: false,
         success: function (data) {
-            if (data != 'Ok') {
+            if (data == 'Ok') {
                 // Пока кокой-то деревянный способ
-                alert('Данные успешно изменены');
-            } else {
                 location.href = "#";
                 location.reload();
+            } else {
+                alert(data);
             }
         }
     });
