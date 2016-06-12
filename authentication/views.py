@@ -5,8 +5,6 @@ from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.contrib import auth
-from django.contrib.auth.forms import UserCreationForm
-from django.core.context_processors import csrf
 from django.views.decorators.csrf import ensure_csrf_cookie
 from TonerProject.settings import STATIC_URL
 from authentication.models import Bank, Account
