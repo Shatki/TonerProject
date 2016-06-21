@@ -128,23 +128,17 @@
 /* ***************************************** */
 
 .panel {
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    background-size: cover;
     display: table;
-    position: relative;
     padding-top: 30px;
     padding-bottom: 30px;
-    width: 100%;
     text-align: left;
     margin: 60px 0 54px;
     border: 1px solid #d8d8d8;
     background: #fff;
     color: #333333;
     border-radius: 5px;
-    max-width: 100%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-
+    overflow: hidden;
 }
 
 .panel label {
@@ -211,19 +205,20 @@
     background-color: #3333ff;
 }
 
-/* ***************************************** */
-/* Styles for SELECT and UL */
-/* ***************************************** */
-
-/* ***************************************** */
 .userprofile {
     position: relative;
-    height: 1280px;
     min-height: 500px;
     width: 100%;
     background: #161415 url(../img/header-background.jpg) no-repeat top center;
     background-size: cover !important;
     -webkit-background-size: cover !important;
     text-align: center;
+    height: 1280px;
     overflow: hidden;
 }
+
+/* ***************************************** */
+/* Styles for SELECT and UL */
+/* ***************************************** */
+
+/* ***************************************** */

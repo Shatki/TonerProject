@@ -26,11 +26,11 @@ def login(request):
         user = auth.authenticate(username=login, password=password)
         if user is not None:
             auth.login(request, user)
-            return HttpResponse('Ok', content_type='text/html')
+            return HttpResponse(u'Ok', content_type='text/html')
         else:
-            return HttpResponse('Неверный логин/пароль', content_type='text/html')
+            return HttpResponse(u'Неверный логин/пароль', content_type='text/html')
     else:
-        return HttpResponse('Ошибка авторизации!', content_type='text/html')
+        return HttpResponse(u'Ошибка авторизации!', content_type='text/html')
 
 
 def logout(request):
@@ -41,7 +41,6 @@ def logout(request):
 
 @ensure_csrf_cookie
 def register(request):
-    # return_path = request.META.get('HTTP_REFERER', '/')
     args = {}
     args.update(csrf(request))
     if request.POST:
@@ -92,13 +91,13 @@ def register(request):
 def dispatch_user(request, username, **kwargs):
     user_for_profile = get_object_or_404(get_user_model(), username=username)
     if user_for_profile == request.user:
-        return profile(request, username, kwargs)
+        return profile(request)
     else:
-        return public_profile(request, username, kwargs)
+        return public_profile(request, username)
 
 
 @ensure_csrf_cookie
-def profile(request, username, param):
+def profile(request):
     # Тут код личного профиля
     args = {}
     args['userprofile'] = request.user
@@ -108,7 +107,7 @@ def profile(request, username, param):
 
 
 @ensure_csrf_cookie
-def public_profile(request, username, param):
+def public_profile(request, username):
     # Тут код публичного профиля
     public_profile = Account.objects.get(username=username)
     args = {}
@@ -171,8 +170,9 @@ def change_user_info(request):
         # tag_line     не проверяется
         user_for_change.tagline = request.POST.get('userprofile_tagline')
 
-        if request.POST.get('userprofile_is_company') == 'yes':
+        if request.POST.get('userprofile_is_company') == 'yes' or request.POST.get('userprofile_is_company') == 'on':
             user_for_change.is_company = True
+
             # company_name
             user_for_change.company_name = request.POST.get('userprofile_company_name')
             if len(user_for_change.company_name) < 4:

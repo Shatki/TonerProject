@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^blog/', include('blog.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^auth/', include('authentication.urls')),
-    # url(r'^manager/', dashboard.views.manager),
+    url(r'^dashboard/', dashboard.views.dashboard),
     # url(r'^test/', dashboard.views.testpage),
     url(r'^(?P<username>\w+)/photo', authentication.views.get_photo),
     url(r'^(?P<username>\w+)', authentication.views.dispatch_user),
