@@ -2,10 +2,10 @@
 __autor__ = 'macpro'
 
 from django.forms import ModelForm
-from blog.models import Comments
+from blog.models import Comment
 
 # Форма для оставления комментарий к статьям
 class CommentForm(ModelForm):
     class Meta:
-        model = Comments
+        model = Comment
         fields = ['comments_text']

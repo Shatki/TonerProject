@@ -22,7 +22,7 @@ class AccountManager(BaseUserManager):
 
         account = self.model(username=username)
         if kwargs.get('email'):
-            account.email = kwargs.get('email'),
+            account.email = kwargs.get('email')
         if kwargs.get('phone'):
             account.company_phone = kwargs.get('phone')
 
@@ -60,7 +60,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # слоган или статус - куда же без него. Наследство от соц. сетей
     tagline = models.CharField(verbose_name=u'Статус', max_length=140, blank=True, null=True)
     user_photo = models.FilePathField(verbose_name=u'Аватар', blank=True, null=True,
-                                  default='/profile/defaultprofileimage.jpg')
+                                      default='profile/defaultprofileimage.jpg')
 
     #### ДАННЫЕ Организации #########
     # Наименование компании - не обязательна для физ лиц

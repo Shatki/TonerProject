@@ -3,10 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-
 from .models import Account, Bank
-
-admin.site.register(Bank)
 
 
 class AccountCreationForm(forms.ModelForm):
@@ -123,3 +120,4 @@ class AccountAdmin(UserAdmin):
 
 
 admin.site.unregister(Group)
+admin.site.register(Bank)

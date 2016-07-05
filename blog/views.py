@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from blog.models import Article, Comments, Likes
+from blog.models import Article, Comment, Like
 from django.shortcuts import render_to_response, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import Http404
@@ -29,7 +29,7 @@ def article(request, article_id=1):
     args = {}
     args.update(csrf(request))
     args['article'] = Article.objects.get(id=article_id)
-    args['comments'] = Comments.objects.filter(comments_article_id=article_id)
+    args['comments'] = Comment.objects.filter(comment_article_id=article_id)
     args['form'] = comment_form
     args['username'] = auth.get_user(request).username
     return render_to_response('article.html', args)
@@ -45,7 +45,8 @@ def addlike(request, article_id):
             article = Article.objects.get(id=article_id)  # подхватываем статью из базы
             user = request.user
             try:
-                user_liked = Likes.objects.get(likes_user=user, likes_article=article_id)  # подхватываем лайки к этой статье
+                user_liked = Like.objects.get(like_user=user,
+                                              like_article=article_id)  # подхватываем лайки к этой статье
             except ObjectDoesNotExist:
                 user_liked = None
 
@@ -55,7 +56,7 @@ def addlike(request, article_id):
                 article.article_likes -= 1  # Likes.objects.filter(likes_article_id=article_id).count()
                 article.save()
             else:
-                user_liked = Likes(likes_article=article)
+                user_liked = Like(like_article=article)
                 article.article_likes += 1
                 user_liked.likes_user = user
                 article.save()
@@ -76,7 +77,7 @@ def addcomment(request, article_id):
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
-            comment.comments_article = Article.objects.get(id=article_id)
+            comment.comment_article = Article.objects.get(id=article_id)
             form.save()
             request.session.set_expiry(60) #ограничение ввода комментариев
             request.session['pause'] = True
