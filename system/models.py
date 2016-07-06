@@ -87,6 +87,13 @@ class Printer(models.Model):
         return self.name
 
 
+class RepairPart(models.Model):
+    class Meta:
+        db_table = 'repair part'
+
+    name = models.CharField(verbose_name=u'Модель принтера', max_length=20)
+
+
 # Модель приемки заказов на картриджи.
 class Order(models.Model):
     class Meta:
