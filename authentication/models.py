@@ -1,18 +1,58 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.core.validators import RegexValidator
+from system.validators import numeric, phone, alphanumeric
 
 
 class Bank(models.Model):
-    # alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message=u'Только буквенноцифровые символы допустимы.')
-    numeric = RegexValidator(r'^[0-9]*$', message=u'Только цифровые символы допустимы.')
-    bank_name = models.CharField(unique=True, max_length=100, db_index=True, blank=False)
-    bank_address = models.CharField(max_length=100)  # адрес банка
-    bank_account = models.CharField(unique=True, max_length=20, db_index=True, validators=[numeric])  # Кор счет
-    bank_bik = models.CharField(unique=True, max_length=9, db_index=True, validators=[numeric])  # Кор счет
+    class Meta:
+        verbose_name = 'Банк'
+        verbose_name_plural = 'Банки'
+        db_table = 'bank'
+
+    name = models.CharField(verbose_name=u'Наименование банка', unique=True, max_length=100, db_index=True, blank=False)
+    address = models.CharField(verbose_name=u'Адрес банка', max_length=100)  # адрес банка
+    account = models.CharField(verbose_name=u'Корреспондентский счёт', unique=True, max_length=20, db_index=True,
+                               validators=[numeric])  # Кор счет
+    bik = models.CharField(verbose_name=u'БИК', unique=True, max_length=9, db_index=True,
+                           validators=[numeric])  # Кор счет
     # для отображения в списках
     def __str__(self):
-        return self.bank_name
+        return self.name
+
+
+class Company(models.Model):
+    #### ДАННЫЕ Организации #########
+    # Наименование компании - не обязательна для физ лиц
+    class Meta:
+        verbose_name = 'Организация'
+        verbose_name_plural = 'Организации'
+        db_table = 'company'
+
+    # numeric = RegexValidator(r'^[0-9]*$', message=u'Только цифровые символы допустимы.')
+    name = models.CharField(verbose_name=u'Наименование компании', max_length=100, blank=True, null=True)
+    boss_first_name = models.CharField(verbose_name=u'Имя руководителя', max_length=40, blank=True, null=True)  # Имя
+    boss_second_name = models.CharField(verbose_name=u'Отчество руководителя', max_length=40, blank=True,
+                                        null=True)  # Отчество
+    boss_last_name = models.CharField(verbose_name=u'Фамилия руководителя', max_length=40, blank=True,
+                                      null=True)  # Фамилия
+    phone = models.CharField(verbose_name=u'Контактный телефон', max_length=10, validators=[phone], null=True)
+    inn = models.CharField(verbose_name=u'ИНН', unique=True, max_length=12, validators=[numeric], null=True)  # ИНН
+    ogrn = models.CharField(verbose_name=u'ОГРН', unique=True, max_length=15, validators=[numeric], null=True)  # ОГРН
+    okpo = models.CharField(verbose_name=u'ОКПО', max_length=9, validators=[numeric], null=True)  # ОКПО
+    okato = models.CharField(verbose_name=u'ОКАТО', max_length=11, validators=[numeric], null=True)  # ОКАТО
+    address = models.CharField(verbose_name=u'Адрес организации', max_length=100, null=True)
+    bank = models.ForeignKey(Bank, verbose_name=u'Банк', blank=True, null=True)
+    bank_account = models.CharField(verbose_name=u'Банковский счёт', max_length=20, validators=[numeric],
+                                    null=True)  # счет
+
+    def __str__(self):
+        return self.name
+
+    def get_boss_full_name(self):
+        return ' '.join([self.boss_first_name, self.boss_second_name, self.boss_last_name])
+
+    def get_boss_short_name(self):
+        return ' '.join([self.boss_first_name, self.boss_second_name])
 
 # Класс менеджера должен переопределить методы create_user() и create_superuser().
 class AccountManager(BaseUserManager):
@@ -23,8 +63,8 @@ class AccountManager(BaseUserManager):
         account = self.model(username=username)
         if kwargs.get('email'):
             account.email = kwargs.get('email')
-        if kwargs.get('phone'):
-            account.company_phone = kwargs.get('phone')
+        if kwargs.get('nickname'):
+            account.nickname = kwargs.get('nickname')
 
         account.set_password(password)
         account.is_staff = False
@@ -41,15 +81,16 @@ class AccountManager(BaseUserManager):
         account.save(using=self._db)
         return account
 
-
 class Account(AbstractBaseUser, PermissionsMixin):
-    alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message=u'Только буквенноцифровые символы допустимы.')
-    numeric = RegexValidator(r'^[0-9]*$', message=u'Только цифровые символы допустимы.')
-    phone = RegexValidator(regex='^\d{10}$', message=u'Укажите правильный номер телефона')
-
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        db_table = 'account'
     #### ДАННЫЕ ПОЛЬЗОВАТЕЛЯ #########
     # username нам  необходим для отображении записей и страницы действий
-    username = models.CharField(verbose_name=u'Логин', unique=True, max_length=30, db_index=True,
+    nickname = models.CharField(verbose_name=u'Имя пользователя в системе', unique=True, max_length=30, db_index=True,
+                                validators=[alphanumeric])
+    username = models.CharField(verbose_name=u'Логин входа в систему', unique=True, max_length=30, db_index=True,
                                 validators=[alphanumeric])
     #Авторизация будет происходить по E-mail
     email = models.EmailField(verbose_name=u'Электронная почта', unique=True, max_length=255)
@@ -59,23 +100,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(verbose_name=u'Фамилия пользователя', max_length=40, blank=True, null=True)
     # слоган или статус - куда же без него. Наследство от соц. сетей
     tagline = models.CharField(verbose_name=u'Статус', max_length=140, blank=True, null=True)
-    user_photo = models.FilePathField(verbose_name=u'Аватар', blank=True, null=True,
+    photo = models.FilePathField(verbose_name=u'Аватар', blank=True, null=True,
                                       default='profile/defaultprofileimage.jpg')
-
-    #### ДАННЫЕ Организации #########
-    # Наименование компании - не обязательна для физ лиц
-    company_name = models.CharField(verbose_name=u'Наименование компании', max_length=100, blank=True, null=True)
-    company_boss_first_name = models.CharField(max_length=40, blank=True, null=True)  # Имя
-    company_boss_second_name = models.CharField(max_length=40, blank=True, null=True)  # Отчество
-    company_boss_last_name = models.CharField(max_length=40, blank=True, null=True)  # Фамилия
-    company_inn = models.CharField(unique=True, max_length=12, validators=[numeric], null=True)  # ИНН
-    company_ogrn = models.CharField(unique=True, max_length=15, validators=[numeric], null=True)  # ОГРН
-    company_okpo = models.CharField(max_length=9, validators=[numeric], null=True)  # ОКПО
-    company_okato = models.CharField(max_length=11, validators=[numeric], null=True)  # ОКАТО
-    company_address = models.CharField(max_length=100, null=True)
-    company_phone = models.CharField(max_length=10, validators=[phone], null=True)
-    user_bank = models.ForeignKey(Bank, blank=True, null=True)
-    user_bank_account = models.CharField(max_length=20, validators=[numeric], null=True)  # счет
+    phone = models.CharField(verbose_name=u'Сотовый телефон', max_length=10, validators=[phone], null=True)
+    company = models.ForeignKey(Company, verbose_name=u'Организация', blank=True, null=True)
 
     #### АТРИБУТЫ #########
     # Атрибут суперпользователя
@@ -87,8 +115,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # Устанавливая auto_now_add=True, мы говорим Джанго автоматически
     # ставить время при создании, причем далее поле будет нередактируемым.
     #  Аналогично и auto_now=True, разница в том, что поле каждый раз обновляется с обновлением объекта
-    date_joined = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+    date_joined = models.DateTimeField(verbose_name=u'Дата создания', auto_now_add=True)
+    date_updated = models.DateTimeField(verbose_name=u'Последнее обновление', auto_now=True)
 
 
 
@@ -101,19 +129,13 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # логинимся по email
     USERNAME_FIELD = 'username'
     # обязательное поле
-    REQUIRED_FIELDS = ['email', ]
+    REQUIRED_FIELDS = ['nickname', 'email', ]
 
     def __str__(self):
-        return self.username
+        return self.nickname
 
     def get_full_name(self):
         return ' '.join([self.first_name, self.last_name])
-
-    def get_boss_full_name(self):
-        return ' '.join([self.company_boss_first_name, self.company_boss_second_name, self.company_boss_last_name])
-
-    def get_boss_short_name(self):
-        return ' '.join([self.company_boss_first_name, self.company_boss_second_name])
 
     def get_short_name(self):
         return self.first_name
@@ -125,8 +147,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return True
 
     def get_photo(self):
-        return self.user_photo
+        return self.photo
 
-    class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
+    def get_company(self):
+        if self.company is not None:
+            return self.company.name
+        else:
+            return 'Частное лицо'

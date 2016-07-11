@@ -9,6 +9,8 @@ def home_page(request):
     args = {}
     args.update(csrf(request))
     args['username'] = auth.get_user(request).username
-    args['form'] = UserCreationForm()
+    if request.user.is_authenticated():
+        args['nickname'] = auth.get_user(request).nickname
+    # args['form'] = UserCreationForm()
     return render_to_response('homepage.html', args)
 

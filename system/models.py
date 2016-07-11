@@ -14,16 +14,16 @@ class Status(models.Model):
         return self.name
     @property
     def csscolor(self):
-        return '#' + self.csscolor
+        return '#%s' % self.csscolor
 
 
 class Developer(models.Model):
     class Meta:
-        verbose_name = 'Изготовитель'
-        verbose_name_plural = 'Изготовители'
+        verbose_name = 'Производитель'
+        verbose_name_plural = 'Производители'
         db_table = 'developer'
 
-    name = models.CharField(verbose_name=u'Изготовитель', max_length=20)
+    name = models.CharField(verbose_name=u'Производитель', max_length=20)
     def __str__(self):
         return self.name
 
@@ -33,7 +33,9 @@ class Brand(models.Model):
         verbose_name = 'Бренд'
         verbose_name_plural = 'Бренды'
         db_table = 'brand'
-    name = models.CharField(verbose_name=u'Бренд', max_length=20)
+
+    name = models.CharField(verbose_name=u'Бренд', max_length=20,
+                            help_text=u"Бренд это промышленый стандарт или тип производимого товара")
     def __str__(self):
         return self.name
 
@@ -45,10 +47,10 @@ class Toner(models.Model):
         verbose_name_plural = 'Тонеры'
         db_table = 'toner'
     name = models.CharField(verbose_name=u'Тонер', max_length=20)
-    brand = models.ForeignKey(Brand, verbose_name=u'Марка тонера')
-    developer = models.ForeignKey(Developer, verbose_name=u'Производитель тонера')
+    brand = models.ForeignKey(Brand, verbose_name=u'Марка тонера', unique=False)
+    developer = models.ForeignKey(Developer, verbose_name=u'Производитель тонера', unique=False)
     def __str__(self):
-        return self.brand.name + " " + self.name
+        return "%s %s" % (self.brand.name, self.name)
 
 
 class Cartridge(models.Model):

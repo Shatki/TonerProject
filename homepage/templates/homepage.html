@@ -10,9 +10,9 @@
         <li><a class="smoothscroll" href="#portfolio">Наши работы</a></li>
         <li><a class="smoothscroll" href="#testimonials">Отзывы</a></li>
         <li><a class="smoothscroll" href="#contact">Контакты</a></li>
-        {% if username %}
+        {% if nickname %}
             <li><a href="/auth/logout/">Выйти</a>
-                <a href="/{{ username }}"><img class="photo" title="{{ username }}" src="/{{ username }}/photo"/></a>
+                <a href="/{{ nickname }}"><img class="photo" title="{{ nickname }}" src="/{{ nickname }}/photo"/></a>
             </li>
         {% else %}
             <li id="loadloginform"><a id="singin" href="#">Вход в систему</a></li>

@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from .models import Account, Bank
+from .models import Account, Bank, Company
 
 
 class AccountCreationForm(forms.ModelForm):
@@ -42,10 +42,10 @@ class AccountCreationForm(forms.ModelForm):
 class BankChangeForm(forms.ModelForm):
     class Meta:
         model = Bank
-        fields = ('bank_name',
-                  'bank_address',
-                  'bank_account',
-                  'bank_bik',)
+        fields = ('name',
+                  'address',
+                  'account',
+                  'bik',)
 
 
 class AccountChangeForm(forms.ModelForm):
@@ -56,6 +56,7 @@ class AccountChangeForm(forms.ModelForm):
         fields = ('username',
                   'email',
                   'password',
+                  'company',
                   'is_admin',
                   'is_staff',
                   'is_company',
@@ -66,23 +67,21 @@ class AccountChangeForm(forms.ModelForm):
 
 
 class BankAdmin(UserAdmin):
-    list_display = ('bank_name',
-                    'bank_address',
-                    'bank_account',
-                    'bank_bik',)
-    ordering = ('bank_name',)
+    list_display = ('name',
+                    'address',
+                    'account',
+                    'bik',)
+    ordering = ('name',)
 
 
 
 @admin.register(Account)
 class AccountAdmin(UserAdmin):
-    list_display = ('company_name',
-                    'company_phone',
-                    'username',
+    list_display = ('username',
                     'email',
                     'is_staff',
                     'is_admin',
-                    'is_company',
+                    'company',
                     )
 
     list_filter = ('is_admin',
@@ -90,33 +89,89 @@ class AccountAdmin(UserAdmin):
                    'is_company',
                    )
     fieldsets = (
-        (None, {'fields': ('email', 'username', 'password')}),
-        ('Personal info', {'fields': ('email', 'first_name', 'last_name',
-                                      'user_photo', 'tagline')}),
-        ('Company info', {'fields': ('company_name', 'company_boss_first_name',
-                                     'company_boss_second_name', 'company_boss_last_name',
-                                     'company_inn', 'company_ogrn', 'company_okpo', 'company_okato',
-                                     'company_phone', 'user_bank', 'user_bank_account')}),
+        (None, {
+            'fields': ('email',
+                       'username',
+                       'password',
+                       )}),
+        (u'Персональная информация', {
+            'fields': (
+                'email',
+                'first_name',
+                'last_name',
+                'photo',
+                'company',
+                'tagline',
+            )}),
 
-        ('Permissions', {'fields': ('is_admin', 'is_staff', 'is_company', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login',)}),
+        (u'Права доступа', {
+            'fields': (
+                'is_admin',
+                'is_staff',
+                'is_company',
+                'groups',
+                'user_permissions',
+            )}),
+        (u'Важные даты', {
+            'fields': (
+                'last_login',
+            )}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_admin')
-        }),
+            'fields': (
+                'email',
+                'password1',
+                'password2',
+                'is_staff',
+                'is_admin',
+            )}),
     )
 
     search_fields = ('username',
-                     'email',
-                     'company_name',)
+                     'email',)
     ordering = ('email',)
-    filter_horizontal = ('groups', 'user_permissions',)
+    filter_horizontal = ('groups',
+                         'user_permissions',)
 
     form = AccountChangeForm
     add_form = AccountCreationForm
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ('name',
+                    'boss_first_name',
+                    'boss_second_name',
+                    'boss_last_name',
+                    )
+    fieldsets = (
+        (None, {
+            'fields': (
+                'name',
+            )}),
+        (u'Контактная информация', {
+            'fields': (
+                'boss_first_name',
+                'boss_second_name',
+                'boss_last_name',
+                'address',
+            )}),
+        (u'Реквизиты', {
+            'fields': (
+                'inn',
+                'ogrn',
+                'okpo',
+                'okato',
+                'bank',
+                'bankaccount',
+            )}),
+    )
+
+    search_fields = ('name',)
+    ordering = ('name',)
 
 
 admin.site.unregister(Group)

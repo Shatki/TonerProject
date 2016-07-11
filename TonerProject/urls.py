@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^auth/', include('authentication.urls')),
     url(r'^dashboard/', dashboard.views.dashboard),
     # url(r'^test/', dashboard.views.testpage),
-    url(r'^(?P<username>\w+)/photo', authentication.views.get_photo),
-    url(r'^(?P<username>\w+)', authentication.views.dispatch_user),
+    url(r'^(?P<nickname>\w+)/photo', authentication.views.get_photo),
+    url(r'^(?P<nickname>\w+)', authentication.views.dispatch_user),
     url(r'^$', homepage.views.home_page),
 ]

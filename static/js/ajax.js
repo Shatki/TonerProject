@@ -5,7 +5,7 @@
  -----------------------------------------------------------------------------------*/
 
 /*----------------------------------------------------*/
-/*	Login/Register form
+/*	AJAX Setup
  ------------------------------------------------------*/
 $.ajaxSetup({
     beforeSend: function (xhr, settings) {
@@ -127,7 +127,7 @@ $(document).on('click', '#login-btn', function () {
 });
 
 // Дополнительно: возвращает стиль элементов к исходному после индикации ошибки
-$(document).on('click', 'form', function () {
+$(document).on('click', 'form#login-dlg', function () {
     //Восстанавливаем значения стиля после индикации ошибки
     document.getElementById("username").style.backgroundColor = '#ffffff';
     document.getElementById("username").style.borderColor = '#cccccc';
@@ -162,11 +162,11 @@ $(document).on('click', '#register-btn', function () {
 
 
 /*----------------------------------------------------*/
-/*	Personal info form
+/*	Personal info change form
  ------------------------------------------------------*/
 
-$('#save-btn').click(function () {
-    var data = $('DIV #personalinfo').serialize();
+$('#user-save-btn').click(function () {
+    var data = $('form#person-form').serialize();
     $.ajax({
         url: '/auth/changeuserinfo/',
         method: 'POST',
@@ -176,6 +176,32 @@ $('#save-btn').click(function () {
             if (data == 'Ok') {
                 // Пока кокой-то деревянный способ
                 location.href = "#";
+                alert('Данные пользователя успешно изменены');
+                location.reload();
+            } else {
+                alert(data);
+            }
+        }
+    });
+    return false;
+});
+
+/*----------------------------------------------------*/
+/*	Company info change form
+ ------------------------------------------------------*/
+
+$('#company-save-btn').click(function () {
+    var data = $('form#company-form').serialize();
+    $.ajax({
+        url: '/auth/changecompanyinfo/',
+        method: 'POST',
+        data: data,
+        cache: false,
+        success: function (data) {
+            if (data == 'Ok') {
+                // Пока кокой-то деревянный способ
+                location.href = "#";
+                alert('Данные организации успешно изменены');
                 location.reload();
             } else {
                 alert(data);
