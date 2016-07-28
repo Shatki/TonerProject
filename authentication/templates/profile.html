@@ -30,7 +30,7 @@
             <div id="personalinfo" class="row">
                 <div class="twelve columns">
                     <div class="panel">
-                        <form id="person-form">
+                        <form id="person-form" method="post">
                             <!--Фото слева -->
                             <div class="four columns">
                                 <img class="profile-photo" src="/{{ userprofile.nickname }}/photo" alt="Профильное фото"
@@ -102,7 +102,7 @@
 
                     </div>
                     <div class="panel">
-                        <form id="company-form"
+                        <form id="company-form" method="post"
                                 {% if userprofile.is_company %}
                              style="display: block;"
                                 {% else %}
@@ -110,6 +110,9 @@
                                 {% endif %}
                                 >
                             <!--Данные компании -->
+                            <div class="twelve columns">
+                                <h1>Организация</h1>
+                            </div>
                             <div class="nine columns">
                                 <label class="">Полное наименование организации:</label>
                                 <input type="text" name="company_name"

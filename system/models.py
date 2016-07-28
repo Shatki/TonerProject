@@ -58,9 +58,12 @@ class Cartridge(models.Model):
         verbose_name = 'Картридж'
         verbose_name_plural = 'Картриджи'
         db_table = 'cartridge'
-    name = models.CharField(verbose_name=u'Модель картриджа', max_length=20)
-    toner = models.ForeignKey(Toner, verbose_name=u'Тип тонера')
-    weight = models.IntegerField(verbose_name=u'Вес(грамм)')
+
+    name = models.CharField(verbose_name=u'Модель картриджа', max_length=20, blank=False)
+    toner = models.ForeignKey(Toner, verbose_name=u'Тип тонера', blank=False)
+    weight = models.IntegerField(verbose_name=u'Вес(грамм)', default=50)
+    resource = models.IntegerField(verbose_name=u'Ресурс печати одной заправки(страниц)', default=1000)
+    refill_price = models.IntegerField(verbose_name=u'Стоимость заправки(рублей)', default=400)
     def __str__(self):
         return self.name
 
@@ -79,13 +82,43 @@ class Printer(models.Model):
 
 class RepairPart(models.Model):
     class Meta:
-        verbose_name = 'Запчасть'
-        verbose_name_plural = 'Запчасти'
+        verbose_name = 'Компонент'
+        verbose_name_plural = 'Компоненты и ЗЧ'
         db_table = 'repair part'
-    name = models.CharField(verbose_name=u'Модель принтера', max_length=20)
+
+    name = models.CharField(verbose_name=u'Компонент', max_length=20)
+    cartridge = models.ForeignKey(Cartridge, blank=True, verbose_name=u'Используется в картридже')
+    printer = models.ForeignKey(Printer, blank=True, verbose_name=u'Используется в устройстве')
+
+    def __str__(self):
+        return self.name
 
 
-# Модель приемки заказов на картриджи.
+class Work(models.Model):
+    class Meta:
+        verbose_name = 'Вид работы'
+        verbose_name_plural = 'Вид работ'
+        db_table = 'work'
+
+    name = models.CharField(verbose_name=u'Вид работы', max_length=30, blank=False)
+
+    def __str__(self):
+        return self.name
+
+
+class Device(models.Model):
+    class Meta:
+        verbose_name = 'Устройство'
+        verbose_name_plural = 'Устройства'
+        db_table = 'device'
+
+    name = models.CharField(verbose_name=u'Модель устройства', max_length=20)
+    brand = models.ForeignKey(Brand, verbose_name=u'Производитель устройства')
+
+    def __str__(self):
+        return "%s %s" % (self.brand.name, self.name)
+
+
 class Order(models.Model):
     class Meta:
         verbose_name = 'Заказ'
@@ -93,9 +126,14 @@ class Order(models.Model):
         db_table = 'order'
     number = models.CharField(max_length=10, verbose_name=u'Номер заказа', validators=[validator_numerator],
                               help_text=u"Пожалуйста используйте следующий формат: AA-xxxxxxx")
-    date = models.DateField(verbose_name=u'Дата заказа')
+    date = models.DateField(verbose_name=u'Дата заказа', auto_now_add=True)
     user = models.ForeignKey(Account, verbose_name=u'Клиент')
-    cartridge = models.ForeignKey(Cartridge, verbose_name=u'Картридж')
+    work = models.ForeignKey(Work, verbose_name=u'Вид работ')
+    cost = models.IntegerField(verbose_name=u'Стоимость', editable=True, default=0)
+    # Оборудованиe
+    device = models.ForeignKey(Device, verbose_name='Устройство')
+    # cartridge = models.ForeignKey(Cartridge, verbose_name=u'Картридж')
+    # Вид работы
     comments = models.TextField(max_length=100, verbose_name=u'Комментарий', blank=True)
     status = models.ForeignKey(Status, verbose_name=u'Статус заказа')
     def __str__(self):

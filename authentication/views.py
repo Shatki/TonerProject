@@ -120,21 +120,29 @@ def profile(request):
 @ensure_csrf_cookie
 def public_profile(request, nickname):
     # Тут код публичного профиля
-    public_profile = Account.objects.get(nickname=nickname)
-    args = {}
-    args['userprofile'] = request.user
-    args['public_phone'] = public_profile.phone
-    args['public_nickname'] = public_profile.nickname
-    args['public_first_name'] = public_profile.first_name
-    args['public_last_name'] = public_profile.last_name
-    if public_profile.is_company == True:
-        try:
-            args['public_company_name'] = Company.objects.get(id=public_profile.company_id).name
-        except Company.DoesNotExist:
-            args['public_company_name'] = "Ошибка БД. Обратитесь к администратору"
-            # Код отправки баг репорта администратору
-    else:
-        args['public_company_name'] = "Частное лицо"
+    try:
+        public_profile = Account.objects.get(nickname=nickname)
+        args = {}
+        args['userprofile'] = request.user
+        args['public_phone'] = public_profile.phone
+        args['public_nickname'] = public_profile.nickname
+        args['public_first_name'] = public_profile.first_name
+        args['public_last_name'] = public_profile.last_name
+        if public_profile.is_company == True:
+            try:
+                args['public_company_name'] = Company.objects.get(id=public_profile.company_id).name
+            except Company.DoesNotExist:
+                args['public_company_name'] = "Ошибка БД. Обратитесь к администратору"
+                # Код отправки баг репорта администратору
+                return HttpResponse(
+                    u'Ошибка в view.public_profile. Не могу получить доступ к учетной записи организации в БД',
+                    content_type='text/html')
+        else:
+            args['public_company_name'] = "Частное лицо"
+    except Account.DoesNotExist:
+        # Баг репорт.
+        return HttpResponse(u'Ошибка в view.public_profile. Не могу получить доступ к учетной записи пользователя в БД',
+                            content_type='text/html')
 
     args.update(csrf(request))
     return render_to_response('public_profile.html', args)
@@ -178,6 +186,13 @@ def change_user_info(request):
             return HttpResponse(u'Очень короткий email', content_type='text/html')
         if user_for_change.email.find('@') == -1 or user_for_change.email.find('.') == -1:
             return HttpResponse(u'Не верный email', content_type='text/html')
+
+        # phone
+        user_for_change.phone = request.POST.get('userprofile_phone')
+        if len(user_for_change.phone) != 10:
+            return HttpResponse(u'Контактный телефон должен состоять из 10 цифр', content_type='text/html')
+        if not user_for_change.phone.isdigit():
+            return HttpResponse(u'Контактный телефон должен состоять только из цифр', content_type='text/html')
 
         # first_name
         user_for_change.first_name = request.POST.get('userprofile_first_name')
