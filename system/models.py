@@ -11,10 +11,10 @@ class Status(models.Model):
     name = models.CharField(max_length=20, verbose_name=u'Статус заказа')
     color = models.CharField(max_length=6, validators=[hexnumeric], verbose_name=u'Цвет пиктограммы', default='ffffff')
     def __str__(self):
-        return self.name
+        return self.nameыы
     @property
     def csscolor(self):
-        return '#%s' % self.csscolor
+        return '#%s' % self.color
 
 
 class Developer(models.Model):
