@@ -12,7 +12,7 @@ def validator_numerator(value):
         raise ValidationError(u'%s укажите цифровой номер заказа' % value)
 
 
-numeric = RegexValidator(r'^[0-9]*$', message=u'Только цифровые символы допустимы.')
+numeric = RegexValidator(r'^[0-9]*$', message=u'Допустимы только цифровые символы.')
 hexnumeric = RegexValidator(r'^[0-9a-fA-F]*$', message=u'Должен указывается в шестнадцатиричной системе.')
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message=u'Только буквенноцифровые символы допустимы.')
 phone = RegexValidator(regex='^\d{10}$', message=u'Укажите правильный номер телефона')
