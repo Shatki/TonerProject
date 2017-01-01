@@ -12,6 +12,12 @@ def validator_numerator(value):
         raise ValidationError(u'%s укажите цифровой номер заказа' % value)
 
 
+def validator_warranty(value):
+    if value < 0:
+        raise ValidationError(u'%i - не может быть верным гарантийным сроком ' % value)
+    if value > 60:
+        raise ValidationError(u'%i - слишком большой гарантийный срок' % value)
+
 numeric = RegexValidator(r'^[0-9]*$', message=u'Допустимы только цифровые символы.')
 hexnumeric = RegexValidator(r'^[0-9a-fA-F]*$', message=u'Должен указывается в шестнадцатиричной системе.')
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message=u'Только буквенноцифровые символы допустимы.')

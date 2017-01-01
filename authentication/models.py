@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from system.validators import numeric, phone, alphanumeric
+
+from TonerProject.validators import numeric, phone, alphanumeric
 
 
 class Bank(models.Model):
