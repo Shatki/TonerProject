@@ -127,6 +127,9 @@ class Features(models.Model):
         return self.group.belongs.first().name + ' | ' + self.group.name + ' | ' \
                + self.feature.name + ': ' + self.name
 
+    def only_name(self):
+        return self.name
+
 
 class Product(models.Model):
     class Meta:
@@ -139,9 +142,66 @@ class Product(models.Model):
     category = models.ForeignKey(Category, verbose_name=u'категория продукта')
     developer = models.ForeignKey(Developer, verbose_name=u'производитель продукта')
     code = models.ForeignKey(Code, verbose_name=u'коды продукта:', null=True, blank=True)
-    features = models.ManyToManyField(Features, verbose_name=u'характеристики продукта', blank=True)
-    include = models.ManyToManyField("self", symmetrical=True, default=None, verbose_name=u'подходит для:', blank=True)
+    features = models.ManyToManyField(Features, verbose_name=u'характеристики продукта',
+                                      related_name='features', blank=True)
+    include = models.ManyToManyField('self', symmetrical=True, default=None,
+                                     verbose_name=u'подходит для:', blank=True)
+    # Параметры для отображения информации в наименовании
+    first_view = models.ForeignKey(Features, verbose_name=u'первая отображаемая в наименовании характеристика',
+                                   related_name='first_features_view', null=True, blank=True)
+    second_view = models.ForeignKey(Features, verbose_name=u'вторая отображаемая в наименовании характеристика',
+                                    related_name='second_features_view', null=True, blank=True)
+
+    third_view = models.ForeignKey(Features, verbose_name=u'третья отображаемая в наименовании характеристика',
+                                   related_name='third_features_view', null=True, blank=True)
+
+    fourth_view = models.ForeignKey(Features, verbose_name=u'четвертая отображаемая в наименовании характеристика',
+                                    related_name='fourth_features_view', null=True, blank=True)
+
+    fifth_view = models.ForeignKey(Features, verbose_name=u'пятая отображаемая в наименовании характеристика',
+                                   related_name='fifth_features_view', null=True, blank=True)
+
+    sixth_view = models.ForeignKey(Features, verbose_name=u'шестая отображаемая в наименовании характеристика',
+                                   related_name='sixth_features_view', null=True, blank=True)
 
     def __str__(self):
-        return self.category.name + ' ' + self.developer.name + ' ' + self.name
+        retstr = self.category.name + ' ' + self.developer.name + ' ' + self.name
+        if self.first_view:
+            retstr = retstr + ', ' + self.first_view.name
 
+        if self.second_view:
+            retstr = retstr + ', ' + self.second_view.name
+
+        if self.third_view:
+            retstr = retstr + ', ' + self.third_view.name
+
+        if self.fourth_view:
+            retstr = retstr + ', ' + self.fourth_view.name
+
+        if self.fifth_view:
+            retstr = retstr + ', ' + self.fifth_view.name
+
+        if self.sixth_view:
+            retstr = retstr + ', ' + self.sixth_view.name
+        return retstr
+
+    def __unicode__(self):
+        retstr = self.category.name + ' ' + self.developer.name + ' ' + self.name
+        if self.first_view:
+            retstr = retstr + ', ' + self.first_view.name
+
+        if self.second_view:
+            retstr = retstr + ', ' + self.second_view.name
+
+        if self.third_view:
+            retstr = retstr + ', ' + self.third_view.name
+
+        if self.fourth_view:
+            retstr = retstr + ', ' + self.fourth_view.name
+
+        if self.fifth_view:
+            retstr = retstr + ', ' + self.fifth_view.name
+
+        if self.sixth_view:
+            retstr = retstr + ', ' + self.sixth_view.name
+        return retstr

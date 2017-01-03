@@ -7,9 +7,9 @@ from TonerProject.validators import hexnumeric, numeric, validator_numerator, va
 # Create your models here.
 class Status(models.Model):
     class Meta:
-        verbose_name = 'статус'
-        verbose_name_plural = 'статусы'
-        db_table = 'status'
+        verbose_name = 'статус выполненной работы'
+        verbose_name_plural = 'статусы выполенных работ'
+        db_table = 'service_status'
 
     name = models.CharField(max_length=20, verbose_name=u'статус заказа')
     color = models.CharField(max_length=6, validators=[hexnumeric], verbose_name=u'цвет пиктограммы', default='ffffff')

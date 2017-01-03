@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Информация о товаре: {{ product }}</title>
+</head>
+<body>
+<h2>{{ product }}</h2>
+<h4>{{ product.developer }}</h4>
+
+{% for group in features_group %}
+
+    <h3>{{ group.name }}</h3>
+    {% for feature in features %}
+
+        {% if feature.group.name == group.name %}
+            {{ feature.feature }}: {{ feature.name }}
+            <br>
+        {% endif %}
+
+    {% endfor %}
+    <hr>
+
+{% endfor %}
+
+</body>
+</html>

@@ -4,6 +4,21 @@ from TonerProject.validators import hexnumeric, numeric, validator_numerator, va
 
 
 # Create your models here.
+class Status(models.Model):
+    class Meta:
+        verbose_name = 'статус заказа'
+        verbose_name_plural = 'статусы заказов'
+        db_table = 'trade_status'
+
+    name = models.CharField(max_length=20, verbose_name=u'статус заказа')
+    color = models.CharField(max_length=6, validators=[hexnumeric], verbose_name=u'цвет пиктограммы', default='ffffff')
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def csscolor(self):
+        return '#%s' % self.color
 
 class Package(models.Model):
     class Meta:
@@ -31,4 +46,4 @@ class Item(models.Model):
     package = models.ForeignKey(Package, verbose_name=u'тип поставки', null=True)
 
     def __str__(self):
-        return self.product.__str__()
+        return str(self.product) + ', ' + self.package.name
