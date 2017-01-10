@@ -1,5 +1,8 @@
 from django.db import models
-from TonerProject.validators import hexnumeric, numeric, validator_numerator
+from TonerProject.validators import hexnumeric, numeric, validator_numerator, validator_path
+from django.utils.text import slugify
+from .translit_v5 import transliterate
+
 
 # ********** Основные Классы *************
 class Code(models.Model):
@@ -40,6 +43,7 @@ class Code(models.Model):
     def ean13(self):
         return self.code_ean13
 
+
 # *********** Общие Классы **************
 class Country(models.Model):
     class Meta:
@@ -75,13 +79,25 @@ class Category(models.Model):
         verbose_name = 'категория товара'
         verbose_name_plural = 'категории товаров'
         db_table = 'category'
+        ordering = ('name',)
 
     name = models.CharField(verbose_name=u'категория товара', max_length=30,
                             help_text=u"наименование категории товара")
+    path = models.CharField(verbose_name=u'наименование для адресной строки', max_length=30,
+                            validators=[validator_path],
+                            help_text=u"категории товара в адресной строке в латинских символах")
     parent = models.ForeignKey("self", verbose_name=u'Родительскиая категория', null=True, blank=True, default=None)
 
     def __str__(self):
         return self.name
+
+    def get_path(self):
+        path = '/'
+        if self.parent is not None:
+            path = self.parent.get_path() + self.parent.path + '/'
+        return path
+
+    get_path.short_description = 'Путь'
 
 
 class Type(models.Model):
@@ -89,13 +105,23 @@ class Type(models.Model):
         verbose_name = 'группа характеристик'
         verbose_name_plural = 'группы характеристик'
         db_table = 'type_of_feature'
+        ordering = ('id',)
 
     name = models.CharField(verbose_name=u'группа характеристики', max_length=40,
                             help_text=u"наименование группы характеристики товара")
-    belongs = models.ManyToManyField(Category, verbose_name=u'принадлежность к категории товаров:')
+    belongs = models.ManyToManyField(Category, verbose_name=u'принадлежность к категории товаров')
 
     def __str__(self):
         return self.belongs.first().name + " | " + self.name
+
+    def belongs_list(self):
+        belongs_str = ''
+        belongs_list = self.belongs.all()
+        for belongs in belongs_list:
+            belongs_str += ', ' + belongs.name
+        return belongs_str.lstrip(', ')
+
+    belongs_list.short_description = 'Принадлежность к категориям'
 
 
 class Feature(models.Model):
@@ -116,13 +142,15 @@ class Features(models.Model):
         verbose_name = 'характиристика товара'
         verbose_name_plural = 'характиристики товаров'
         db_table = 'features'
+        ordering = ('group',)
 
-    feature = models.ForeignKey(Feature, verbose_name=u'наименование характеристики:')
+    feature = models.ForeignKey(Feature, verbose_name=u'наименование характеристики')
     group = models.ForeignKey(Type, verbose_name=u'группа характеристик товара',
                               help_text=u"группа принадлежности характеристики")
     name = models.CharField(verbose_name=u'Модель или количество', max_length=70,
                             help_text=u"описание характеристик товара, "
                                       u"может иметь количественное или булево значение 'есть/нет'")
+
     def __str__(self):
         return self.group.belongs.first().name + ' | ' + self.group.name + ' | ' \
                + self.feature.name + ': ' + self.name
@@ -147,21 +175,21 @@ class Product(models.Model):
     include = models.ManyToManyField('self', symmetrical=True, default=None,
                                      verbose_name=u'подходит для:', blank=True)
     # Параметры для отображения информации в наименовании
-    first_view = models.ForeignKey(Features, verbose_name=u'первая отображаемая в наименовании характеристика',
+    first_view = models.ForeignKey(Features, verbose_name=u'первая характеристика',
                                    related_name='first_features_view', null=True, blank=True)
-    second_view = models.ForeignKey(Features, verbose_name=u'вторая отображаемая в наименовании характеристика',
+    second_view = models.ForeignKey(Features, verbose_name=u'вторая характеристика',
                                     related_name='second_features_view', null=True, blank=True)
 
-    third_view = models.ForeignKey(Features, verbose_name=u'третья отображаемая в наименовании характеристика',
+    third_view = models.ForeignKey(Features, verbose_name=u'третья характеристика',
                                    related_name='third_features_view', null=True, blank=True)
 
-    fourth_view = models.ForeignKey(Features, verbose_name=u'четвертая отображаемая в наименовании характеристика',
+    fourth_view = models.ForeignKey(Features, verbose_name=u'четвертая характеристика',
                                     related_name='fourth_features_view', null=True, blank=True)
 
-    fifth_view = models.ForeignKey(Features, verbose_name=u'пятая отображаемая в наименовании характеристика',
+    fifth_view = models.ForeignKey(Features, verbose_name=u'пятая характеристика',
                                    related_name='fifth_features_view', null=True, blank=True)
 
-    sixth_view = models.ForeignKey(Features, verbose_name=u'шестая отображаемая в наименовании характеристика',
+    sixth_view = models.ForeignKey(Features, verbose_name=u'шестая характеристика',
                                    related_name='sixth_features_view', null=True, blank=True)
 
     def __str__(self):

@@ -12,11 +12,22 @@ def validator_numerator(value):
         raise ValidationError(u'%s укажите цифровой номер заказа' % value)
 
 
+def validator_path(string):
+    for s_ in string:
+        if s_ == ' ':
+            raise ValidationError(u'В строке "%s" замените пробелы символом подчеркивания!' % string)
+        if ord('a') <= ord(s_) <= ord('z') or ord('A') <= ord(s_) <= ord('Z') or s_ == '_':
+            pass
+        else:
+            # print(ord('a'), ord(s_), ord('z'), s_)
+            raise ValidationError(u'В строке "%s" привутствуют запрещенные символы!' % string)
+
 def validator_warranty(value):
     if value < 0:
         raise ValidationError(u'%i - не может быть верным гарантийным сроком ' % value)
     if value > 60:
         raise ValidationError(u'%i - слишком большой гарантийный срок' % value)
+
 
 numeric = RegexValidator(r'^[0-9]*$', message=u'Допустимы только цифровые символы.')
 hexnumeric = RegexValidator(r'^[0-9a-fA-F]*$', message=u'Должен указывается в шестнадцатиричной системе.')
