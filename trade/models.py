@@ -33,7 +33,7 @@ class Package(models.Model):
 
 
 class Item(models.Model):
-    # Класс товаров для индивидуального учета по серийным номерам
+    # реальный товар
     class Meta:
         verbose_name = 'товар'
         verbose_name_plural = 'товары'

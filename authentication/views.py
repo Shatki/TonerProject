@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 from django.contrib.auth import get_user_model
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template.context_processors import csrf
-from django.template.loader import get_template
+import django.template.loader
 from django.contrib import auth
 from django.views.decorators.csrf import ensure_csrf_cookie
 from TonerProject.settings import STATIC_URL
-from authentication.models import Bank, Account, Company
+from authentication.models import Account
+from contractor.models import Contractor
 
 
-def loadloginform(request):
-    return HttpResponse(get_template("login.html").render(), content_type='text/html')
+def load_login_form(request):
+    return HttpResponse(django.template.loader.get_template("login.html").render(), content_type='text/html')
 
 
-def loadregisterform(request):
-    return HttpResponse(get_template("register.html").render(), content_type='text/html')
+def load_register_form(request):
+    return HttpResponse(django.template.loader.get_template("register.html").render(), content_type='text/html')
 
 
 @ensure_csrf_cookie
@@ -110,9 +112,15 @@ def dispatch_user(request, nickname, **kwargs):
 def profile(request):
     # Тут код личного профиля
     args = {}
-    args['userprofile'] = request.user
-    args['banks'] = Bank.objects.all()
-    # args['company'] = Company.
+    args['user_profile'] = request.user
+    try:
+        args['banks'] = Contractor.objects.filter(type__name='Банк')
+    except Contractor.DoesNotExist:
+        return HttpResponse(
+            u'Ошибка в view.profile. Не могу прочитать список банков',
+            content_type='text/html')
+    if request.user.company_id != None:
+        args['user_company'] = Company.objects.get(id=request.user.company_id)
     args.update(csrf(request))
     return render_to_response('profile.html', args)
 
@@ -123,7 +131,7 @@ def public_profile(request, nickname):
     try:
         public_profile = Account.objects.get(nickname=nickname)
         args = {}
-        args['userprofile'] = request.user
+        args['user_profile'] = request.user
         args['public_phone'] = public_profile.phone
         args['public_nickname'] = public_profile.nickname
         args['public_first_name'] = public_profile.first_name
@@ -154,8 +162,8 @@ def get_photo(request, nickname):
     try:
         user = Account.objects.get(nickname=nickname)
     except:
-        return redirect(os.path.join(STATIC_URL, "profile/defaultprofileimage.jpg"))
-    return redirect(os.path.join(STATIC_URL, user.get_photo()))
+        return redirect(os.path.join(STATIC_URL, "defaultprofileimage.jpg"))
+    return redirect(os.path.join(STATIC_URL, 'profile/' + user.get_photo()))
 
 
 def change_user_info(request):
@@ -215,7 +223,7 @@ def change_user_info(request):
             user_for_change.is_company = True
             if user_for_change.company_id is None:
                 try:
-                    company_for_change = Company.objects.create()
+                    company_for_change = Contractor.objects.create()
                     user_for_change.company_id = company_for_change
                     user_for_change.is_company = True
                     user_for_change.company.save()
@@ -225,10 +233,10 @@ def change_user_info(request):
             user_for_change.is_company = False
             if user_for_change.company:
                 try:
-                    company_for_change = Company.objects.get(id=user_for_change.company_id)
+                    company_for_change = Contractor.objects.get(id=user_for_change.company_id)
                     company_for_change.delete()
                     user_for_change.company = None
-                except Company.DoesNotExist:
+                except Contractor.DoesNotExist:
                     user_for_change.company = None
         # изменение профиля тут
         user_for_change.save()
@@ -242,102 +250,113 @@ def change_company_info(request):
     if request.user.is_authenticated() and request.POST:
         # Пользователь аутентифицирован
         # необходимо выполнить валидацию каждого поля перед изменением
+        user_for_change = request.user
+
+        try:
+            bank = Contractor.objects.get(name=request.POST.get('company_bank'))
+        except:
+            return HttpResponse(u'Указаный банк не найден в БД', content_type='text/html')
+
+        # name
+        if len(request.POST.get('company_name')) < 4:
+            return HttpResponse(u'Наименование организации не допустимо короткое', content_type='text/html')
+        # boss_first_name
+        if len(request.POST.get('company_boss_first_name')) < 2:
+            return HttpResponse(u'Слишком короткое Имя руководителя', content_type='text/html')
+        if not request.POST.get('company_boss_first_name').isalpha():
+            return HttpResponse(u'Имя пользователя может состоять только из букв', content_type='text/html')
+        # boss_second_name
+        if len(request.POST.get('company_boss_second_name')) < 2:
+            return HttpResponse(u'Слишком короткое Отчество руководителя', content_type='text/html')
+        if not request.POST.get('company_boss_second_name').isalpha():
+            return HttpResponse(u'Отчество руководителя может состоять только из букв', content_type='text/html')
+        # boss_last_name
+        if len(request.POST.get('company_boss_last_name')) < 2:
+            return HttpResponse(u'Слишком короткая Фамилия руководителя', content_type='text/html')
+        if not request.POST.get('company_boss_last_name').isalpha():
+            return HttpResponse(u'Фамилия руководителя может состоять только из букв', content_type='text/html')
+        # phone
+        if len(request.POST.get('company_phone')) != 10:
+            return HttpResponse(u'Телефон организации должен состоять из 10 цифр', content_type='text/html')
+        if not request.POST.get('company_phone').isdigit():
+            return HttpResponse(u'Телефон должен состоять только из цифр', content_type='text/html')
+        # address
+        if len(request.POST.get('company_address')) > 100:
+            return HttpResponse(u'Адрес организации не должен превышать 100 знаков', content_type='text/html')
+        # inn
+        if len(request.POST.get('company_inn')) != 10 and len(request.POST.get('company_inn')) != 12:
+            return HttpResponse(u'ИНН организации должен состоять из 10 или 12 цифр', content_type='text/html')
+        if not request.POST.get('company_inn').isdigit():
+            return HttpResponse(u'ИНН должен состоять только из цифр', content_type='text/html')
+        # ogrn
+        if len(request.POST.get('company_ogrn')) != 15:
+            return HttpResponse(u'ОГРН организации должен состоять из 15 цифр', content_type='text/html')
+        if not request.POST.get('company_ogrn').isdigit():
+            return HttpResponse(u'ОГРН должен состоять только из цифр', content_type='text/html')
+        # okpo
+        if len(request.POST.get('company_okpo')) != 9:
+            return HttpResponse(u'ОКПО организации должен состоять из 9 цифр', content_type='text/html')
+        if not request.POST.get('company_okpo').isdigit():
+            return HttpResponse(u'ОКПО должен состоять только из цифр', content_type='text/html')
+        # okato
+        if len(request.POST.get('company_okato')) != 11:
+            return HttpResponse(u'ОКАТО организации должен состоять из 11 цифр', content_type='text/html')
+        if not request.POST.get('company_okato').isdigit():
+            return HttpResponse(u'ОКАТО должен состоять только из цифр', content_type='text/html')
+        # account
+        if len(request.POST.get('company_account')) != 20:
+            return HttpResponse(u'Банковский счёт должен состоять из 20 цифр', content_type='text/html')
+        if not request.POST.get('company_account').isdigit():
+            return HttpResponse(u'Банковский счёт должен состоять только из цифр', content_type='text/html')
+
+
+            # try:
+            # Создаем новый объект
+            #    company_for_change = Company.objects.create()
+            # company_for_change.save()
+            # except:
+            #    return HttpResponse(u'Не удается создать организацию', content_type='text/html')
         try:
             company_for_change = Company.objects.get(id=request.user.company_id)
         except Company.DoesNotExist:
             try:
-                user_for_change = request.user
                 # Создаем новый объект
                 company_for_change = Company.objects.create()
                 company_for_change.save()
-                user_for_change.company = company_for_change
-                user_for_change.is_company = True
-                user_for_change.save()
             except:
-                return HttpResponse(u'Не удается создать организацию', content_type='text/html')
-
+                return HttpResponse(u'change_company_info: Не удается создать организацию в БД',
+                                    content_type='text/html')
+        # Валидация пройдена изменяем запись в БД
         # name
         company_for_change.name = request.POST.get('company_name')
-        if len(company_for_change.name) < 4:
-            return HttpResponse(u'Наименование организации не допустимо короткое', content_type='text/html')
-
         # boss_first_name
         company_for_change.boss_first_name = request.POST.get('company_boss_first_name')
-        if len(company_for_change.boss_first_name) < 2:
-            return HttpResponse(u'Слишком короткое Имя руководителя', content_type='text/html')
-        if not company_for_change.boss_first_name.isalpha():
-            return HttpResponse(u'Имя пользователя может состоять только из букв', content_type='text/html')
-
         # boss_second_name
         company_for_change.boss_second_name = request.POST.get('company_boss_second_name')
-        if len(company_for_change.boss_second_name) < 2:
-            return HttpResponse(u'Слишком короткое Отчество руководителя', content_type='text/html')
-        if not company_for_change.boss_second_name.isalpha():
-            return HttpResponse(u'Отчество руководителя может состоять только из букв', content_type='text/html')
-
         # boss_last_name
         company_for_change.boss_last_name = request.POST.get('company_boss_last_name')
-        if len(company_for_change.boss_last_name) < 2:
-            return HttpResponse(u'Слишком короткая Фамилия руководителя', content_type='text/html')
-        if not company_for_change.boss_last_name.isalpha():
-            return HttpResponse(u'Фамилия руководителя может состоять только из букв', content_type='text/html')
-
         # phone
         company_for_change.phone = request.POST.get('company_phone')
-        if len(company_for_change.phone) != 10:
-            return HttpResponse(u'Телефон организации должен состоять из 10 цифр', content_type='text/html')
-        if not company_for_change.phone.isdigit():
-            return HttpResponse(u'Телефон должен состоять только из цифр', content_type='text/html')
-
         # address
         company_for_change.address = request.POST.get('company_address')
-        if len(company_for_change.address) > 100:
-            return HttpResponse(u'Адрес организации не должен превышать 100 знаков', content_type='text/html')
-
-
         # inn
         company_for_change.inn = request.POST.get('company_inn')
-        if len(company_for_change.inn) != 10 and len(company_for_change.inn) != 12:
-            return HttpResponse(u'ИНН организации должен состоять из 10 или 12 цифр', content_type='text/html')
-        if not company_for_change.inn.isdigit():
-            return HttpResponse(u'ИНН должен состоять только из цифр', content_type='text/html')
-
         # ogrn
         company_for_change.ogrn = request.POST.get('company_ogrn')
-        if len(company_for_change.ogrn) != 15:
-            return HttpResponse(u'ОГРН организации должен состоять из 15 цифр', content_type='text/html')
-        if not company_for_change.ogrn.isdigit():
-            return HttpResponse(u'ОГРН должен состоять только из цифр', content_type='text/html')
-
         # okpo
         company_for_change.okpo = request.POST.get('company_okpo')
-        if len(company_for_change.okpo) != 9:
-            return HttpResponse(u'ОКПО организации должен состоять из 9 цифр', content_type='text/html')
-        if not company_for_change.okpo.isdigit():
-            return HttpResponse(u'ОКПО должен состоять только из цифр', content_type='text/html')
-
         # okato
         company_for_change.okato = request.POST.get('company_okato')
-        if len(company_for_change.okato) != 11:
-            return HttpResponse(u'ОКАТО организации должен состоять из 11 цифр', content_type='text/html')
-        if not company_for_change.okato.isdigit():
-            return HttpResponse(u'ОКАТО должен состоять только из цифр', content_type='text/html')
-
-        # bank_account
-        company_for_change.bank_account = request.POST.get('company_bank_account')
-        if len(company_for_change.bank_account) != 20:
-            return HttpResponse(u'Банковский счёт должен состоять из 20 цифр', content_type='text/html')
-        if not company_for_change.bank_account.isdigit():
-            return HttpResponse(u'Банковский счёт должен состоять только из цифр', content_type='text/html')
-
+        # account
+        company_for_change.account = request.POST.get('company_account')
         # user_bank
-        try:
-            company_for_change.bank = Bank.objects.get(name=request.POST.get('company_bank'))
-        except:
-            return HttpResponse(u'Указаный банк не найден в БД', content_type='text/html')
+        company_for_change.bank = bank
+
         # изменение профиля тут
+        user_for_change.company = company_for_change
+        user_for_change.is_company = True
+        user_for_change.save()
         company_for_change.save()
         return HttpResponse(u'Ok', content_type='text/html')
-
     else:
         return HttpResponse(u'Bad change Company data', content_type='text/html')

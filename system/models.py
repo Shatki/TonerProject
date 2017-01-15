@@ -1,7 +1,5 @@
 from django.db import models
-from TonerProject.validators import hexnumeric, numeric, validator_numerator, validator_path
-from django.utils.text import slugify
-from .translit_v5 import transliterate
+from TonerProject.validators import numeric, alfa_lat, validator_numerator, validator_path
 
 
 # ********** Основные Классы *************
@@ -233,3 +231,36 @@ class Product(models.Model):
         if self.sixth_view:
             retstr = retstr + ', ' + self.sixth_view.name
         return retstr
+
+
+class Currency(models.Model):
+    class Meta:
+        verbose_name = 'валюта'
+        verbose_name_plural = 'валюты'
+        db_table = 'currency'
+
+    name = models.CharField(max_length=20, verbose_name=u'название валюты')
+    name_4217 = models.CharField(max_length=20, verbose_name=u'название валюты alfa-3 ISO 4217',
+                                 validators=[alfa_lat])
+    code_4217 = models.CharField(max_length=3, verbose_name=u'код валюты number-3 ISO 4217',
+                                 validators=[numeric])
+    course = models.ForeignKey('Course', verbose_name=u'текущий курс', related_name='currency_course')
+
+    def __str__(self):
+        return self.name
+
+
+class Course(models.Model):
+    class Meta:
+        verbose_name = 'курс валюты'
+        verbose_name_plural = 'курсы валют'
+        db_table = 'course'
+
+    currency = models.ForeignKey(Currency, verbose_name=u'валюта', related_name='currency_name')
+    value = models.FloatField(verbose_name=u'курс',
+                              help_text=u'введите курс валюты используйте запятую для разделения целой и дробной части')
+    relation = models.ForeignKey(Currency, verbose_name=u'в валюте', related_name='currency_relation')
+    date = models.DateField(verbose_name=u'дата изменения курса', default='01.01.1980')
+
+    def __str__(self):
+        return self.value.__str__() + ' (' + self.date.today().__str__() + ')'

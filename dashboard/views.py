@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response, redirect
-from django.contrib import auth
+# from django.contrib import auth
 from django.template.context_processors import csrf
 # from django.template.loader import get_template
-from authentication.models import Bank, Account
+# from authentication.models import Account
+from contractor.models import Contractor
 from authentication.views import login
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -19,12 +20,13 @@ def dashboard(request):
         # Тут код личного профиля
         args = {}
         args['userprofile'] = request.user
-        args['banks'] = Bank.objects.all()
+        args['banks'] = Contractor.objects.filter(type='Банк')
         args.update(csrf(request))
         return render_to_response('dashboard.html', args)
     else:
         # отправляем на аутентификацию и проверяем пользователя
         return login(request)
 
+
 def testpage(request):
-    return (render_to_response('test.html', testpage))
+    return render_to_response('test.html', testpage)

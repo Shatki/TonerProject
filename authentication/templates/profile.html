@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {% extends 'base.html' %}
 {% load staticfiles %}
 
@@ -14,8 +15,8 @@
                     <li><a class="smoothscroll" href="#Raports">Отчёты</a></li>
                     {% if userprofile.username %}
                         <li><a href="/auth/logout/">Выйти</a>
-                            <a href="/{{ username }}"><img class="photo" title="{{ userprofile.nickname }}"
-                                                           src="/{{ userprofile.nickname }}/photo"/></a>
+                            <a href="/{{ username }}"><img class="photo" title="{{ user_profile.nickname }}"
+                                                           src="/{{ user_profile.nickname }}/photo"/></a>
                         </li>
                     {% else %}
                         <li id="loadloginform"><a id="login" href="#">Вход в систему</a></li>
@@ -33,12 +34,13 @@
                         <form id="person-form" method="post">
                             <!--Фото слева -->
                             <div class="four columns">
-                                <img class="profile-photo" src="/{{ userprofile.nickname }}/photo" alt="Профильное фото"
+                                <img class="profile-photo" src="/{{ user_profile.nickname }}/photo"
+                                     alt="Профильное фото"
                                      title="Изменить фото..."/>
                                 <!-- радиосвич компания или нет -->
 
                                 <input class="checkbox" type="checkbox" name="userprofile_is_company"
-                                        {% if userprofile.is_company %}
+                                        {% if user_profile.is_company %}
                                        checked
                                         {% endif %}
                                        id="iscompany">
@@ -53,25 +55,25 @@
 
                             <div class="four columns">
                                 <label class="">Никнейм*:</label>
-                                <input type="text" name="userprofile_nickname" value="{{ userprofile.nickname }}"
+                                <input type="text" name="userprofile_nickname" value="{{ user_profile.nickname }}"
                                        placeholder='Имя пользователя в системе'/>
                             </div>
 
                             <div class="four columns">
                                 <label class="">Телефон:</label>
-                                <input type="text" name="userprofile_phone" value="{{ userprofile.phone }}"
+                                <input type="text" name="userprofile_phone" value="{{ user_profile.phone }}"
                                        placeholder='Контактный телефон'/>
                             </div>
 
                             <div class="four columns">
                                 <label class="">E-mail*:</label>
-                                <input type="text" name="userprofile_email" value="{{ userprofile.email }}"
+                                <input type="text" name="userprofile_email" value="{{ user_profile.email }}"
                                        placeholder="Электронная почта"/>
                             </div>
 
                             <div class="four columns">
                                 <label class="">Логин*:</label>
-                                <input type="text" name="userprofile_username" value="{{ userprofile.username }}"
+                                <input type="text" name="userprofile_username" value="{{ user_profile.username }}"
                                        placeholder='Логин, e-mail или номер телефона'/>
                             </div>
 
@@ -85,13 +87,13 @@
 
                             <div class="four columns">
                                 <label class="">Фамилия*:</label>
-                                <input type="text" name="userprofile_last_name" value="{{ userprofile.last_name }}"
+                                <input type="text" name="userprofile_last_name" value="{{ user_profile.last_name }}"
                                        placeholder="Фамилия"/>
                             </div>
 
                             <div class="eight columns">
                                 <label class="">Tag-Line:</label>
-                                <input type="text" name="userprofile_tagline" value="{{ userprofile.tagline }}"
+                                <input type="text" name="userprofile_tagline" value="{{ user_profile.tagline }}"
                                        placeholder="Тут можно оставить себе заметку или задачу на будущее"/>
                             </div>
                             <div class="four columns">
@@ -103,7 +105,7 @@
                     </div>
                     <div class="panel">
                         <form id="company-form" method="post"
-                                {% if userprofile.is_company %}
+                                {% if user_profile.is_company %}
                              style="display: block;"
                                 {% else %}
                              style="display: none;"
@@ -116,53 +118,53 @@
                             <div class="nine columns">
                                 <label class="">Полное наименование организации:</label>
                                 <input type="text" name="company_name"
-                                       value="{{ userprofile.company.name }}"
+                                       value="{{ user_company.name }}"
                                        placeholder="Полное юридическое наименование организации для документов"/>
                             </div>
 
                             <div class="three columns">
                                 <label class="">Телефон:</label>
                                 <input type="text" name="company_phone" placeholder='Контактный телефон'
-                                       value="{{ userprofile.company.phone }}"/>
+                                       value="{{ user_company.phone }}"/>
                             </div>
 
                             <div class="four columns ">
                                 <label class="">Имя руководителя:</label>
                                 <input type="text" name="company_boss_first_name" placeholder='Имя'
-                                       value="{{ userprofile.company.boss_first_name }}"/>
+                                       value="{{ user_company.boss_first_name }}"/>
                             </div>
 
                             <div class="four columns ">
                                 <label class="">Отчество руководителя:</label>
                                 <input type="text" name="company_boss_second_name"
                                        placeholder='Отчество'
-                                       value="{{ userprofile.company.boss_second_name }}"/>
+                                       value="{{ user_company.boss_second_name }}"/>
                             </div>
 
                             <div class="four columns">
                                 <label class="">Фамилия руководителя:</label>
                                 <input type="text" name="company_boss_last_name" placeholder="Фамилия"
-                                       value="{{ userprofile.company.boss_last_name }}"/>
+                                       value="{{ user_company.boss_last_name }}"/>
                             </div>
 
                             <div class="twelve columns">
                                 <label class="">Юридический организации:</label>
                                 <input type="text" name="company_address"
-                                       value="{{ userprofile.company.address }}"
+                                       value="{{ user_company.address }}"
                                        placeholder="Юридический адрес организации для документов"/>
                             </div>
 
                             <div class="four columns">
                                 <label class="">Расчетный счет:</label>
-                                <input type="text" placeholder="Расчетный счёт" name="company_bank_account"
-                                       value="{{ userprofile.company.bank_account }}"/>
+                                <input type="text" placeholder="Расчетный счёт" name="company_account"
+                                       value="{{ user_company.account }}"/>
                             </div>
 
                             <div class="eight columns">
                                 <label>Банк в котором открыт расчетный счёт: </label>
                                 <select name="company_bank" class="selecter" action="#">
                                     {% for bank in banks %}
-                                        {% if bank.name == userprofile.bank.name %}
+                                        {% if bank.name == user_company.bank.name %}
                                             <option selected>{{ bank.name }}</option>
                                         {% else %}
                                             <option>{{ bank.name }}</option>
@@ -174,27 +176,27 @@
                             <div class="three columns ">
                                 <label class="">ИНН:</label>
                                 <input type="text" placeholder='ИНН' name="company_inn"
-                                       value="{{ userprofile.company.inn }}"/>
+                                       value="{{ user_company.inn }}"/>
                             </div>
 
 
                             <div class="three columns">
                                 <label class="">ОГРН:</label>
                                 <input type="text" placeholder="ОГРН" name="company_ogrn"
-                                       value="{{ userprofile.company.ogrn }}"/>
+                                       value="{{ user_company.ogrn }}"/>
                             </div>
 
 
                             <div class="three columns">
                                 <label class="">ОКПО:</label>
                                 <input type="text" placeholder="ОКПО" name="company_okpo"
-                                       value="{{ userprofile.company.okpo }}"/>
+                                       value="{{ user_company.okpo }}"/>
                             </div>
 
                             <div class="three columns">
                                 <label class="">ОКАТО:</label>
                                 <input type="text" placeholder="ОКАТО" name="company_okato"
-                                       value="{{ userprofile.company.okato }}"/>
+                                       value="{{ user_company.okato }}"/>
 
                             </div>
 

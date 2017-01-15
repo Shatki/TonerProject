@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Code, Country, Developer, Type, Feature, Features, Category, Product
+from .models import Code, Country, Developer, Type, Feature, Features, Category, Product, Currency, Course
 
 
 class CountryAdmin(admin.ModelAdmin):
@@ -89,6 +89,26 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ('developer',)
 
 
+class CurrencyAdmin(admin.ModelAdmin):
+    list_display = ('name',
+                    'name_4217',
+                    'code_4217',
+                    #                    'course',
+                    )
+    search_fields = ('name',)
+    ordering = ('id',)
+
+
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('currency',
+                    'value',
+                    'relation',
+                    'date',
+                    )
+    search_fields = ('currency',)
+    ordering = ('date',)
+
+
 admin.site.register(Code)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Developer, DeveloperAdmin)
@@ -97,3 +117,5 @@ admin.site.register(Feature, FeatureAdmin)
 admin.site.register(Features, FeaturesAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Currency, CurrencyAdmin)
+admin.site.register(Course, CourseAdmin)

@@ -190,8 +190,8 @@ $('#user-save-btn').click(function () {
 /*	Company info change form
  ------------------------------------------------------*/
 
-$('#company-save-btn').click(function () {
-    var data = $('form#company-form').serialize();
+$('#contractor-save-btn').click(function () {
+    var data = $('form#contractor-form').serialize();
     $.ajax({
         url: '/auth/changecompanyinfo/',
         method: 'POST',

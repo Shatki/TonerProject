@@ -236,12 +236,12 @@ jQuery(document).ready(function ($) {
     $('#iscompany').change(function () {
         <!-- Скрипт плавного открытия и закрытия блока -->
         if ($('#iscompany').prop('checked')) {
-            $('#company-form').animate({
+            $('#contractor-form').animate({
                 height: 'show'
             }, 500);
         }
         else {
-            $('#company-form').animate({
+            $('#contractor-form').animate({
                 height: 'hide'
             }, 500);
         }

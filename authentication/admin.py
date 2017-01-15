@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from .models import Account, Bank, Company
+from .models import Account
 
 
 class AccountCreationForm(forms.ModelForm):
@@ -39,15 +39,6 @@ class AccountCreationForm(forms.ModelForm):
         return user
 
 
-class BankChangeForm(forms.ModelForm):
-    class Meta:
-        model = Bank
-        fields = ('name',
-                  'address',
-                  'account',
-                  'bik',)
-
-
 class AccountChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(label='password', help_text='There is no way to see this password.')
 
@@ -56,7 +47,7 @@ class AccountChangeForm(forms.ModelForm):
         fields = ('username',
                   'email',
                   'password',
-                  'company',
+                  'contractor',
                   'is_admin',
                   'is_staff',
                   'is_company',
@@ -66,22 +57,13 @@ class AccountChangeForm(forms.ModelForm):
         return self.initial['password']
 
 
-class BankAdmin(UserAdmin):
-    list_display = ('name',
-                    'address',
-                    'account',
-                    'bik',)
-    ordering = ('name',)
-
-
-
 @admin.register(Account)
 class AccountAdmin(UserAdmin):
     list_display = ('username',
                     'email',
                     'is_staff',
                     'is_admin',
-                    'company',
+                    'contractor',
                     )
 
     list_filter = ('is_admin',
@@ -100,7 +82,7 @@ class AccountAdmin(UserAdmin):
                 'first_name',
                 'last_name',
                 'photo',
-                'company',
+                'contractor',
                 'tagline',
             )}),
 
@@ -140,39 +122,4 @@ class AccountAdmin(UserAdmin):
     add_form = AccountCreationForm
 
 
-@admin.register(Company)
-class CompanyAdmin(admin.ModelAdmin):
-    list_display = ('name',
-                    'boss_first_name',
-                    'boss_second_name',
-                    'boss_last_name',
-                    )
-    fieldsets = (
-        (None, {
-            'fields': (
-                'name',
-            )}),
-        (u'Контактная информация', {
-            'fields': (
-                'boss_first_name',
-                'boss_second_name',
-                'boss_last_name',
-                'address',
-            )}),
-        (u'Реквизиты', {
-            'fields': (
-                'inn',
-                'ogrn',
-                'okpo',
-                'okato',
-                'bank',
-                'bankaccount',
-            )}),
-    )
-
-    search_fields = ('name',)
-    ordering = ('name',)
-
-
 admin.site.unregister(Group)
-admin.site.register(Bank)
