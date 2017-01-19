@@ -1,7 +1,7 @@
 from django.db import models
 from authentication.models import Account
 from system.models import Product
-from TonerProject.validators import hexnumeric, numeric, validator_numerator, validator_warranty
+from TonerProject.validators import hexnumeric, validator_numerator
 
 
 # Create your models here.
@@ -17,7 +17,6 @@ class Status(models.Model):
     def __str__(self):
         return self.name
 
-    @property
     def csscolor(self):
         return '#%s' % self.color
 

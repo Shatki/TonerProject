@@ -1,5 +1,6 @@
 from django.db import models
-from TonerProject.validators import numeric, alfa_lat, validator_numerator, validator_path
+from TonerProject.validators import numeric, alfa_lat, validator_path
+from .constants import QUANTITY, WEIGHT, VOLUME
 
 
 # ********** Основные Классы *************
@@ -264,3 +265,28 @@ class Course(models.Model):
 
     def __str__(self):
         return self.value.__str__() + ' (' + self.date.today().__str__() + ')'
+
+
+# Create your models here.
+class Measure(models.Model):
+    class Meta:
+        verbose_name = 'единица измерения'
+        verbose_name_plural = 'единицы измерения'
+        db_table = 'measure'
+
+    MEASURE_CHOICES = (
+        (QUANTITY, 'Штук'),
+        (WEIGHT, 'Киллограммов'),
+        (VOLUME, 'Литров'),
+    )
+    name = models.CharField(verbose_name=u"наименование единицы", unique=True, default=QUANTITY,
+                            max_length=20, blank=False, choices=MEASURE_CHOICES)
+
+    def __str__(self):
+        return self.name
+
+    def short_name(self):
+        return self.get_short_name()
+
+    def name_list(self):
+        return self.name + ' Сокращенное обозначение: ' + self.short_name()

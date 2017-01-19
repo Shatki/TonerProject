@@ -74,14 +74,14 @@
                             <div class="four columns">
                                 <label class="">Логин*:</label>
                                 <input type="text" name="userprofile_username" value="{{ user_profile.username }}"
-                                       placeholder='Логин, e-mail или номер телефона'/>
+                                       placeholder='Ваш логин может быть никнейм, e-mail или номер телефона'/>
                             </div>
 
 
                             <div class="four columns ">
                                 <label class="">Имя пользователя*:</label>
                                 <input type="text" name="userprofile_first_name"
-                                       value='{{ userprofile.first_name }}' placeholder='Имя'
+                                       value='{{ user_profile.first_name }}' placeholder='Имя'
                                        autocomplete="on">
                             </div>
 
@@ -118,53 +118,53 @@
                             <div class="nine columns">
                                 <label class="">Полное наименование организации:</label>
                                 <input type="text" name="company_name"
-                                       value="{{ user_company.name }}"
+                                       value="{{ contractor.name }}"
                                        placeholder="Полное юридическое наименование организации для документов"/>
                             </div>
 
                             <div class="three columns">
                                 <label class="">Телефон:</label>
                                 <input type="text" name="company_phone" placeholder='Контактный телефон'
-                                       value="{{ user_company.phone }}"/>
+                                       value="{{ contractor.phone }}"/>
                             </div>
 
                             <div class="four columns ">
                                 <label class="">Имя руководителя:</label>
                                 <input type="text" name="company_boss_first_name" placeholder='Имя'
-                                       value="{{ user_company.boss_first_name }}"/>
+                                       value="{{ contractor.boss_first_name }}"/>
                             </div>
 
                             <div class="four columns ">
                                 <label class="">Отчество руководителя:</label>
                                 <input type="text" name="company_boss_second_name"
                                        placeholder='Отчество'
-                                       value="{{ user_company.boss_second_name }}"/>
+                                       value="{{ contractor.boss_second_name }}"/>
                             </div>
 
                             <div class="four columns">
                                 <label class="">Фамилия руководителя:</label>
                                 <input type="text" name="company_boss_last_name" placeholder="Фамилия"
-                                       value="{{ user_company.boss_last_name }}"/>
+                                       value="{{ contractor.boss_last_name }}"/>
                             </div>
 
                             <div class="twelve columns">
                                 <label class="">Юридический организации:</label>
                                 <input type="text" name="company_address"
-                                       value="{{ user_company.address }}"
+                                       value="{{ contractor.address }}"
                                        placeholder="Юридический адрес организации для документов"/>
                             </div>
 
                             <div class="four columns">
                                 <label class="">Расчетный счет:</label>
                                 <input type="text" placeholder="Расчетный счёт" name="company_account"
-                                       value="{{ user_company.account }}"/>
+                                       value="{{ contractor.account }}"/>
                             </div>
 
                             <div class="eight columns">
                                 <label>Банк в котором открыт расчетный счёт: </label>
                                 <select name="company_bank" class="selecter" action="#">
                                     {% for bank in banks %}
-                                        {% if bank.name == user_company.bank.name %}
+                                        {% if bank.name == contractor.bank.name %}
                                             <option selected>{{ bank.name }}</option>
                                         {% else %}
                                             <option>{{ bank.name }}</option>
@@ -176,27 +176,27 @@
                             <div class="three columns ">
                                 <label class="">ИНН:</label>
                                 <input type="text" placeholder='ИНН' name="company_inn"
-                                       value="{{ user_company.inn }}"/>
+                                       value="{{ contractor.inn }}"/>
                             </div>
 
 
                             <div class="three columns">
                                 <label class="">ОГРН:</label>
                                 <input type="text" placeholder="ОГРН" name="company_ogrn"
-                                       value="{{ user_company.ogrn }}"/>
+                                       value="{{ contractor.ogrn }}"/>
                             </div>
 
 
                             <div class="three columns">
                                 <label class="">ОКПО:</label>
                                 <input type="text" placeholder="ОКПО" name="company_okpo"
-                                       value="{{ user_company.okpo }}"/>
+                                       value="{{ contractor.okpo }}"/>
                             </div>
 
                             <div class="three columns">
                                 <label class="">ОКАТО:</label>
                                 <input type="text" placeholder="ОКАТО" name="company_okato"
-                                       value="{{ user_company.okato }}"/>
+                                       value="{{ contractor.okato }}"/>
 
                             </div>
 

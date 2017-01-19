@@ -13,8 +13,8 @@ from .constants import date_minimal, date_maximal
 #               по отпуску и приему товарно-материальных ценностей (ТМЦ).
 class Consignment(models.Model):
     class Meta:
-        verbose_name = 'накладная'
-        verbose_name_plural = 'накладные'
+        verbose_name = 'реализация'
+        verbose_name_plural = 'реализации'
         db_table = 'consignment'
 
     number = models.CharField(max_length=20, verbose_name=u'номер накладной')
@@ -24,10 +24,11 @@ class Consignment(models.Model):
     receiver = models.ForeignKey(Contractor, verbose_name=u'организация принимающая груз',
                                  related_name='consignment_receiver')
     items = models.ManyToManyField(Item, verbose_name=u'перемещаемый товар')
-    status = models.BooleanField(verbose_name=u'статус проведения', default=False)
+
+    status = models.BooleanField(verbose_name=u'документ проведен', default=False)
 
     def __str__(self):
-        return '№ ' + self.number + ' от ' + str(self.date)
+        return 'Накладная № ' + self.number + ' от ' + str(self.date)
 
 
 class Contract(models.Model):
@@ -45,4 +46,4 @@ class Contract(models.Model):
     date_expire = models.DateField(verbose_name=u'дата истечения контракта', default=date_maximal)
 
     def __str__(self):
-        return '№ ' + self.number + ' от ' + str(self.date_begin)
+        return 'Контракт № ' + self.number + ' от ' + str(self.date_begin)

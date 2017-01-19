@@ -1,19 +1,15 @@
 from django.db import models
 from TonerProject.validators import numeric, phone
+from .constants import PERSON, COMPANY, BANK, GOV_BANK, GOV_COMPANY
 
 
 # Create your models here.
 class Type(models.Model):
     class Meta:
-        verbose_name = 'тип организации'
-        verbose_name_plural = 'типы огранизаций'
+        verbose_name = 'вид контрагента'
+        verbose_name_plural = 'виды контрагентов'
         db_table = 'contractor_type'
 
-    PERSON = 'Физическое лицо'
-    COMPANY = 'Коммерческая организация'
-    BANK = 'Банк'
-    GOV_BANK = 'Центральный Банк'
-    GOV_COMPANY = 'Государственное учреждение'
     CONTRACTOR_CHOICES = (
         (PERSON, 'Физическое лицо'),
         (COMPANY, 'Коммерческая организация'),
@@ -22,11 +18,17 @@ class Type(models.Model):
         (GOV_COMPANY, 'Государственная учреждение'),
     )
 
-    name = models.CharField(verbose_name=u'тип организации', unique=True, default=PERSON,
+    name = models.CharField(verbose_name=u'вид контрагента', unique=True, default=PERSON,
                             max_length=100, blank=False, choices=CONTRACTOR_CHOICES)
 
     def __str__(self):
         return self.name
+
+    def type_person(self):
+        return self.PERSON
+
+    def type_bank(self):
+        return self.bank
 
 
 class Contractor(models.Model):
@@ -57,7 +59,7 @@ class Contractor(models.Model):
     bank = models.ForeignKey('self', verbose_name=u'банк', blank=True, null=True)
     account = models.CharField(verbose_name=u'банковский счёт', max_length=20,
                                validators=[numeric], null=True, blank=True)  # счет
-    type = models.ForeignKey(Type, verbose_name=u'тип организации', null=True, blank=True)
+    type = models.ForeignKey(Type, verbose_name=u'вид контрагента', null=True, blank=True)
     bik = models.CharField(verbose_name=u'БИК', unique=True, max_length=9, db_index=True,
                            validators=[numeric], blank=True, null=True)  # БИК атрибут банков
 

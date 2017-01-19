@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import Code, Country, Developer, Type, Feature, Features, Category, Product, Currency, Course
+from .models import Measure
+
 
 
 class CountryAdmin(admin.ModelAdmin):
@@ -109,6 +111,14 @@ class CourseAdmin(admin.ModelAdmin):
     ordering = ('date',)
 
 
+class MeasureAdmin(admin.ModelAdmin):
+    list_display = ('name',
+                    )
+
+    search_fields = ('name',)
+    ordering = ('name',)
+
+
 admin.site.register(Code)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Developer, DeveloperAdmin)
@@ -119,3 +129,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Currency, CurrencyAdmin)
 admin.site.register(Course, CourseAdmin)
+admin.site.register(Measure, MeasureAdmin)

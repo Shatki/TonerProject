@@ -10,7 +10,8 @@ from django.contrib import auth
 from django.views.decorators.csrf import ensure_csrf_cookie
 from TonerProject.settings import STATIC_URL
 from authentication.models import Account
-from contractor.models import Contractor
+from contractor.models import Contractor, BANK
+from authentication.constants import PROFILE_IMAGE_DEFAULT_NAME, PROFILE_IMAGE_DIR
 
 
 def load_login_form(request):
@@ -111,16 +112,15 @@ def dispatch_user(request, nickname, **kwargs):
 @ensure_csrf_cookie
 def profile(request):
     # Тут код личного профиля
-    args = {}
-    args['user_profile'] = request.user
+    args = {'user_profile': request.user}
     try:
-        args['banks'] = Contractor.objects.filter(type__name='Банк')
+        args['banks'] = Contractor.objects.filter(type__name=BANK)
     except Contractor.DoesNotExist:
         return HttpResponse(
             u'Ошибка в view.profile. Не могу прочитать список банков',
             content_type='text/html')
-    if request.user.company_id != None:
-        args['user_company'] = Company.objects.get(id=request.user.company_id)
+    if request.user.contractor_id is not None:
+        args['contractor'] = Contractor.objects.get(id=request.user.contractor_id)
     args.update(csrf(request))
     return render_to_response('profile.html', args)
 
@@ -129,24 +129,24 @@ def profile(request):
 def public_profile(request, nickname):
     # Тут код публичного профиля
     try:
-        public_profile = Account.objects.get(nickname=nickname)
-        args = {}
-        args['user_profile'] = request.user
-        args['public_phone'] = public_profile.phone
-        args['public_nickname'] = public_profile.nickname
-        args['public_first_name'] = public_profile.first_name
-        args['public_last_name'] = public_profile.last_name
-        if public_profile.is_company == True:
+        _public_profile = Account.objects.get(nickname=nickname)
+        args = {'user_profile': request.user,
+                'public_phone': _public_profile.phone,
+                'public_nickname': _public_profile.nickname,
+                'public_first_name': _public_profile.first_name,
+                'public_last_name': _public_profile.last_name,
+                }
+        if _public_profile.is_company:
             try:
-                args['public_company_name'] = Company.objects.get(id=public_profile.company_id).name
-            except Company.DoesNotExist:
-                args['public_company_name'] = "Ошибка БД. Обратитесь к администратору"
+                args['public_contractor_name'] = Contractor.objects.get(id=_public_profile.contractor_id).name
+            except Contractor.DoesNotExist:
+                args['public_contractor_name'] = "Ошибка БД. Обратитесь к администратору"
                 # Код отправки баг репорта администратору
                 return HttpResponse(
                     u'Ошибка в view.public_profile. Не могу получить доступ к учетной записи организации в БД',
                     content_type='text/html')
         else:
-            args['public_company_name'] = "Частное лицо"
+            args['public_contractor_name'] = "Частное лицо"
     except Account.DoesNotExist:
         # Баг репорт.
         return HttpResponse(u'Ошибка в view.public_profile. Не могу получить доступ к учетной записи пользователя в БД',
@@ -162,8 +162,8 @@ def get_photo(request, nickname):
     try:
         user = Account.objects.get(nickname=nickname)
     except:
-        return redirect(os.path.join(STATIC_URL, "defaultprofileimage.jpg"))
-    return redirect(os.path.join(STATIC_URL, 'profile/' + user.get_photo()))
+        return redirect(os.path.join(STATIC_URL, PROFILE_IMAGE_DEFAULT_NAME))
+    return redirect(os.path.join(STATIC_URL, PROFILE_IMAGE_DIR + user.get_photo()))
 
 
 def change_user_info(request):
@@ -221,23 +221,23 @@ def change_user_info(request):
 
         if request.POST.get('userprofile_is_company') == 'yes' or request.POST.get('userprofile_is_company') == 'on':
             user_for_change.is_company = True
-            if user_for_change.company_id is None:
+            if user_for_change.contractor_id is None:
                 try:
-                    company_for_change = Contractor.objects.create()
-                    user_for_change.company_id = company_for_change
+                    contractor_for_change = Contractor.objects.create()
+                    user_for_change.contractor_id = contractor_for_change
                     user_for_change.is_company = True
-                    user_for_change.company.save()
+                    user_for_change.contractor.save()
                 except:
                     user_for_change.is_company = True
         else:
             user_for_change.is_company = False
-            if user_for_change.company:
+            if user_for_change.contractor:
                 try:
-                    company_for_change = Contractor.objects.get(id=user_for_change.company_id)
-                    company_for_change.delete()
-                    user_for_change.company = None
+                    contractor_for_change = Contractor.objects.get(id=user_for_change.contractor_id)
+                    contractor_for_change.delete()
+                    user_for_change.contractor = None
                 except Contractor.DoesNotExist:
-                    user_for_change.company = None
+                    user_for_change.contractor = None
         # изменение профиля тут
         user_for_change.save()
         return HttpResponse(u'Ok', content_type='text/html')
@@ -246,14 +246,14 @@ def change_user_info(request):
         return HttpResponse(u'Bad change User data', content_type='text/html')
 
 
-def change_company_info(request):
+def change_contractor_info(request):
     if request.user.is_authenticated() and request.POST:
         # Пользователь аутентифицирован
         # необходимо выполнить валидацию каждого поля перед изменением
         user_for_change = request.user
 
         try:
-            bank = Contractor.objects.get(name=request.POST.get('company_bank'))
+            bank = Contractor.objects.get(name=request.POST.get('contractor_bank'))
         except:
             return HttpResponse(u'Указаный банк не найден в БД', content_type='text/html')
 
@@ -312,51 +312,51 @@ def change_company_info(request):
 
             # try:
             # Создаем новый объект
-            #    company_for_change = Company.objects.create()
-            # company_for_change.save()
+            #    contractor_for_change = contractor.objects.create()
+            # contractor_for_change.save()
             # except:
             #    return HttpResponse(u'Не удается создать организацию', content_type='text/html')
         try:
-            company_for_change = Company.objects.get(id=request.user.company_id)
-        except Company.DoesNotExist:
+            contractor_for_change = Contractor.objects.get(id=request.user.contractor_id)
+        except Contractor.DoesNotExist:
             try:
                 # Создаем новый объект
-                company_for_change = Company.objects.create()
-                company_for_change.save()
+                contractor_for_change = Contractor.objects.create()
+                contractor_for_change.save()
             except:
-                return HttpResponse(u'change_company_info: Не удается создать организацию в БД',
+                return HttpResponse(u'change_contractor_info: Не удается создать организацию в БД',
                                     content_type='text/html')
         # Валидация пройдена изменяем запись в БД
         # name
-        company_for_change.name = request.POST.get('company_name')
+        contractor_for_change.name = request.POST.get('company_name')
         # boss_first_name
-        company_for_change.boss_first_name = request.POST.get('company_boss_first_name')
+        contractor_for_change.boss_first_name = request.POST.get('company_boss_first_name')
         # boss_second_name
-        company_for_change.boss_second_name = request.POST.get('company_boss_second_name')
+        contractor_for_change.boss_second_name = request.POST.get('company_boss_second_name')
         # boss_last_name
-        company_for_change.boss_last_name = request.POST.get('company_boss_last_name')
+        contractor_for_change.boss_last_name = request.POST.get('company_boss_last_name')
         # phone
-        company_for_change.phone = request.POST.get('company_phone')
+        contractor_for_change.phone = request.POST.get('company_phone')
         # address
-        company_for_change.address = request.POST.get('company_address')
+        contractor_for_change.address = request.POST.get('company_address')
         # inn
-        company_for_change.inn = request.POST.get('company_inn')
+        contractor_for_change.inn = request.POST.get('company_inn')
         # ogrn
-        company_for_change.ogrn = request.POST.get('company_ogrn')
+        contractor_for_change.ogrn = request.POST.get('company_ogrn')
         # okpo
-        company_for_change.okpo = request.POST.get('company_okpo')
+        contractor_for_change.okpo = request.POST.get('company_okpo')
         # okato
-        company_for_change.okato = request.POST.get('company_okato')
+        contractor_for_change.okato = request.POST.get('company_okato')
         # account
-        company_for_change.account = request.POST.get('company_account')
+        contractor_for_change.account = request.POST.get('company_account')
         # user_bank
-        company_for_change.bank = bank
+        contractor_for_change.bank = bank
 
         # изменение профиля тут
-        user_for_change.company = company_for_change
+        user_for_change.contractor = contractor_for_change
         user_for_change.is_company = True
         user_for_change.save()
-        company_for_change.save()
+        contractor_for_change.save()
         return HttpResponse(u'Ok', content_type='text/html')
     else:
-        return HttpResponse(u'Bad change Company data', content_type='text/html')
+        return HttpResponse(u'Bad change contractor data', content_type='text/html')

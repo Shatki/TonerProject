@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('number',
                  models.CharField(help_text='Пожалуйста используйте следующий формат: AA-xxxxxxx', max_length=10,
-                                  validators=[system.models.validator_numerator], verbose_name='Номер заказа')),
+                                  verbose_name='Номер заказа')),
                 ('date', models.DateField(verbose_name='Дата заказа')),
                 ('comments', models.TextField(blank=True, max_length=100, verbose_name='Комментарий')),
                 ('cartridge', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='system.Cartridge',

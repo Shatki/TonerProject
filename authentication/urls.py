@@ -12,5 +12,5 @@ urlpatterns = [
     url(r'^logout/$', authentication.views.logout),
     url(r'^register/$', authentication.views.register),
     url(r'^changeuserinfo/$', authentication.views.change_user_info),
-    url(r'^changecompanyinfo/$', authentication.views.change_company_info),
+    url(r'^changecompanyinfo/$', authentication.views.change_contractor_info),
     ]
