@@ -1,5 +1,5 @@
 from django.db import models
-from TonerProject.validators import numeric, alfa_lat, validator_path
+from TonerProject.validators import numeric, alpha_lat, validator_path
 from .constants import QUANTITY, WEIGHT, VOLUME
 
 
@@ -242,7 +242,7 @@ class Currency(models.Model):
 
     name = models.CharField(max_length=20, verbose_name=u'название валюты')
     name_4217 = models.CharField(max_length=20, verbose_name=u'название валюты alfa-3 ISO 4217',
-                                 validators=[alfa_lat])
+                                 validators=[alpha_lat])
     code_4217 = models.CharField(max_length=3, verbose_name=u'код валюты number-3 ISO 4217',
                                  validators=[numeric])
     course = models.ForeignKey('Course', verbose_name=u'текущий курс', related_name='currency_course')

@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'document',
     'homepage',
     'service',
+    'stock',
     'system',
     'trade',
 )

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from TonerProject.validators import phone, alphanumeric
+from TonerProject.validators import phone, alpha_all, alphanumeric
 from contractor.models import Contractor
 
 
@@ -18,6 +18,7 @@ class AccountManager(BaseUserManager):
             account.nickname = kwargs.get('nickname')
 
         account.set_password(password)
+        account.is_admin = False
         account.is_staff = False
         account.is_company = False
         account.save(using=self._db)
@@ -44,7 +45,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     nickname = models.CharField(verbose_name=u'имя пользователя в системе', unique=True, max_length=30, db_index=True,
                                 validators=[alphanumeric])
     username = models.CharField(verbose_name=u'логин входа в систему', unique=True, max_length=30, db_index=True,
-                                validators=[alphanumeric])
+                                validators=[alpha_all])
     # Авторизация будет происходить по E-mail
     email = models.EmailField(verbose_name=u'электронная почта', unique=True, max_length=255)
     # Имя - не является обязательным
@@ -60,7 +61,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
                                    related_name='account_contractor')
 
     # Атрибут суперпользователя
-    is_admin = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False, null=False)
     is_staff = models.BooleanField(default=False, null=False)
     is_company = models.BooleanField(default=False, null=False)
 

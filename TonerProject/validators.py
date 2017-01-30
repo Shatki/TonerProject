@@ -30,8 +30,8 @@ def validator_warranty(value):
 
 
 numeric = RegexValidator(r'^[0-9]*$', message=u'допустимы только цифровые символы.')
-alfa_all = RegexValidator(r'^[a-zA-Zа-яА-Я]*$', message=u'допустимы только буквенные символы.')
-alfa_lat = RegexValidator(r'^[a-zA-Z]*$', message=u'допустимы только латинские буквы.')
+alpha_all = RegexValidator(r'^[a-zA-Zа-яА-Я]*$', message=u'допустимы только буквенные символы.')
+alpha_lat = RegexValidator(r'^[a-zA-Z]*$', message=u'допустимы только латинские буквы.')
 hexnumeric = RegexValidator(r'^[0-9a-fA-F]*$', message=u'должен указывается в шестнадцатиричной системе.')
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', message=u'только буквенноцифровые символы допустимы.')
 phone = RegexValidator(regex='^\d{10}$', message=u'укажите правильный номер телефона')

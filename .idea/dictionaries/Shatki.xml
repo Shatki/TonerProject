@@ -1,6 +1,8 @@
 <component name="ProjectDictionaryState">
   <dictionary name="Shatki">
     <words>
+      <w>backends</w>
+      <w>csrf</w>
       <w>loadloginform</w>
       <w>ogrn</w>
       <w>okato</w>

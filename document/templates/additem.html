@@ -1,0 +1,35 @@
+{% block dialog %}
+    <div id="additem-dlg" class="easyui-dialog" title="Добавление товара" style="width:800px;height:400px"
+         data-options="iconCls:'icon-add',resizable:true,modal:true"
+         closed="true"
+         buttons="#additem-buttons">
+
+
+        <div class="easyui-layout" fit="true">
+            <div region="west" split="true" style="width:30%;">
+                <form id="additem-fm" method="post" novalidate>
+                    <ul class="easyui-tree" data-options="url:'/stock/item/all/json/'"></ul>
+                </form>
+            </div>
+            <div region="center" border="false" border="false">
+                <div class="easyui-tabs" fit="true">
+                    <div title="Основные" style="padding:10px;">
+
+                        jQuery easyui framework help you build your web page easily.
+
+                    </div>
+                    <div title="Дополнительные">
+                        No contact data.
+                    </div>
+                </div>
+            </div>
+            <div region="south" border="false" style="text-align:right;height:30px;line-height:30px;">
+                <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveItem()"
+                   style="width:90px">Готово</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
+                   onclick="javascript:$('#additem-dlg').dialog('close')" style="width:90px">Отмена</a>
+            </div>
+        </div>
+
+    </div>
+{% endblock dialog %}

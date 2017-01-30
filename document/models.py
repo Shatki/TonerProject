@@ -1,7 +1,8 @@
 from django.db import models
+
 from contractor.models import Contractor
-from trade.models import Item
-from .constants import date_minimal, date_maximal
+from stock.models import Item
+from TonerProject.constants import date_minimal, date_maximal
 
 
 # Приложение для формирования, хранения и обработки документации
@@ -17,18 +18,42 @@ class Consignment(models.Model):
         verbose_name_plural = 'реализации'
         db_table = 'consignment'
 
-    number = models.CharField(max_length=20, verbose_name=u'номер накладной')
+    number = models.CharField(max_length=10, verbose_name=u'номер накладной')
     date = models.DateField(verbose_name=u'дата документа')
     emitter = models.ForeignKey(Contractor, verbose_name=u'организация отпускающая груз',
                                 related_name='consignment_emitter')
     receiver = models.ForeignKey(Contractor, verbose_name=u'организация принимающая груз',
                                  related_name='consignment_receiver')
-    items = models.ManyToManyField(Item, verbose_name=u'перемещаемый товар')
+    items = models.ManyToManyField(Item, verbose_name=u'перемещаемый товар',
+                                   through='ConsignmentTable',
+                                   through_fields=('consignment', 'item'),
+                                   related_name='consignment_table'
+                                   )
 
     status = models.BooleanField(verbose_name=u'документ проведен', default=False)
 
     def __str__(self):
-        return 'Накладная № ' + self.number + ' от ' + str(self.date)
+        return 'Накладная № ' + self.str_number() + ' от ' + str(self.date)
+
+    def str_date(self):
+        return str(self.date.day) + '/' + str(self.date.month) + '/' + str(self.date.year)
+
+    def str_number(self):
+        # Потом доработать для случаем сложных нумераций
+        return ('0000000000' + str(int(self.number)))[-10:]
+
+
+class ConsignmentTable(models.Model):
+    class Meta:
+        verbose_name = 'Продукция в накладной'
+        verbose_name_plural = 'Продукция в накладной'
+        db_table = 'consignment_table'
+
+    consignment = models.ForeignKey(Consignment, verbose_name=u'накладная')
+    item = models.OneToOneField(Item, verbose_name=u'продукт')
+
+    def __str__(self):
+        return self.item.product.category.name
 
 
 class Contract(models.Model):

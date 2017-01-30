@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from system.models import Product, Features, Developer, Type, Country, Category, Code
 from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponse
 from django.template.context_processors import csrf
 from django.contrib import auth
+
+from system.models import Product, Features, Developer, Type, Country, Category, Code
 
 
 # Create your views here.

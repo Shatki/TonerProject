@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Consignment, Contract
+from .models import Consignment, Contract, ConsignmentTable
+
+
+class ConsignmentTableInline(admin.TabularInline):
+    model = ConsignmentTable
+    extra = 1
 
 
 class ConsignmentAdmin(admin.ModelAdmin):
@@ -11,6 +16,11 @@ class ConsignmentAdmin(admin.ModelAdmin):
 
     search_fields = ('number', 'date')
     ordering = ('id',)
+    inlines = (ConsignmentTableInline,)
+
+
+class ConsignmentTableAdmin(admin.ModelAdmin):
+    inlines = (ConsignmentTableInline,)
 
 
 class ContractAdmin(admin.ModelAdmin):
