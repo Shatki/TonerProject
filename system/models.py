@@ -91,9 +91,10 @@ class Category(models.Model):
         return self.name
 
     def get_path(self):
-        path = '/'
-        if self.parent is not None:
-            path = self.parent.get_path() + self.parent.path + '/'
+        if self.parent:
+            path = self.parent.get_path() + self.path + '/'
+        else:
+            path = '/' + self.path + '/'
         return path
 
     get_path.short_description = 'Путь'
