@@ -1,35 +1,137 @@
 {% block dialog %}
-    <div id="additem-dlg" class="easyui-dialog" title="Добавление товара" style="width:800px;height:400px"
-         data-options="iconCls:'icon-add',resizable:true,modal:true"
-         closed="true"
-         buttons="#additem-buttons">
+    <div id="item-add-dlg" class="easyui-dialog" title="Добавление товара"
+         data-options="iconCls:'icon-add',resizable:true,modal:true,
+         minWidth:'800',maxWidth:'1024',minHeight:'400',maxHeight:'768',modal:'true',closed:'true'">
+        {% block panel %}
+            <div class="easyui-layout" fit="true">
+                <form id="item-info-fm" method="post">
+                    {% csrf_token %}
 
+                    {% block product_tree %}
+                        <div region="west" split="true" style="width:70%;"
+                             data-options="minWidth:'300', maxWidth:'600'">
+                            <table class="easyui-treegrid" id="products" title="Браузер продукции"
+                                   data-options="url:'/catalog/item/all/json/',idField:'id',treeField:'name',
+                                   showLines:'true'"
+                                   rownumbers="true">
+                                <thead>
+                                <tr>
+                                    <th field="name">Наименование</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    {% endblock product_tree %}
 
-        <div class="easyui-layout" fit="true">
-            <div region="west" split="true" style="width:30%;">
-                <form id="additem-fm" method="post" novalidate>
-                    <ul class="easyui-tree" data-options="url:'/stock/item/all/json/'"></ul>
+                    {% block product_data %}
+                        <div region="center" border="false" border="false">
+                            <div class="easyui-tabs" fit="true">
+                                <div title="Основные" style="padding:10px;">
+                                    <div>
+                                        <select class="easyui-combobox" id="country" name="country" required="required"
+                                                label="Страна происхождения"
+                                                labelPosition="top"
+                                                data-options="valueField:'id',textField:'name',
+                                                url:'/catalog/country/json/', minWidth:'160'">
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <input class="easyui-textbox" name="warranty" id="warranty"
+                                               data-options="minWidth:'160',required:true,label:'Гарантийный срок'"
+                                               labelPosition="top"
+                                               placeholder="0000000001" type="text">
+                                    </div>
+                                    <div>
+                                        <select class="easyui-combobox" id="package" name="package" required="required"
+                                                label="Тип поставки"
+                                                labelPosition="top"
+                                                data-options="valueField:'id',textField:'name',
+                                                url:'/stock/package/json/', minWidth:'160',">
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <input class="easyui-textbox" name="serial_number" id="serial-number"
+                                               data-options="minWidth:'160',required:true,label:'Серийный номер №'"
+                                               labelPosition="top"
+                                               placeholder="0000000001" type="text">
+                                    </div>
+                                    <div>
+                                        <input class="easyui-textbox" name="quantity" id="quantity"
+                                               data-options="minWidth:'160',required:true,label:'Количество'"
+                                               labelPosition="top"
+                                               placeholder="1" type="text">
+                                    </div>
+                                    <div>
+                                        <select class="easyui-combobox" id="measure" name="measure" required="required"
+                                                label="Единица измерения"
+                                                labelPosition="top"
+                                                data-options="valueField:'id',textField:'name',
+                                                url:'/catalog/measure/json/', minWidth:'160'">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div title="Дополнительно">
+                                    Функционал в разработке.
+                                </div>
+                            </div>
+                        </div>
+                    {% endblock product_data %}
+
+                    <div region="south" border="false" style="text-align:right;height:30px;line-height:30px;">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveItem()"
+                           style="width:90px">Готово</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
+                           onclick="javascript:$('#item-add-dlg').dialog('close');" style="width:90px">Отмена</a>
+                    </div>
                 </form>
             </div>
-            <div region="center" border="false" border="false">
-                <div class="easyui-tabs" fit="true">
-                    <div title="Основные" style="padding:10px;">
 
-                        jQuery easyui framework help you build your web page easily.
-
-                    </div>
-                    <div title="Дополнительные">
-                        No contact data.
-                    </div>
-                </div>
-            </div>
-            <div region="south" border="false" style="text-align:right;height:30px;line-height:30px;">
-                <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveItem()"
-                   style="width:90px">Готово</a>
-                <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
-                   onclick="javascript:$('#additem-dlg').dialog('close')" style="width:90px">Отмена</a>
-            </div>
-        </div>
+        {% endblock panel %}
 
     </div>
 {% endblock dialog %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        var url;
+        var csrftoken = Cookies.get('csrftoken');
+
+        function saveItem() {
+            var data = $('#item-info-fm').serialize();
+            $.ajax({
+                url: '../item/add/',
+                'csrfmiddlewaretoken': csrftoken,
+                method: 'POST',
+                data: data,
+                cache: false,
+                onSubmit: function () {
+                    return $(this).form('validate');
+                },
+                success: function (data) {
+                    if (data == 'Ok') {
+                        // Пока кокой-то деревянный способ
+                        alert('Данные получены');
+                        //location.href = "#";
+                        //location.reload();
+                        $('#item-add-dlg').dialog('close');      // close the dialog
+                        $('#item-table').datagrid('reload');    // reload the data table
+                    } else {
+                        alert(data);
+                        // location.href = "#";
+                        // location.reload();
+                    }
+                }
+            });
+        }
+
+        function addItem() {
+            $('#item-add-dlg').dialog('open').dialog('setTitle', 'Добавить товар');
+            $('#item-info-fm').form('clear');
+            url = '../item/add/';
+        }
+
+        function reload() {
+            $('#products').treegrid('reload');
+        }
+    </script>
+{% endblock scripts %}

@@ -2,13 +2,13 @@
 from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponse
 from django.template.context_processors import csrf
+from django.views.decorators.csrf import csrf_protect
 from django.contrib import auth
 from django.http import JsonResponse
 
 from contractor.models import Contractor
 from system.models import Product, Measure
-from stock.models import Item
-from .models import Consignment, Contract
+from .models import Consignment
 
 
 # Представление общего журнала накладных
@@ -63,7 +63,7 @@ def consignment_edit(request, consignment_id):
                 'consignment': Consignment.objects.get(id=consignment_id),
                 'contractors': Contractor.objects.all(),
                 # 'items': Consignment.objects.get(id=consignment_id).items.all(),
-                'measures': Measure.objects.all()
+                'measures': Measure.objects.all(),
                 }
 
     except:
@@ -72,6 +72,25 @@ def consignment_edit(request, consignment_id):
 
     # просмотр полного списка накладных
     return render_to_response('consignment.html', args)
+
+
+# Тестовая версия создания накладной
+def consignment_new(request):
+    # добавить проверку на пользователя
+    try:
+        args = {'user_profile': request.user,
+                'contractors': Contractor.objects.all(),
+                'products': Product.objects.all(),
+                'measures': Measure.objects.all(),
+                }
+    except:
+        return HttpResponse(u'Ошибка consignment_new. Ошибка БД', content_type='text/html')
+    # if request.user.contractor_id is not None:
+    #    args['contractor'] = Contractor.objects.get(id=request.user.contractor_id)
+    args.update(csrf(request))
+
+    # Добавление новой накладной
+    return render_to_response("consignment.html", args)
 
 
 # JSON обработка отображение позиций товара
@@ -102,23 +121,14 @@ def items_json(request, consignment_id):
     return JsonResponse(response, safe=False)
 
 
-# Тестовая версия создания накладной
-def consignment_new(request):
-    # добавить проверку на пользователя
-    try:
-        args = {'user_profile': request.user,
-                'contractors': Contractor.objects.all(),
-                'products': Product.objects.all(),
-                'measures': Measure.objects.all()
-                }
-    except:
-        return HttpResponse(u'Ошибка consignment_new. Ошибка БД', content_type='text/html')
-    # if request.user.contractor_id is not None:
-    #    args['contractor'] = Contractor.objects.get(id=request.user.contractor_id)
-    args.update(csrf(request))
+@csrf_protect
+def item_add(request, consignment_id):
+    if request.POST:
+        response = request.POST.get('serial_number') + ' ' + request.POST.get('country') + ' ' + str(consignment_id)
+        print(response)
+        # response.update(csrf(request))
+    return HttpResponse("Ok", content_type='text/html')
 
-    # Добавление новой накладной
-    return render_to_response('consignment.html', args)
 
 
 def edit(request):

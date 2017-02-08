@@ -174,36 +174,3 @@
     {% endblock dialog %}
 
 {% endblock mainview %}
-
-{% block scripts %}
-    <script type="text/javascript">
-        var url;
-        function saveItem() {
-            $('#additem-fm').form('submit', {
-                url: url,
-                onSubmit: function () {
-                    return $(this).form('validate');
-                },
-                success: function (result) {
-                    var result = eval('(' + result + ')');
-                    if (result.errorMsg) {
-                        $.messager.show({
-                            title: 'Error',
-                            msg: result.errorMsg
-                        });
-                    } else {
-                        $('#additem-dlg').dialog('close');      // close the dialog
-                        $('#item-table').datagrid('reload');    // reload the data table
-                    }
-                }
-            });
-        }
-
-        function addItem() {
-            $('#additem-dlg').dialog('open').dialog('setTitle', 'Добавить товар');
-            $('#additem-fm').form('clear');
-            url = '../add/item/';
-        }
-    </script>
-
-{% endblock scripts %}

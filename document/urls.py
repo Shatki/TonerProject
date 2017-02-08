@@ -10,6 +10,7 @@ urlpatterns = [
     # url(r'^article(?P<article_id>\d+)/$', blog.views.article),
     # url(r'^admin/', include(admin.site.urls)),
     url(r'^consignment/(?P<consignment_id>\d+)/edit/$', document.views.consignment_edit),
+    url(r'^consignment/(?P<consignment_id>\d+)/item/add/$', document.views.item_add),
     url(r'^consignment/(?P<consignment_id>\d+)/items/json/$', document.views.items_json),
     url(r'^consignment/all/$', document.views.consignments),
     url(r'^consignment/all/json/$', document.views.consignments_json),

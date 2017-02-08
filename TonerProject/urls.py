@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^dashboard/', dashboard.views.dashboard),
     url(r'^document/', include('document.urls')),
     url(r'^stock/', include('stock.urls')),
+    url(r'^system/', include('system.urls')),
     # url(r'^test/', dashboard.views.testpage),
     url(r'^(?P<nickname>\w+)/photo$', authentication.views.get_photo),
     url(r'^(?P<nickname>\w+)$', authentication.views.dispatch_user),
