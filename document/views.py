@@ -7,8 +7,9 @@ from django.contrib import auth
 from django.http import JsonResponse
 
 from contractor.models import Contractor
-from system.models import Product, Measure
-from .models import Consignment
+from system.models import Product, Measure, Country
+from .models import Consignment, ConsignmentTable
+from stock.models import Item
 
 
 # Представление общего журнала накладных
@@ -123,12 +124,30 @@ def items_json(request, consignment_id):
 
 @csrf_protect
 def item_add(request, consignment_id):
-    if request.POST:
-        response = request.POST.get('serial_number') + ' ' + request.POST.get('country') + ' ' + str(consignment_id)
-        print(response)
+    if request.POST and consignment_id:
+        # Нужно добавить больше валидаций данных
+        if request.POST.get('product-tg-id')[0] != 'p':
+            return HttpResponse("item_add: AJAX data error", content_type='text/html')
+        product_id = request.POST.get('product-tg-id')[1:]
+        try:
+            new_item = Item.objects.create(
+                product=Product.objects.get(id=product_id),
+                country_id=request.POST.get('country'),
+                warranty=request.POST.get('warranty'),
+                package_id=request.POST.get('package'),
+                serial_number=int(request.POST.get('serial_number')),
+                quantity=float(request.POST.get('quantity')),
+                measure_id=request.POST.get('measure'),
+            )
+            ConsignmentTable.objects.create(
+                item=new_item,
+                consignment_id=consignment_id,
+            )
+        except:
+            return HttpResponse("item add: DB error", content_type='text/html')
         # response.update(csrf(request))
-    return HttpResponse("Ok", content_type='text/html')
 
+    return HttpResponse("Ok", content_type='text/html')
 
 
 def edit(request):

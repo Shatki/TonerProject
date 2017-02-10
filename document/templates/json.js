@@ -47,3 +47,61 @@ function destroyDocument() {
         });
     }
 }
+
+
+function saveItem() {
+    var data = $('#item-info-fm').serialize();
+    $.ajax({
+        url: '../item/add/',
+        method: 'POST',
+        data: data,
+        cache: false,
+        //beforeSend: function (xhr) {
+        //    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        //    return $('#item-info-fm').form('validate');
+        //},
+        success: function (data) {
+            if (data == 'Ok') {
+                // Пока кокой-то деревянный способ
+                // alert('Данные получены');
+                //location.href = "#";
+                //location.reload();
+                $('#item-add-dlg').dialog('close');      // close the dialog
+                $('#item-table').datagrid('reload');    // reload the data table
+            } else {
+                // Данные получены кривые
+                return $('#item-info-fm').form('validate');
+                // location.href = "#";
+                // location.reload();
+            }
+        }
+    });
+}
+
+
+function saveItem() {
+    var data = $('#item-info-fm').serialize();
+    $('#item-info-fm').form({
+        url: '../item/add/',
+        method: 'POST',
+        //data: data,
+        cache: false,
+        onSubmit: function () {
+            return $(this).form('validate');
+        },
+        success: function (data) {
+            if (data == 'Ok') {
+                // Пока кокой-то деревянный способ
+                alert('Данные получены');
+                //location.href = "#";
+                //location.reload();
+                $('#item-add-dlg').dialog('close');      // close the dialog
+                $('#item-table').datagrid('reload');    // reload the data table
+            } else {
+                alert(data);
+                // location.href = "#";
+                // location.reload();
+            }
+        }
+    });
+}
