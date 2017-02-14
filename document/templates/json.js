@@ -105,3 +105,29 @@ function saveItem() {
         }
     });
 }
+
+
+var data = {'item_id': $('#item-table').datagrid('getSelected').id};
+$.ajax({
+    url: '../item/json/',
+    method: 'POST',
+    data: data,
+    cache: false,
+    success: function (data) {
+        if (data.status == 'Ok') {
+            $('#product-tg').treegrid('select', data.product_id);
+            $('#serial-number').textbox('setValue', data.serial_number);
+            $('#warranty').textbox('setValue', data.warranty);
+            $('#country').combobox('setValue', data.warranty);
+
+            //$('#item-add-dlg').dialog('close');      // close the dialog
+            //$('#item-table').datagrid('reload');    // reload the data table
+        } else {
+            // alert(data);
+            // Данные получены кривые, закрываемся
+            $('#item-add-dlg').dialog('close');      // close the dialog
+            $('#item-table').datagrid('reload');    // reload the data table
+        }
+    }
+});
+$('#product-tg').treegrid('reload');

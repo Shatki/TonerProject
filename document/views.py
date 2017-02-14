@@ -10,9 +10,11 @@ from contractor.models import Contractor
 from system.models import Product, Measure, Country
 from .models import Consignment, ConsignmentTable
 from stock.models import Item
+from stock.views import item_add, item_delete
 
 
 # Представление общего журнала накладных
+@csrf_protect
 def consignments(request):
     # добавить проверку на пользователя
     try:
@@ -23,7 +25,7 @@ def consignments(request):
                 }
 
     except:
-        return HttpResponse(u"Ошибка consignments. Ошибка БД", content_type='text/html')
+        return HttpResponse(u"consignments: DB Error", content_type='text/html')
     args.update(csrf(request))
 
     # просмотр полного списка накладных
@@ -31,11 +33,12 @@ def consignments(request):
 
 
 # JSON обработка отображение общего журнала
+@csrf_protect
 def consignments_json(request):
     try:
         data = Consignment.objects.all()
     except:
-        return HttpResponse(u'Ошибка consignments_json. Ошибка БД', content_type='text/html')
+        return HttpResponse(u'consignments_json: DB Error', content_type='text/html')
     # Serialize
     rows = []
     for get_one in data:
@@ -57,6 +60,7 @@ def consignments_json(request):
 
 
 # Отображение представление одной накладной
+@csrf_protect
 def consignment_edit(request, consignment_id):
     # добавить проверку на пользователя
     try:
@@ -68,14 +72,14 @@ def consignment_edit(request, consignment_id):
                 }
 
     except:
-        return HttpResponse(u"Ошибка consignment. Ошибка БД", content_type='text/html')
+        return HttpResponse(u"consignment_edit: DB error", content_type='text/html')
     args.update(csrf(request))
-
     # просмотр полного списка накладных
     return render_to_response('consignment.html', args)
 
 
 # Тестовая версия создания накладной
+@csrf_protect
 def consignment_new(request):
     # добавить проверку на пользователя
     try:
@@ -85,7 +89,7 @@ def consignment_new(request):
                 'measures': Measure.objects.all(),
                 }
     except:
-        return HttpResponse(u'Ошибка consignment_new. Ошибка БД', content_type='text/html')
+        return HttpResponse(u'consignment_new:  DB error', content_type='text/html')
     # if request.user.contractor_id is not None:
     #    args['contractor'] = Contractor.objects.get(id=request.user.contractor_id)
     args.update(csrf(request))
@@ -95,11 +99,12 @@ def consignment_new(request):
 
 
 # JSON обработка отображение позиций товара
-def items_json(request, consignment_id):
+@csrf_protect
+def consignment_items_json(request, consignment_id):
     try:
         items = Consignment.objects.get(id=consignment_id).items.all()
     except:
-        return HttpResponse(u'Ошибка consignment_get_all. Ошибка БД', content_type='text/html')
+        return HttpResponse(u'items_json: Error DB', content_type='text/html')
     # Serialize
     rows = []
     for get_one in items:
@@ -122,41 +127,46 @@ def items_json(request, consignment_id):
     return JsonResponse(response, safe=False)
 
 
+# Создание нового товара и добавление его в накладную
 @csrf_protect
-def item_add(request, consignment_id):
-    if request.POST and consignment_id:
+def consignment_item_add(request, consignment_id):
+    if request.POST and consignment_id and request.POST.get('product'):
         # Нужно добавить больше валидаций данных
-        if request.POST.get('product-tg-id')[0] != 'p':
-            return HttpResponse("item_add: AJAX data error", content_type='text/html')
-        product_id = request.POST.get('product-tg-id')[1:]
+        if request.POST.get('product')[0] != 'p':
+            return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
+        product_id = request.POST.get('product')[1:]
+        # Возможно нужно перенести часть функции в stock.view.item_add
         try:
-            new_item = Item.objects.create(
-                product=Product.objects.get(id=product_id),
-                country_id=request.POST.get('country'),
-                warranty=request.POST.get('warranty'),
-                package_id=request.POST.get('package'),
-                serial_number=int(request.POST.get('serial_number')),
-                quantity=float(request.POST.get('quantity')),
-                measure_id=request.POST.get('measure'),
-            )
-            ConsignmentTable.objects.create(
-                item=new_item,
-                consignment_id=consignment_id,
-            )
+            new_item = item_add(request, product_id)
+            if new_item:
+                ConsignmentTable.objects.create(
+                    item=new_item,
+                    consignment_id=consignment_id,
+                )
+            else:
+                return HttpResponse("item_add: DB error", content_type='text/html')
         except:
-            return HttpResponse("item add: DB error", content_type='text/html')
+            return HttpResponse("consignment_item_add: DB error", content_type='text/html')
         # response.update(csrf(request))
-
-    return HttpResponse("Ok", content_type='text/html')
-
-
-def edit(request):
-    # добавить проверку на пользователя
-    # Редактирование накладной
-    return render_to_response('', )
+        return HttpResponse("Ok", content_type='text/html')
+    else:
+        return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
 
 
-def delete(request):
-    # добавить проверку на пользователя
-    # Удаление накладной(только админ)
-    return render_to_response('', )
+# Удаление товара из накладной и из базы
+# Пробная версия
+@csrf_protect
+def consignment_item_delete(request, consignment_id, item_id):
+    if consignment_id and item_id:
+        try:
+            # Удаляем запись о товаре в накладной из базы
+            ConsignmentTable.objects.get(item_id=item_id, consignment_id=consignment_id).delete()
+
+            # тут основной функционал, многое надо допилить
+            # Удаляем товар!! очень аккуратно
+            if not item_delete(item_id):
+                return HttpResponse("item_delete: Can't delete Item", content_type='text/html')
+        except ConsignmentTable.DoesNotExist:
+            return HttpResponse("consignment_item_delete: ConsignmentTable.DoesNotExist", content_type='text/html')
+        return HttpResponse("Ok", content_type='text/html')
+    return HttpResponse("consignment_item_delete: AJAX data error", content_type='text/html')

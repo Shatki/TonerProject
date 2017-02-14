@@ -15,8 +15,8 @@
 
         {% block document %}
             <div id="mm-document" style="width:150px;">
-                <div data-options="iconCls:'icon-save'">Сохранить</div>
-                <div data-options="iconCls:'icon-close'">Закрыть</div>
+                <div data-options="iconCls:'icon-save'" onclick="saveDoc()">Сохранить</div>
+                <div data-options="iconCls:'icon-close'" onclick="closeDoc()">Закрыть</div>
                 <div class="menu-sep"></div>
                 <div>Cut</div>
                 <div>Copy</div>
@@ -88,15 +88,17 @@
             {% block consignment_number %}
                 <input class="easyui-textbox" name="number" id="number" required="required" style="width: 100px"
                        label="Накладная №"
+                       data-options="onChange:function(number){renameTab(number,0)}"
                        labelPosition="top"
                        value="{{ consignment.str_number }}"
                        placeholder="0000000001" type="text">
                 <span>от</span>
                 <input class="easyui-datebox" name="date" id="date" required="required" style="width: 285px"
-                       data-options="panelWidth:285,currentText:'Сегодня',closeText:'Закрыть'"
+                       data-options="panelWidth:285,currentText:'Сегодня',closeText:'Закрыть',
+                       onChange:function(date){renameTab(0,date)}"
                        labelPosition="top"
                        value="{{ consignment.str_date }}"
-                       placeholder="31-10-1985">
+                       placeholder="31/10/1985">
             {% endblock consignment_number %}
 
             {% block contractors %}
@@ -139,7 +141,7 @@
                toolbar="#item-toolbar" pagination="true"
                rownumbers="true"
                fitColumns="true"
-               singleSelect="False">
+               singleSelect="true">
             <thead>
             <tr>
                 <th field="ck" checkbox="true"></th>
@@ -161,7 +163,7 @@
                     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
                        onclick="editItem()">Редактировать</a>
                     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
-                       onclick="destroyItem()">Удалить</a>
+                       onclick="deleteItem()">Удалить</a>
                 </div>
             {% endblock itemtable-menu %}
 
@@ -174,3 +176,22 @@
     {% endblock dialog %}
 
 {% endblock mainview %}
+
+
+
+
+{% block scripts %}
+    <script type="text/javascript">
+        // Скрипты для главного меню документа
+        function saveDoc() {
+            alert('Записано!');
+
+        }
+
+        // Скрипты специфичные для накладной
+        //$('#number').textbox({
+        //    onChange: alert('!!!')
+        //renameTab('000000001', '31/10/1985')
+        //});
+    </script>
+{% endblock scripts %}

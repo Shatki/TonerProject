@@ -4,6 +4,8 @@ import stock.views
 urlpatterns = [
     # Examples:
     url(r'^package/json/$', stock.views.package_json),
+    url(r'^item/(?P<item_id>\d+)/json/$', stock.views.item_json),
+    url(r'^item/(?P<item_id>\d+)/edit/$', stock.views.item_edit),
     # url(r'^admin/', include(admin.site.urls)),
     # url(r'^consignment/(?P<consignment_id>\d+)/edit/$', document.views.consignment_edit),
     # url(r'^consignment/(?P<consignment_id>\d+)/items/json/$', document.views.items_json),

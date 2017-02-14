@@ -33,7 +33,7 @@ class Consignment(models.Model):
     status = models.BooleanField(verbose_name=u'документ проведен', default=False)
 
     def __str__(self):
-        return 'Накладная № ' + self.str_number() + ' от ' + str(self.date)
+        return 'Накладная № ' + self.str_number() + ' от ' + self.str_date()
 
     def str_date(self):
         return str(self.date.day) + '/' + str(self.date.month) + '/' + str(self.date.year)

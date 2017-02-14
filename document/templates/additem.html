@@ -1,7 +1,7 @@
 {% block dialog %}
-    <div id="item-add-dlg" class="easyui-dialog" title="Добавление товара"
-         data-options="iconCls:'icon-add',resizable:true,modal:true,
-         minWidth:'800',maxWidth:'1024',minHeight:'400',maxHeight:'768',modal:'true',closed:'true'">
+    <div id="item-add-dlg" class="easyui-dialog"
+         data-options="iconCls:'icon-add', resizable:true, modal:true,
+         minWidth:'800', maxWidth:'1024', minHeight:'400', maxHeight:'768', modal:'true', closed:'true'">
         {% block panel %}
             <div class="easyui-layout" fit="true">
 
@@ -10,7 +10,7 @@
                          data-options="minWidth:'300', maxWidth:'600'">
                         <table class="easyui-treegrid" id="product-tg" title="Браузер продукции"
                                data-options="url:'/catalog/item/all/json/',idField:'id',treeField:'name',
-                                   showLines:'true'"
+                               singleSelect:true"
                                rownumbers="true">
                             <thead>
                             <tr>
@@ -27,8 +27,10 @@
 
                             <div class="easyui-tabs" fit="true">
                                 <div title="Основные" style="padding:10px;">
-
-                                    <input hidden="hidden" id="product-tg-id" name="product-tg-id" required="required"/>
+                                    <div>
+                                        <input id="product" type="text" hidden="hidden"
+                                               name="product" required="required"/>
+                                    </div>
                                     <div>
                                         <select class="easyui-combobox" id="country" name="country" required="required"
                                                 label="Страна происхождения"
@@ -99,10 +101,11 @@
 {% block scripts %}
     <script type="text/javascript">
         function saveItem() {
+            // alert(url);
             if ($('#item-info-fm').form('validate')) {
                 var data = $('#item-info-fm').serialize();
                 $.ajax({
-                    url: '../item/add/',
+                    url: url,
                     method: 'POST',
                     data: data,
                     cache: false,
@@ -126,13 +129,63 @@
         }
 
         function addItem() {
+            url = '../item/add/';
+            $('#item-info-fm').form('clear');
             $('#item-add-dlg').dialog('open').dialog('setTitle', 'Добавить товар');
             // Перезагрузим таблицу, иначе не увидим позиции
             $('#product-tg').treegrid('reload');
-            $('#item-info-fm').form('clear');
             // Сброс настроек выбора узла
             //$('#product-tg').treegrid('unselectAll')
         }
+
+        function editItem() {
+            var item_id = $('#item-table').datagrid('getSelected').id;
+            url = '/stock/item/' + item_id + '/edit/';
+            $('#item-add-dlg').dialog('open').dialog('setTitle', 'Редактировать товар');
+            // Перезагрузим таблицу, иначе не увидим позиции
+            $.ajax({
+                url: '/stock/item/' + item_id + '/json/',
+                method: 'POST',
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'Ok') {
+                        $('#item-info-fm').form('load', data);
+                        $('#product-tg').treegrid('select', data.product);
+                    } else {
+                        // Данные получены кривые, закрываемся
+                        $('#item-add-dlg').dialog('close');      // close the dialog
+                        $('#item-table').datagrid('reload');    // reload the data table
+                    }
+                }
+            });
+            //$('#item-info-fm').form('clear');
+            $('#product-tg').treegrid('reload');
+        }
+
+        function deleteItem() {
+            var item_id = $('#item-table').datagrid('getSelected').id;
+            // Спросить? вы уверены?
+            // Очень сложная операция, т/к может затронуть многие изменения
+            // Перезагрузим таблицу, иначе не увидим позиции
+            $.ajax({
+                url: '../item/' + item_id + '/delete/',
+                method: 'POST',
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'Ok') {
+
+                    } else {
+                        // Данные получены кривые, закрываемся
+                        $('#item-table').datagrid('reload');    // reload the data table
+                    }
+                }
+            });
+            //$('#item-info-fm').form('clear');
+            $('#product-tg').treegrid('reload');
+        }
+
+
+
 
         // Контекстное меню. Пока обновляет только браузер продукции
         function reload() {
@@ -141,7 +194,7 @@
 
         $('#product-tg').treegrid({
             onSelect: function (row) {
-                $("#product-tg-id").val(row.id);
+                $("#product-tg").val(row.id);
             }
         });
     </script>
