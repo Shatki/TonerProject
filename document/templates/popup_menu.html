@@ -58,5 +58,12 @@
                 });
             });
         });
+
+        function closeTab() {
+            var tab = $('#doc-tab').tabs('getSelected');
+            if ($('#doc-tab').tabs('getTabIndex', tab) > 0) {
+                $('#doc-tab').tabs('close', tab);
+            }
+        }
     </script>
 {% endblock popup-menu %}

@@ -1,8 +1,11 @@
 {% extends "consignments.html" %}
 {% load staticfiles %}
 
+{% block head %}
+{% endblock head %}
+
 {% block mainview %}
-    <body style="padding: 0">
+    <div style="width:100%;height:100%;padding:0">
     {% block mainmenu %}
         {% block ibuttons %}
             <div style="background:#fafafa;width:100%;border:1px solid #ccc">
@@ -136,7 +139,7 @@
     {% block maintab %}
         <table id="item-table" title="Таблица товаров" class="easyui-datagrid" width="100% "
                 {% if consignment.id %}
-               url="../../{{ consignment.id }}/items/json/"
+               url="/document/consignment/{{ consignment.id }}/items/json/"
                 {% endif %}
                toolbar="#item-toolbar" pagination="true"
                rownumbers="true"
@@ -169,15 +172,12 @@
 
         </table>
     {% endblock maintab %}
-    </body>
 
     {% block dialog %}
         {% include 'additem.html' %}
     {% endblock dialog %}
-
+    </div>
 {% endblock mainview %}
-
-
 
 
 {% block scripts %}
@@ -188,10 +188,24 @@
 
         }
 
-        // Скрипты специфичные для накладной
-        //$('#number').textbox({
-        //    onChange: alert('!!!')
-        //renameTab('000000001', '31/10/1985')
-        //});
+        // НЕ РАБОТАЕТ!!!! смена наименования панели
+        function renameTab(number, date) {
+            var tab = $('#doc-tab').tabs('getSelected');
+            if (number == 0) {
+                number = '0000000031';
+            }
+            if (date == 0) {
+                date = '31/10/1985';
+            }
+            var title = 'Накладная № ' + number + ' от ' + date;
+
+            $('#doc-tab').tabs('update', {
+                tab: tab,
+                options: {
+                    title: title
+                }
+            });
+        }
+
     </script>
 {% endblock scripts %}
