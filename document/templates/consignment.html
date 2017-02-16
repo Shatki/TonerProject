@@ -188,24 +188,5 @@
 
         }
 
-        // НЕ РАБОТАЕТ!!!! смена наименования панели
-        function renameTab(number, date) {
-            var tab = $('#doc-tab').tabs('getSelected');
-            if (number == 0) {
-                number = '0000000031';
-            }
-            if (date == 0) {
-                date = '31/10/1985';
-            }
-            var title = 'Накладная № ' + number + ' от ' + date;
-
-            $('#doc-tab').tabs('update', {
-                tab: tab,
-                options: {
-                    title: title
-                }
-            });
-        }
-
     </script>
 {% endblock scripts %}

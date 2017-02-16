@@ -13,8 +13,6 @@
             <link rel="stylesheet" type="text/css" href="{% static "css/themes/demo.css" %}">
         {% endblock theme %}
 
-    
-
         <script type='text/javascript' src="{% static 'js/jquery.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/jquery.easyui.min.js' %}"></script>
         <script type='text/javascript' src="{% static 'js/ajax.js' %}"></script>
@@ -24,16 +22,14 @@
 {% block mainview %}
     <body style="height:100%">
 
-
     <div id="doc-tab" class="easyui-tabs" style="width:100%; height:100%;"
-         border="false" fit="true" plain="true" title="Журнал накладных">
+         border="false" fit="true" plain="true">
 
         {% block maintab %}
             <div id="docs" title="Журнал накладных">
-
                 {% block doctable %}
                     <table id="common-tab" title="Журнал накладных за 31/10/1985 - 26/01/2017" class="easyui-datagrid"
-                           url="../consignment/all/json/"
+                           url="/document/consignment/all/json/"
                            toolbar="#toolbar" pagination="true"
                            rownumbers="true" fitColumns="true" singleSelect="true">
                         <thead>
@@ -66,7 +62,6 @@
         {% endblock maintab %}
     </div>
 
-
     {% block buttons %}
         <div id="dlg-buttons">
             <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="savedocument()"
@@ -75,7 +70,6 @@
                onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Cancel</a>
         </div>
     {% endblock buttons %}
-
     </body>
 
     {% block dialog %}
@@ -103,9 +97,7 @@
     {% include "popup_menu.html" %}
 {% endblock popup-menu %}
 
-
 {% block mainscripts %}
-
     <script type="text/javascript">
         function addTab(title, url) {
             if ($('#doc-tab').tabs('exists', title)) {
@@ -115,7 +107,6 @@
                     url: url,
                     cache: true,
                     success: function (html) {
-                        //var content = '<div style="width:100%;height:100%;padding:0">' + html + '</div>';
                         $('#doc-tab').tabs('add', {
                             title: title,
                             content: html,
@@ -126,11 +117,50 @@
             }
         }
 
+        function closeTab() {
+            var tab = $('#doc-tab').tabs('getSelected');
+            var index = $('#doc-tab').tabs('getTabIndex', tab);
+            if (index > 0) {
+                $('#doc-tab').tabs('close', index);
+            }
+        }
+
         // НЕ РАБОТАЕТ!!!! смена даты на панели общего журнала
         function renameConsignmentTab() {
             $('#common-tab').title()
         }
 
+        // Смена наименования панели
+        function renameTab(number, date) {
+            var jqtab = $('#doc-tab');
+            var t = jqtab.tabs('getSelected');
+            titleParts = t.panel('options').title.split(" ", 5);
+
+            if (number == 0) {
+                number = titleParts[2];
+            }
+            if (date == 0) {
+                date = titleParts[4];
+            }
+            var title = 'Накладная № ' + number + ' от ' + date;
+
+            jqtab.tabs('updateTitle', {
+                tab: t,
+                title: title
+            });
+        }
+
+        // EASYUI переименование tabs без перезагрузки
+        $.extend($.fn.tabs.methods, {
+            updateTitle: function (jq, param) {
+                return jq.each(function () {
+                    var t = $(param.tab);
+                    var opts = t.panel('options');
+                    opts.title = param.title;
+                    opts.tab.find('.tabs-title').html(param.title);
+                })
+            }
+        });
 
         // Методы для управления выводом datebox
         $.fn.datebox.defaults.parser = function (s) {
@@ -156,7 +186,7 @@
         function editDocument() {
             var row = $('#common-tab').datagrid('getSelected');
             if (row) {
-                url = '../consignment/' + row.id + '/edit/';
+                url = '/document/consignment/' + row.id + '/edit/';
                 addTab(row.name, url);
             }
         }
