@@ -39,8 +39,8 @@
                             <th field="seller" width="29%" align="left">Организация отпускающая продукцию</th>
                             <th field="buyer" width="29%" align="left">Организация принимающая продукцию</th>
                             <th field="total" width="5%" align="center">Сумма</th>
-                            <th field="status" width="5%" align="center"
-                                editor="{type:'checkbox',options:{on:'True',off:'False'}}">Статус проведения
+                            <th field="enable" width="5%" align="center"
+                                editor="{type:'checkbox',options:{on:'True',off:'False'}}">Активный
                             </th>
                         </tr>
                         </thead>
@@ -49,7 +49,7 @@
                     {% block doctable-menu %}
                         <div id="toolbar">
                             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
-                               onclick="addTab('Новая накладная','../consignment/new/')">Создать</a>
+                               onclick="addTab('Новая накладная от {{ system_date }}' ,'../consignment/new/')">Создать</a>
                             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
                                onclick="editDocument()">Редактировать</a>
                             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
@@ -118,14 +118,16 @@
         }
 
         function closeTab() {
-            var tab = $('#doc-tab').tabs('getSelected');
-            var index = $('#doc-tab').tabs('getTabIndex', tab);
-            if (index > 0) {
-                $('#doc-tab').tabs('close', index);
+            var jqtab = $('#doc-tab');
+            var t = jqtab.tabs('getSelected');
+            var index = jqtab.tabs('getTabIndex', t);
+            // Общий журнал не закрывается
+            if (index) {
+                jqtab.tabs('close', index);
             }
         }
 
-        // НЕ РАБОТАЕТ!!!! смена даты на панели общего журнала
+        // СДЕЛАТЬ смена даты на панели журнала накладных
         function renameConsignmentTab() {
             $('#common-tab').title()
         }
@@ -134,14 +136,23 @@
         function renameTab(number, date) {
             var jqtab = $('#doc-tab');
             var t = jqtab.tabs('getSelected');
-            titleParts = t.panel('options').title.split(" ", 5);
+            var titleParts = t.panel('options').title.split(" ", 5);
 
-            if (number == 0) {
+            if (!number) {
                 number = titleParts[2];
             }
-            if (date == 0) {
-                date = titleParts[4];
+            if (titleParts[4]) {
+                // Наименование будет из 5  частей
+                if (!date) {
+                    date = titleParts[4];
+                }
+            } else {
+                // Наименование будет из 4  частей
+                if (!date) {
+                    date = titleParts[3];
+                }
             }
+
             var title = 'Накладная № ' + number + ' от ' + date;
 
             jqtab.tabs('updateTitle', {

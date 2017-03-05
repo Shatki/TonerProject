@@ -4,11 +4,11 @@ from django.http import HttpResponse
 from django.template.context_processors import csrf
 from django.contrib import auth
 from django.http import JsonResponse
-
 from system.models import Product, Features, Developer, Type, Country, Category, Measure
 
 
 # Create your views here.
+
 def product_view(request, product_id):
     args = {}
     args.update(csrf(request))

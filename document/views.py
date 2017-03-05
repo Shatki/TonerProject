@@ -1,39 +1,43 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponse
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
-from django.contrib import auth
 from django.http import JsonResponse
 
 from contractor.models import Contractor
-from system.models import Product, Measure, Country
+from system.models import Product, Measure
 from .models import Consignment, ConsignmentTable
-from stock.models import Item
-from stock.views import item_add, item_delete
+from stock.views import item_add, item_edit, item_delete
+from system.datetime import SystemDateTime
+from datetime import datetime
+
+from RUSystem.RUClient import send_data
 
 
 # Представление общего журнала накладных
 @csrf_protect
+@login_required
 def consignments(request):
     # добавить проверку на пользователя
     try:
         args = {'user_profile': request.user,
                 'consignments': Consignment.objects.all(),
                 'contractors': Contractor.objects.all(),
-                'measures': Measure.objects.all()
+                'measures': Measure.objects.all(),
+                'system_date': SystemDateTime.today(),
                 }
-
     except:
         return HttpResponse(u"consignments: DB Error", content_type='text/html')
     args.update(csrf(request))
-
     # просмотр полного списка накладных
     return render_to_response('consignments.html', args)
 
 
 # JSON обработка отображение общего журнала
 @csrf_protect
+@login_required
 def consignments_json(request):
     try:
         data = Consignment.objects.all()
@@ -47,7 +51,8 @@ def consignments_json(request):
             name=str(get_one),
             seller=str(get_one.emitter),
             buyer=str(get_one.receiver),
-            status=str(get_one.status),
+            enable=str(get_one.enable),
+            delete=str(get_one.delete),
         )
         rows.append(obj)
     # final preparing
@@ -55,12 +60,37 @@ def consignments_json(request):
         total=str(data.count()),
         rows=rows,
     )
-
     return JsonResponse(response, safe=False)
 
 
-# Отображение представление одной накладной
+# Сохранение накладной  через POST
 @csrf_protect
+@login_required
+def consignment_save(request, consignment_id):
+    try:
+        consignment = Consignment.objects.get(id=consignment_id)
+        # Предобработка данных
+        if not request.POST.get('date'):
+            return HttpResponse("consignment_save: Error received data", content_type='text/html')
+        # Обработка даты
+        consignment.date = SystemDateTime.decode(request.POST.get('date'))
+        consignment.number = request.POST.get('number')
+        consignment.emitter_id = Contractor.objects.get(name=request.POST.get('emitter')).id
+        consignment.receiver_id = Contractor.objects.get(name=request.POST.get('receiver')).id
+        consignment.modified = datetime.today()
+        consignment.modificator = request.user
+        consignment.delete = False
+        consignment.save()
+    except:
+        return HttpResponse(u"consignment_save: DB error", content_type='text/html')
+    # args.update(csrf(request))
+    # просмотр полного списка накладных
+    return HttpResponse("Ok", content_type='text/html')
+
+
+# Отображение представления одной накладной
+@csrf_protect
+@login_required
 def consignment_edit(request, consignment_id):
     # добавить проверку на пользователя
     try:
@@ -70,7 +100,6 @@ def consignment_edit(request, consignment_id):
                 # 'items': Consignment.objects.get(id=consignment_id).items.all(),
                 'measures': Measure.objects.all(),
                 }
-
     except:
         return HttpResponse(u"consignment_edit: DB error", content_type='text/html')
     args.update(csrf(request))
@@ -80,18 +109,27 @@ def consignment_edit(request, consignment_id):
 
 # Тестовая версия создания накладной
 @csrf_protect
+@login_required
 def consignment_new(request):
     # добавить проверку на пользователя
     try:
+        new_consignment = Consignment.objects.create(
+            date=SystemDateTime.db_today(),
+            creator=request.user,
+            modificator=request.user,
+        )
         args = {'user_profile': request.user,
+                'consignment': new_consignment,
+                'creator': request.user,
+                'modificator': request.user,
                 'contractors': Contractor.objects.all(),
                 'products': Product.objects.all(),
                 'measures': Measure.objects.all(),
                 }
     except:
         return HttpResponse(u'consignment_new:  DB error', content_type='text/html')
-    # if request.user.contractor_id is not None:
-    #    args['contractor'] = Contractor.objects.get(id=request.user.contractor_id)
+    if request.user.contractor_id is not None:
+        args["contractor"] = Contractor.objects.get(id=request.user.contractor_id)
     args.update(csrf(request))
 
     # Добавление новой накладной
@@ -100,6 +138,7 @@ def consignment_new(request):
 
 # JSON обработка отображение позиций товара
 @csrf_protect
+@login_required
 def consignment_items_json(request, consignment_id):
     try:
         items = Consignment.objects.get(id=consignment_id).items.all()
@@ -123,12 +162,12 @@ def consignment_items_json(request, consignment_id):
         total=str(items.count()),
         rows=rows,
     )
-
     return JsonResponse(response, safe=False)
 
 
 # Создание нового товара и добавление его в накладную
 @csrf_protect
+@login_required
 def consignment_item_add(request, consignment_id):
     if request.POST and consignment_id and request.POST.get('product'):
         # Нужно добавить больше валидаций данных
@@ -153,9 +192,21 @@ def consignment_item_add(request, consignment_id):
         return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
 
 
+@csrf_protect
+@login_required
+def consignment_item_edit(request, consignment_id, item_id):
+    if request.POST and consignment_id and item_id and request.POST.get('product'):
+        # Нужно добавить больше валидаций данных
+        if request.POST.get('product')[0] != 'p':
+            return HttpResponse("consignment_item_edit: AJAX data error", content_type='text/html')
+        # Возможно нужно перенести часть функции в stock.view.item_edit
+        return item_edit(request, item_id)
+
+
 # Удаление товара из накладной и из базы
 # Пробная версия
 @csrf_protect
+@login_required
 def consignment_item_delete(request, consignment_id, item_id):
     if consignment_id and item_id:
         try:

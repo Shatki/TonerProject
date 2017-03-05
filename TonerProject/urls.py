@@ -18,6 +18,7 @@ from django.contrib import admin
 import homepage.views
 import authentication.views
 import dashboard.views
+from django.conf import settings
 
 
 urlpatterns = [
@@ -36,3 +37,10 @@ urlpatterns = [
     url(r'^(?P<nickname>\w+)$', authentication.views.dispatch_user),
     url(r'^$', homepage.views.home_page),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]

@@ -11,10 +11,15 @@ class ConsignmentAdmin(admin.ModelAdmin):
     list_display = ('__str__',
                     'emitter',
                     'receiver',
-                    'status',
+                    'enable',
+                    'delete',
+                    'created',
+                    'creator',
+                    'modified',
+                    'modificator',
                     )
 
-    search_fields = ('number', 'date')
+    search_fields = ('number', 'date', 'creator')
     ordering = ('id',)
     inlines = (ConsignmentTableInline,)
 
@@ -27,6 +32,12 @@ class ContractAdmin(admin.ModelAdmin):
     list_display = ('__str__',
                     'buyer',
                     'seller',
+                    'enable',
+                    'delete',
+                    'created',
+                    'creator',
+                    'modified',
+                    'modificator',
                     )
 
     search_fields = ('number', 'buyer', 'seller',)

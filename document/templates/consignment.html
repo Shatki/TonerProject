@@ -1,192 +1,226 @@
-{% extends "consignments.html" %}
-{% load staticfiles %}
-
-{% block head %}
-{% endblock head %}
-
-{% block mainview %}
+{% block docview %}
     <div style="width:100%;height:100%;padding:0">
-    {% block mainmenu %}
-        {% block ibuttons %}
-            <div style="background:#fafafa;width:100%;border:1px solid #ccc">
-                <a href="#" class="easyui-menubutton" menu="#mm-document" iconCls="icon-large-smartart">Документ</a>
-                <a href="#" class="easyui-menubutton" menu="#mm-edit" iconCls="icon-edit">Правка</a>
-                <a href="#" class="easyui-menubutton" menu="#mm-help" iconCls="icon-help">Помощь</a>
-                <a href="#" class="easyui-menubutton" menu="#mm-operations" iconCls="icon-large-chart">Операции</a>
-            </div>
-        {% endblock ibuttons %}
-
-        {% block document %}
-            <div id="mm-document" style="width:150px;">
-                <div data-options="iconCls:'icon-save'" onclick="saveDoc()">Сохранить</div>
-                <div data-options="iconCls:'icon-close'" onclick="closeDoc()">Закрыть</div>
-                <div class="menu-sep"></div>
-                <div>Cut</div>
-                <div>Copy</div>
-                <div>Paste</div>
-                <div class="menu-sep"></div>
-                <div>
-                    <span>Toolbar</span>
-
-                    <div>
-                        <div>Address</div>
-                        <div>Link</div>
-                        <div>Navigation Toolbar</div>
-                        <div>Bookmark Toolbar</div>
-                        <div class="menu-sep"></div>
-                        <div>New Toolbar...</div>
-                    </div>
+        {% block mainmenu %}
+            {% block ibuttons %}
+                <div style="background:#fafafa;width:100%;border:1px solid #ccc">
+                    <a href="#" class="easyui-menubutton" menu="#mm-document-consignment-{{ consignment.id }}"
+                       iconCls="icon-large-smartart">Документ</a>
+                    <a href="#" class="easyui-menubutton" menu="#mm-edit-consignment-{{ consignment.id }}"
+                       iconCls="icon-edit">Правка</a>
+                    <a href="#" class="easyui-menubutton" menu="#mm-help-consignment-{{ consignment.id }}"
+                       iconCls="icon-help">Помощь</a>
+                    <a href="#" class="easyui-menubutton" menu="#mm-operations-consignment-{{ consignment.id }}"
+                       iconCls="icon-large-chart">Операции</a>
                 </div>
-                <div data-options="iconCls:'icon-remove'">Delete</div>
-                <div>Select All</div>
-            </div>
-        {% endblock document %}
+            {% endblock ibuttons %}
 
-        {% block edit %}
-            <div id="mm-edit" style="width:150px;">
-                <div data-options="iconCls:'icon-undo'">Undo</div>
-                <div data-options="iconCls:'icon-redo'">Redo</div>
-                <div class="menu-sep"></div>
-                <div>Cut</div>
-                <div>Copy</div>
-                <div>Paste</div>
-                <div class="menu-sep"></div>
-                <div>
-                    <span>Toolbar</span>
-
+            {% block document %}
+                <div id="mm-document-consignment-{{ consignment.id }}" style="width:150px;">
+                    <div data-options="iconCls:'icon-save'" onclick="saveDoc({{ consignment.id }})">Сохранить</div>
+                    <div data-options="iconCls:'icon-close'" onclick="closeDoc({{ consignment.id }})">Закрыть</div>
+                    <div class="menu-sep"></div>
+                    <div>Cut</div>
+                    <div>Copy</div>
+                    <div>Paste</div>
+                    <div class="menu-sep"></div>
                     <div>
-                        <div>Address</div>
-                        <div>Link</div>
-                        <div>Navigation Toolbar</div>
-                        <div>Bookmark Toolbar</div>
-                        <div class="menu-sep"></div>
-                        <div>New Toolbar...</div>
+                        <span>Toolbar</span>
+
+                        <div>
+                            <div>Address</div>
+                            <div>Link</div>
+                            <div>Navigation Toolbar</div>
+                            <div>Bookmark Toolbar</div>
+                            <div class="menu-sep"></div>
+                            <div>New Toolbar...</div>
+                        </div>
                     </div>
+                    <div data-options="iconCls:'icon-remove'">Delete</div>
+                    <div>Select All</div>
                 </div>
-                <div data-options="iconCls:'icon-remove'">Delete</div>
-                <div>Select All</div>
-            </div>
-        {% endblock edit %}
+            {% endblock document %}
 
-        {% block help %}
-            <div id="mm-help" style="width:100px;">
-                <div>Help</div>
-                <div>Update</div>
-                <div>About</div>
-            </div>
-        {% endblock help %}
+            {% block edit %}
+                <div id="mm-edit-consignment-{{ consignment.id }}" style="width:150px;">
+                    <div data-options="iconCls:'icon-undo'">Undo</div>
+                    <div data-options="iconCls:'icon-redo'">Redo</div>
+                    <div class="menu-sep"></div>
+                    <div>Cut</div>
+                    <div>Copy</div>
+                    <div>Paste</div>
+                    <div class="menu-sep"></div>
+                    <div>
+                        <span>Toolbar</span>
 
-        {% block operations %}
-            <div id="mm-operations" class="menu-content" style="background:#f0f0f0;padding:10px;text-align:left">
-                <img src="http://www.jeasyui.com/images/logo1.png" style="width:150px;height:50px">
+                        <div>
+                            <div>Address</div>
+                            <div>Link</div>
+                            <div>Navigation Toolbar</div>
+                            <div>Bookmark Toolbar</div>
+                            <div class="menu-sep"></div>
+                            <div>New Toolbar...</div>
+                        </div>
+                    </div>
+                    <div data-options="iconCls:'icon-remove'">Delete</div>
+                    <div>Select All</div>
+                </div>
+            {% endblock edit %}
 
-                <p style="font-size:14px;color:#444;">Try jQuery EasyUI to build your modern, interactive, javascript
-                    applications.</p>
-            </div>
-        {% endblock operations %}
-    {% endblock mainmenu %}
+            {% block help %}
+                <div id="mm-help-consignment-{{ consignment.id }}" style="width:100px;">
+                    <div>Help</div>
+                    <div>Update</div>
+                    <div>About</div>
+                </div>
+            {% endblock help %}
 
-    {% block reqvisites %}
-        <div id="header-toolbar" style="margin: 5px 20px 5px 20px">
-            {% block consignment_number %}
-                <input class="easyui-textbox" name="number" id="number" required="required" style="width: 100px"
-                       label="Накладная №"
-                       data-options="onChange:function(number){renameTab(number,0)}"
-                       labelPosition="top"
-                       value="{{ consignment.str_number }}"
-                       placeholder="0000000001" type="text">
-                <span>от</span>
-                <input class="easyui-datebox" name="date" id="date" required="required" style="width: 285px"
-                       data-options="panelWidth:285,currentText:'Сегодня',closeText:'Закрыть',
+            {% block operations %}
+                <div id="mm-operations-consignment-{{ consignment.id }}" class="menu-content"
+                     style="background:#f0f0f0;padding:10px;text-align:left">
+
+                    <p style="font-size:14px;color:#444;">Try jQuery EasyUI to build your modern, interactive,
+                        javascript
+                        applications.</p>
+                </div>
+            {% endblock operations %}
+        {% endblock mainmenu %}
+
+        {% block reqvisites %}
+            <div id="header-toolbar-consignment-{{ consignment.id }}" style="margin: 5px 20px 5px 20px">
+                <form id="doc-reqv-fm-consignment-{{ consignment.id }}">
+                    {% block consignment_number %}
+                        <input class="easyui-textbox" name="number" required="required" style="width: 100px"
+                               label="Накладная №"
+                               data-options="onChange:function(number){renameTab(number,0)}"
+                               labelPosition="top"
+                                {% if not consignment.number %}
+                               value="Новая"
+                                {% else %}
+                               value="{{ consignment.number }}"
+                                {% endif %}
+                               placeholder="0000000001" type="number">
+                        <span>от</span>
+                        <input class="easyui-datebox" name="date" required="required" style="width: 285px"
+                               data-options="panelWidth:285,currentText:'Сегодня',closeText:'Закрыть',
                        onChange:function(date){renameTab(0,date)}"
-                       labelPosition="top"
-                       value="{{ consignment.str_date }}"
-                       placeholder="31/10/1985">
-            {% endblock consignment_number %}
+                               labelPosition="top"
+                               value="{{ consignment.str_date }}"
+                               placeholder="31/10/1985">
+                    {% endblock consignment_number %}
 
-            {% block contractors %}
-                {% block emitter %}
-                    <select id="emitter" name="emitter" label="Продавец:" class="easyui-combobox"
-                            labelPosition="top">
+                    {% block contractors %}
+                        {% block emitter %}
+                            <select id="emitter-consignment-{{ consignment.id }}" name="emitter" label="Продавец:"
+                                    class="easyui-combobox"
+                                    labelPosition="top">
 
-                        {% for contractor in contractors %}
-                            {% if contractor.id == consignment.emitter.id %}
-                                <option selected>{{ contractor.name }}</option>
-                            {% else %}
-                                <option>{{ contractor.name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                {% endblock emitter %}
+                                {% for contractor in contractors %}
+                                    {% if contractor.id == consignment.emitter.id %}
+                                        <option selected>{{ contractor.name }}</option>
+                                    {% else %}
+                                        <option>{{ contractor.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        {% endblock emitter %}
 
-                {% block receiver %}
-                    <select id="receiver" name="receiver" label="Покупатель:" class="easyui-combobox"
-                            labelPosition="top">
+                        {% block receiver %}
+                            <select id="receiver-consignment-{{ consignment.id }}" name="receiver" label="Покупатель:"
+                                    class="easyui-combobox"
+                                    labelPosition="top">
 
-                        {% for contractor in contractors %}
-                            {% if contractor.id == consignment.receiver.id %}
-                                <option selected>{{ contractor.name }}</option>
-                            {% else %}
-                                <option>{{ contractor.name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                {% endblock receiver %}
-            {% endblock contractors %}
-        </div>
-    {% endblock reqvisites %}
+                                {% for contractor in contractors %}
+                                    {% if contractor.id == consignment.receiver.id %}
+                                        <option selected>{{ contractor.name }}</option>
+                                    {% else %}
+                                        <option>{{ contractor.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        {% endblock receiver %}
+                    {% endblock contractors %}
+                </form>
+            </div>
+        {% endblock reqvisites %}
 
-    {% block maintab %}
-        <table id="item-table" title="Таблица товаров" class="easyui-datagrid" width="100% "
-                {% if consignment.id %}
-               url="/document/consignment/{{ consignment.id }}/items/json/"
-                {% endif %}
-               toolbar="#item-toolbar" pagination="true"
-               rownumbers="true"
-               fitColumns="true"
-               singleSelect="true">
-            <thead>
-            <tr>
-                <th field="ck" checkbox="true"></th>
-                <th field="name" width="30%" align="left">Наименование товара, работ, услуг</th>
-                <th field="measure" width="5%" align="center">
-                    <strong>Ед. </strong>изм.<br><em>(шт., кг и т.д.)</em></th>
-                <th field="quantity" width="5%" align="center">Кол-во<br><em>(единиц)</em></th>
-                <th field="country" width="10%" align="center"><p>Страна<br>изготовитель</p></th>
-                <th field="cost" width="10%" align="center"><p>Цена<br>за единицу</p></th>
-                <th field="total" width="5%" align="center">Сумма</th>
+        {% block maintab %}
+            <table id="item-table-consignment-{{ consignment.id }}" title="Таблица товаров"
+                   class="easyui-datagrid" width="100% "
+                    {% if consignment.id %}
+                   url="/document/consignment/{{ consignment.id }}/items/json/"
+                    {% endif %}
+                   toolbar="#item-toolbar" pagination="true"
+                   rownumbers="true"
+                   fitColumns="true"
+                   singleSelect="true">
+                <thead>
+                <tr>
+                    <th field="ck" checkbox="true"></th>
+                    <th field="name" width="30%" align="left">Наименование товара, работ, услуг</th>
+                    <th field="measure" width="5%" align="center">
+                        <strong>Ед. </strong>изм.<br><em>(шт., кг и т.д.)</em></th>
+                    <th field="quantity" width="5%" align="center">Кол-во<br><em>(единиц)</em></th>
+                    <th field="country" width="10%" align="center"><p>Страна<br>изготовитель</p></th>
+                    <th field="cost" width="10%" align="center"><p>Цена<br>за единицу</p></th>
+                    <th field="total" width="5%" align="center">Сумма</th>
 
-            </tr>
-            </thead>
+                </tr>
+                </thead>
 
-            {% block itemtable-menu %}
-                <div id="item-toolbar">
-                    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
-                       onclick="addItem()">Добавить</a>
-                    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
-                       onclick="editItem()">Редактировать</a>
-                    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
-                       onclick="deleteItem()">Удалить</a>
-                </div>
-            {% endblock itemtable-menu %}
+                {% block itemtable-menu %}
+                    <div id="item-toolbar-{{ consignment.id }}">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+                           onclick="addItem({{ consignment.id }})">Добавить</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
+                           onclick="editItem({{ consignment.id }})">Редактировать</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+                           onclick="deleteItem({{ consignment.id }})">Удалить</a>
+                    </div>
+                {% endblock itemtable-menu %}
 
-        </table>
-    {% endblock maintab %}
+            </table>
+        {% endblock maintab %}
 
-    {% block dialog %}
-        {% include 'additem.html' %}
-    {% endblock dialog %}
+        {% block dialog %}
+            {% include 'item.html' %}
+        {% endblock dialog %}
     </div>
-{% endblock mainview %}
+{% endblock docview %}
 
 
 {% block scripts %}
     <script type="text/javascript">
         // Скрипты для главного меню документа
-        function saveDoc() {
-            alert('Записано!');
+        function saveDoc(doc_id) {
+            var doc_form = $('#doc-reqv-fm-consignment-' + doc_id);
+            // Записываем в том случае, если есть хотя бы одна позиция в таблице продукции
+            //alert($("#item-table-consignment-" + doc_id).datagrid('getData').total);
+            if ($("#item-table-consignment-" + doc_id).datagrid('getData').total > 0) {
+                if (doc_form.form('validate')) {
+                    var data = doc_form.serialize();
+                    $.ajax({
+                        url: '/document/consignment/' + doc_id + '/save/',
+                        method: 'POST',
+                        data: data,
+                        cache: false,
+                        success: function (data) {
+                            if (data == 'Ok') {
+                                // Пока кокой-то деревянный способ
+                                alert(' Документ успешно сохранен');
+                                //$('#item-add-dlg-consignment-' + doc_id).dialog('close');      // close the dialog
+                                //$('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
+                            } else {
+                                alert(data);
+                                // Данные получены кривые
 
+                            }
+                        }
+                    });
+
+                }
+            } else {
+                alert('Заполните таблицу товаров!');
+            }
         }
-
     </script>
 {% endblock scripts %}

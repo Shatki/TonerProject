@@ -1,17 +1,18 @@
 {% block dialog %}
-    <div id="item-add-dlg" class="easyui-dialog"
+    <div id="item-add-dlg-consignment-{{ consignment.id }}"
+         class="easyui-dialog"
          data-options="iconCls:'icon-add', resizable:true, modal:true,
          minWidth:'800', maxWidth:'1024', minHeight:'400', maxHeight:'768', modal:'true', closed:'true'">
         {% block panel %}
             <div class="easyui-layout" fit="true">
 
-                {% block product_tree %}
+                {% block product_browser %}
                     <div region="west" split="true" style="width:70%;"
                          data-options="minWidth:'300', maxWidth:'600'">
-                        <table class="easyui-treegrid" id="product-tg" title="Браузер продукции"
+                        <table class="easyui-treegrid"
+                               id="product-tg-consignment-{{ consignment.id }}" title="Браузер продукции"
                                data-options="url:'/catalog/item/all/json/',idField:'id',treeField:'name',
-                               singleSelect:true"
-                               rownumbers="true">
+                               singleSelect:true" rownumbers="true">
                             <thead>
                             <tr>
                                 <th field="name">Наименование</th>
@@ -19,55 +20,61 @@
                             </thead>
                         </table>
                     </div>
-                {% endblock product_tree %}
+                {% endblock product_browser %}
 
                 {% block product_data %}
-                    <form id="item-info-fm" method="post">
+                    <form id="item-info-fm-consignment-{{ consignment.id }}" method="post">
                         <div region="center" border="false" border="false">
 
                             <div class="easyui-tabs" fit="true">
                                 <div title="Основные" style="padding:10px;">
                                     <div>
-                                        <input id="product" type="text" hidden="hidden"
+                                        <input type="text" hidden="hidden"
+                                               id="product-consignment-{{ consignment.id }}"
                                                name="product" required="required"/>
                                     </div>
                                     <div>
-                                        <select class="easyui-combobox" id="country" name="country" required="required"
+                                        <select class="easyui-combobox" name="country" required="required"
                                                 label="Страна происхождения"
+                                                id="country-consignment-{{ consignment.id }}"
                                                 labelPosition="top"
                                                 data-options="valueField:'id',textField:'name',
                                                 url:'/catalog/country/json/', minWidth:'160'">
                                         </select>
                                     </div>
                                     <div>
-                                        <input class="easyui-textbox" name="warranty" id="warranty"
+                                        <input class="easyui-textbox" name="warranty"
+                                               id="warranty-consignment-{{ consignment.id }}"
                                                data-options="minWidth:'160',required:true,label:'Гарантийный срок'"
                                                labelPosition="top"
                                                placeholder="0000000001" type="text">
                                     </div>
                                     <div>
-                                        <select class="easyui-combobox" id="package" name="package" required="required"
-                                                label="Тип поставки"
+                                        <select class="easyui-combobox" name="package" required="required"
+                                                label="Тип поставки" id="package-consignment-{{ consignment.id }}"
                                                 labelPosition="top"
                                                 data-options="valueField:'id',textField:'name',
                                                 url:'/stock/package/json/', minWidth:'160',">
                                         </select>
                                     </div>
                                     <div>
-                                        <input class="easyui-textbox" name="serial_number" id="serial-number"
+                                        <input class="easyui-textbox" name="serial_number"
+                                               id="serial-number-consignment-{{ consignment.id }}"
                                                data-options="minWidth:'160',label:'Серийный номер №'"
                                                labelPosition="top"
                                                placeholder="0000000001" type="text">
                                     </div>
                                     <div>
-                                        <input class="easyui-textbox" name="quantity" id="quantity"
+                                        <input class="easyui-textbox" name="quantity"
+                                               id="quantity-consignment-{{ consignment.id }}"
                                                data-options="minWidth:'160',required:true,label:'Количество'"
                                                labelPosition="top"
                                                placeholder="1" type="text">
                                     </div>
                                     <div>
-                                        <select class="easyui-combobox" id="measure" name="measure" required="required"
+                                        <select class="easyui-combobox" name="measure" required="required"
                                                 label="Единица измерения"
+                                                id="measures-consignment-{{ consignment.id }}"
                                                 labelPosition="top"
                                                 data-options="valueField:'id',textField:'name',
                                                 url:'/catalog/measure/json/', minWidth:'160'">
@@ -85,10 +92,12 @@
                 {% endblock product_data %}
 
                 <div region="south" border="false" style="text-align:right;height:30px;line-height:30px;">
-                    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveItem()"
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok"
+                       onclick="saveItem({{ consignment.id }})"
                        style="width:90px">Готово</a>
                     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
-                       onclick="javascript:$('#item-add-dlg').dialog('close');" style="width:90px">Отмена</a>
+                       onclick="javascript:$('#item-add-dlg-consignment-' + {{ consignment.id }}).dialog('close');"
+                       style="width:90px">Отмена</a>
                 </div>
 
             </div>
@@ -100,10 +109,11 @@
 
 {% block scripts %}
     <script type="text/javascript">
-        function saveItem() {
-            // alert(url);
-            if ($('#item-info-fm').form('validate')) {
-                var data = $('#item-info-fm').serialize();
+        function saveItem(doc_id) {
+            //var url ='/document/consignment/' + doc_id + '/item/add/';
+            var item_form = $('#item-info-fm-consignment-' + doc_id);
+            if (item_form.form('validate')) {
+                var data = item_form.serialize();
                 $.ajax({
                     url: url,
                     method: 'POST',
@@ -115,8 +125,8 @@
                             // alert('Данные получены');
                             //location.href = "#";
                             //location.reload();
-                            $('#item-add-dlg').dialog('close');      // close the dialog
-                            $('#item-table').datagrid('reload');    // reload the data table
+                            $('#item-add-dlg-consignment-' + doc_id).dialog('close');      // close the dialog
+                            $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
                         } else {
                             alert(data);
                             // Данные получены кривые
@@ -128,47 +138,49 @@
             }
         }
 
-        function addItem() {
-            url = '../item/add/';
-            $('#item-info-fm').form('clear');
-            $('#item-add-dlg').dialog('open').dialog('setTitle', 'Добавить товар');
+        function addItem(doc_id) {
+            url = '/document/consignment/' + doc_id + '/item/add/';
+            //var parent = $('#doc-'+ doc_id);
+            //alert('#doc-'+doc_id);
+            $('#item-info-fm-consignment-' + doc_id).form('clear');
+            $('#item-add-dlg-consignment-' + doc_id).dialog('open').dialog('setTitle', 'Добавить товар');
             // Перезагрузим таблицу, иначе не увидим позиции
-            $('#product-tg').treegrid('reload');
+            $('#product-tg-consignment-' + doc_id).treegrid('reload').treegrid('unselectAll');
             // Сброс настроек выбора узла
-            //$('#product-tg').treegrid('unselectAll')
         }
 
-        function editItem() {
-            var item_id = $('#item-table').datagrid('getSelected').id;
-            url = '/stock/item/' + item_id + '/edit/';
-            $('#item-add-dlg').dialog('open').dialog('setTitle', 'Редактировать товар');
-            // Перезагрузим таблицу, иначе не увидим позиции
+        function editItem(doc_id) {
+            var item_id = $('#item-table-consignment-' + doc_id).datagrid('getSelected').id;
+            url = '/document/consignment/' + doc_id + '/item/' + item_id + '/edit/';
+            $('#item-add-dlg-consignment-' + doc_id).dialog('open').dialog('setTitle', 'Редактировать товар');
+
             $.ajax({
                 url: '/stock/item/' + item_id + '/json/',
                 method: 'POST',
                 cache: false,
                 success: function (data) {
                     if (data.status == 'Ok') {
-                        $('#item-info-fm').form('load', data);
-                        $('#product-tg').treegrid('select', data.product);
+                        $('#item-info-fm-consignment-' + doc_id).form('load', data);
+                        $('#product-tg-consignment-' + doc_id).treegrid('select', data.product);
                     } else {
                         // Данные получены кривые, закрываемся
-                        $('#item-add-dlg').dialog('close');      // close the dialog
-                        $('#item-table').datagrid('reload');    // reload the data table
+                        $('#item-add-dlg-consignment-' + doc_id).dialog('close');      // close the dialog
+                        $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
                     }
                 }
             });
-            //$('#item-info-fm').form('clear');
-            $('#product-tg').treegrid('reload');
+            // Перезагрузим таблицу, иначе не увидим позиции
+            // $('#item-info-fm').form('clear');
+            $('#product-tg-consignment-' + doc_id).treegrid('reload');
         }
 
-        function deleteItem() {
-            var item_id = $('#item-table').datagrid('getSelected').id;
+        function deleteItem(doc_id) {
+            var item_id = $('#item-table-consignment-' + doc_id).datagrid('getSelected').id;
             // Спросить? вы уверены?
             // Очень сложная операция, т/к может затронуть многие изменения
             // Перезагрузим таблицу, иначе не увидим позиции
             $.ajax({
-                url: '../item/' + item_id + '/delete/',
+                url: '/document/consignment/' + doc_id + '/item/' + item_id + '/delete/',
                 method: 'POST',
                 cache: false,
                 success: function (data) {
@@ -176,25 +188,25 @@
 
                     } else {
                         // Данные получены кривые, закрываемся
-                        $('#item-table').datagrid('reload');    // reload the data table
+                        $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
                     }
                 }
             });
             //$('#item-info-fm').form('clear');
-            $('#product-tg').treegrid('reload');
+            $('#product-tg-consignment-' + doc_id).treegrid('reload');
         }
 
 
 
 
         // Контекстное меню. Пока обновляет только браузер продукции
-        function reload() {
-            $('#product-tg').treegrid('reload');
+        function reload(doc_id) {
+            $('#product-tg-consignment-' + doc_id).treegrid('reload');
         }
 
-        $('#product-tg').treegrid({
+        $('#product-tg-consignment-' + '{{ consignment.id }}').treegrid({
             onSelect: function (row) {
-                $("#product-tg").val(row.id);
+                $("#product-consignment-" + '{{ consignment.id }}').val(row.id);
             }
         });
     </script>

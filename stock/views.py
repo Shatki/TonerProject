@@ -7,7 +7,6 @@ from django.contrib import auth
 from system.models import Category, Product
 from stock.models import Package, Item
 
-
 # AJAX запрос для формы.
 @csrf_protect
 def package_json(request):
