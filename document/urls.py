@@ -5,12 +5,9 @@ import document.views
 
 urlpatterns = [
     # Examples:
-    # url(r'^article(?P<article_id>\d+)/addlike/$', blog.views.addlike),
-    # url(r'^article(?P<article_id>\d+)/addcomment/$', blog.views.addcomment),
-    # url(r'^article(?P<article_id>\d+)/$', blog.views.article),
-    # url(r'^admin/', include(admin.site.urls)),
     url(r'^consignment/(?P<consignment_id>\d+)/edit/$', document.views.consignment_edit),
     url(r'^consignment/(?P<consignment_id>\d+)/save/$', document.views.consignment_save),
+    url(r'^consignment/(?P<consignment_id>\d+)/delete/$', document.views.consignment_delete),
     url(r'^consignment/(?P<consignment_id>\d+)/item/add/$', document.views.consignment_item_add),
     url(r'^consignment/(?P<consignment_id>\d+)/item/(?P<item_id>\d+)/edit/$', document.views.consignment_item_edit),
     url(r'^consignment/(?P<consignment_id>\d+)/item/(?P<item_id>\d+)/delete/$', document.views.consignment_item_delete),

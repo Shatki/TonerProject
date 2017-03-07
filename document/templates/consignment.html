@@ -1,5 +1,10 @@
 {% block docview %}
     <div style="width:100%;height:100%;padding:0">
+
+        {% block index %}
+            <div id="consignment-id" hidden="hidden">{{ consignment.id }}</div>
+        {% endblock index %}
+
         {% block mainmenu %}
             {% block ibuttons %}
                 <div style="background:#fafafa;width:100%;border:1px solid #ccc">
@@ -188,7 +193,7 @@
 {% endblock docview %}
 
 
-{% block scripts %}
+{% block doc-scripts %}
     <script type="text/javascript">
         // Скрипты для главного меню документа
         function saveDoc(doc_id) {
@@ -223,4 +228,4 @@
             }
         }
     </script>
-{% endblock scripts %}
+{% endblock doc-scripts %}

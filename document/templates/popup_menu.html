@@ -2,10 +2,11 @@
 
 {% block popup-menu %}
     <div id="mm" class="easyui-menu" style="width:120px;">
-        <div onclick="javascript:alert('new')">Новая</div>
-        <div onclick="javascript:alert('edit')">Изменить</div>
+        <div data-options="iconCls:'icon-add'" onclick="popupMenuDispatcher(1);">Создать</div>
+        <div data-options="iconCls:'icon-edit'" onclick="popupMenuDispatcher(2);">Изменить</div>
+        <div data-options="iconCls:'icon-remove'" onclick="popupMenuDispatcher(3);">Удалить</div>
         <div onclick="closeTab()">Закрыть</div>
-        <div onclick="javascript:reload();">Обновить</div>
+        <div data-options="iconCls:'icon-reload'" onclick="javascript:reload();">Обновить</div>
         <div>
             <span>Экспорт</span>
 
@@ -58,5 +59,45 @@
                 });
             });
         });
+
+        function popupMenuDispatcher(action) {
+            var tab = $('#doc-tab');
+            var selected = tab.tabs('getSelected');
+            var tabIndex = tab.tabs('getTabIndex', selected);
+            //alert(tabIndex);
+            if (tabIndex) {
+                // Действия с документами
+                switch (action) {
+                    case 1:
+                        addItem($("<div/>",
+                                {"html": selected.panel('options').content}).find('#consignment-id').html());
+                        break;
+                    case 2:
+                        editItem($("<div/>",
+                                {"html": selected.panel('options').content}).find('#consignment-id').html());
+                        break;
+                    case 3:
+                        deleteItem($("<div/>",
+                                {"html": selected.panel('options').content}).find('#consignment-id').html());
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (action) {
+                    case 1:
+                        newDocument();
+                        break;
+                    case 2:
+                        editDocument();
+                        break;
+                    case 3:
+                        destroyDocument();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     </script>
 {% endblock popup-menu %}

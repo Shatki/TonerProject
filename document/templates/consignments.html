@@ -49,7 +49,7 @@
                     {% block doctable-menu %}
                         <div id="toolbar">
                             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
-                               onclick="addTab('Новая накладная от {{ system_date }}' ,'../consignment/new/')">Создать</a>
+                               onclick="newDocument('{{ system_date }}')">Создать</a>
                             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
                                onclick="editDocument()">Редактировать</a>
                             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
@@ -108,6 +108,7 @@
                     cache: true,
                     success: function (html) {
                         $('#doc-tab').tabs('add', {
+                            //id: index,
                             title: title,
                             content: html,
                             closable: true
@@ -175,7 +176,7 @@
 
         // Методы для управления выводом datebox
         $.fn.datebox.defaults.parser = function (s) {
-            dateParts = s.split("/", 3);
+            var dateParts = s.split("/", 3);
             if (dateParts[0] != s) {
                 return new Date(dateParts[2], (dateParts[1] - 1), dateParts[0]);
             } else {
@@ -192,15 +193,32 @@
     </script>
 {% endblock mainscripts %}
 
-{% block scripts %}
+{% block common-scripts %}
     <script type="text/javascript">
+        function newDocument(date) {
+            addTab('Новая накладная от ' + date, '../consignment/new/');
+        }
+
         function editDocument() {
             var row = $('#common-tab').datagrid('getSelected');
             if (row) {
-                url = '/document/consignment/' + row.id + '/edit/';
-                addTab(row.name, url);
+                addTab(row.name, '/document/consignment/' + row.id + '/edit/');
+            }
+        }
+
+        function destroyDocument() {
+            var row = $('#common-tab').datagrid('getSelected');
+            if (row) {
+                $.ajax({
+                    method: 'POST',
+                    url: '/document/consignment/' + row.id + '/delete/',
+                    cache: false,
+                    success: function () {
+                        $('#common-tab').datagrid('reload');
+                    }
+                });
             }
         }
     </script>
-{% endblock scripts %}
+{% endblock common-scripts %}
 

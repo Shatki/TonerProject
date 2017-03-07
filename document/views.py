@@ -23,7 +23,7 @@ def consignments(request):
     # добавить проверку на пользователя
     try:
         args = {'user_profile': request.user,
-                'consignments': Consignment.objects.all(),
+                # 'consignments': Consignment.objects.filter(delete=False),
                 'contractors': Contractor.objects.all(),
                 'measures': Measure.objects.all(),
                 'system_date': SystemDateTime.today(),
@@ -35,13 +35,14 @@ def consignments(request):
     return render_to_response('consignments.html', args)
 
 
-# JSON обработка отображение общего журнала
+# JSON запрос элементов для отображения журнала накладных
 @csrf_protect
 @login_required
 def consignments_json(request):
     try:
-        data = Consignment.objects.all()
-    except:
+        # Показывает только не удаленные
+        data = Consignment.objects.filter(delete=False)
+    except Consignment.DoesNotExist:
         return HttpResponse(u'consignments_json: DB Error', content_type='text/html')
     # Serialize
     rows = []
@@ -88,20 +89,36 @@ def consignment_save(request, consignment_id):
     return HttpResponse("Ok", content_type='text/html')
 
 
+# Удаление накладной  через POST
+@csrf_protect
+@login_required
+def consignment_delete(request, consignment_id):
+    try:
+        # Мягкое удаление
+        doc = Consignment.objects.get(id=consignment_id)
+        doc.delete = True
+        doc.save()
+        # Жесткое удаление
+        # Consignment.objects.filter(id=consignment_id).delete()
+        # Предобработка данных
+    except Consignment.DoesNotExist:
+        return HttpResponse(u"consignment_delete: DB error", content_type='text/html')
+    # args.update(csrf(request))
+    # просмотр полного списка накладных
+    return HttpResponse("Ok", content_type='text/html')
+
+
 # Отображение представления одной накладной
 @csrf_protect
 @login_required
 def consignment_edit(request, consignment_id):
     # добавить проверку на пользователя
-    try:
-        args = {'user_profile': request.user,
-                'consignment': Consignment.objects.get(id=consignment_id),
-                'contractors': Contractor.objects.all(),
-                # 'items': Consignment.objects.get(id=consignment_id).items.all(),
-                'measures': Measure.objects.all(),
-                }
-    except:
-        return HttpResponse(u"consignment_edit: DB error", content_type='text/html')
+    args = {'user_profile': request.user,
+            'consignment': Consignment.objects.get(id=consignment_id),
+            'contractors': Contractor.objects.all(),
+            # 'items': Consignment.objects.get(id=consignment_id).items.all(),
+            'measures': Measure.objects.all(),
+            }
     args.update(csrf(request))
     # просмотр полного списка накладных
     return render_to_response('consignment.html', args)
