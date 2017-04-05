@@ -16,6 +16,7 @@
         <script type='text/javascript' src="{% static 'js/jquery.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/jquery.easyui.min.js' %}"></script>
         <script type='text/javascript' src="{% static 'js/ajax.js' %}"></script>
+        <script type='text/javascript' src="{% static 'js/cookies.js' %}"></script>
     </head>
 {% endblock head %}
 
@@ -118,7 +119,7 @@
             }
         }
 
-        function closeTab() {
+        function closeDoc() {
             var jqtab = $('#doc-tab');
             var t = jqtab.tabs('getSelected');
             var index = jqtab.tabs('getTabIndex', t);
@@ -126,6 +127,11 @@
             if (index) {
                 jqtab.tabs('close', index);
             }
+        }
+
+        function printDoc(doc_id) {
+            window.open('/form/consignment/' + doc_id + '/print/pdf/', '_blank');
+            //location.href='/form/consignment/' + doc_id +'/print/pdf/';
         }
 
         // СДЕЛАТЬ смена даты на панели журнала накладных
@@ -219,6 +225,13 @@
                 });
             }
         }
+
+        $(document).ready(function () {
+            if (!navigator.cookieEnabled) {
+                alert('Включите cookie для комфортной работы с этим сайтом');
+            }
+        })
+
     </script>
 {% endblock common-scripts %}
 

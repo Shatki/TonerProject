@@ -6,88 +6,7 @@
         {% endblock index %}
 
         {% block mainmenu %}
-            {% block ibuttons %}
-                <div style="background:#fafafa;width:100%;border:1px solid #ccc">
-                    <a href="#" class="easyui-menubutton" menu="#mm-document-consignment-{{ consignment.id }}"
-                       iconCls="icon-large-smartart">Документ</a>
-                    <a href="#" class="easyui-menubutton" menu="#mm-edit-consignment-{{ consignment.id }}"
-                       iconCls="icon-edit">Правка</a>
-                    <a href="#" class="easyui-menubutton" menu="#mm-help-consignment-{{ consignment.id }}"
-                       iconCls="icon-help">Помощь</a>
-                    <a href="#" class="easyui-menubutton" menu="#mm-operations-consignment-{{ consignment.id }}"
-                       iconCls="icon-large-chart">Операции</a>
-                </div>
-            {% endblock ibuttons %}
-
-            {% block document %}
-                <div id="mm-document-consignment-{{ consignment.id }}" style="width:150px;">
-                    <div data-options="iconCls:'icon-save'" onclick="saveDoc({{ consignment.id }})">Сохранить</div>
-                    <div data-options="iconCls:'icon-close'" onclick="closeDoc({{ consignment.id }})">Закрыть</div>
-                    <div class="menu-sep"></div>
-                    <div>Cut</div>
-                    <div>Copy</div>
-                    <div>Paste</div>
-                    <div class="menu-sep"></div>
-                    <div>
-                        <span>Toolbar</span>
-
-                        <div>
-                            <div>Address</div>
-                            <div>Link</div>
-                            <div>Navigation Toolbar</div>
-                            <div>Bookmark Toolbar</div>
-                            <div class="menu-sep"></div>
-                            <div>New Toolbar...</div>
-                        </div>
-                    </div>
-                    <div data-options="iconCls:'icon-remove'">Delete</div>
-                    <div>Select All</div>
-                </div>
-            {% endblock document %}
-
-            {% block edit %}
-                <div id="mm-edit-consignment-{{ consignment.id }}" style="width:150px;">
-                    <div data-options="iconCls:'icon-undo'">Undo</div>
-                    <div data-options="iconCls:'icon-redo'">Redo</div>
-                    <div class="menu-sep"></div>
-                    <div>Cut</div>
-                    <div>Copy</div>
-                    <div>Paste</div>
-                    <div class="menu-sep"></div>
-                    <div>
-                        <span>Toolbar</span>
-
-                        <div>
-                            <div>Address</div>
-                            <div>Link</div>
-                            <div>Navigation Toolbar</div>
-                            <div>Bookmark Toolbar</div>
-                            <div class="menu-sep"></div>
-                            <div>New Toolbar...</div>
-                        </div>
-                    </div>
-                    <div data-options="iconCls:'icon-remove'">Delete</div>
-                    <div>Select All</div>
-                </div>
-            {% endblock edit %}
-
-            {% block help %}
-                <div id="mm-help-consignment-{{ consignment.id }}" style="width:100px;">
-                    <div>Help</div>
-                    <div>Update</div>
-                    <div>About</div>
-                </div>
-            {% endblock help %}
-
-            {% block operations %}
-                <div id="mm-operations-consignment-{{ consignment.id }}" class="menu-content"
-                     style="background:#f0f0f0;padding:10px;text-align:left">
-
-                    <p style="font-size:14px;color:#444;">Try jQuery EasyUI to build your modern, interactive,
-                        javascript
-                        applications.</p>
-                </div>
-            {% endblock operations %}
+            {% include 'menu.html' %}
         {% endblock mainmenu %}
 
         {% block reqvisites %}
@@ -226,6 +145,35 @@
             } else {
                 alert('Заполните таблицу товаров!');
             }
+        }
+
+        function copyItem(doc_id) {
+            setCookie('copyItem', $("#item-table-consignment-" + doc_id).datagrid('getSelected').id);
+        }
+
+        function pasteItem(doc_id) {
+            $.ajax({
+                url: '/document/consignment/' + doc_id + '/item/paste/',
+                method: 'POST',
+                data: {'item': getCookie('copyItem')},
+                cache: false,
+                success: function (data) {
+                    if (data == 'Ok') {
+                        // Пока кокой-то деревянный способ
+                        // alert('Данные получены');
+                        $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
+                    } else {
+                        alert(data);
+                        // Данные получены кривые
+                        // location.href = "#";
+                        // location.reload();
+                    }
+                }
+            });
+        }
+
+        function dublicateItem(doc_id) {
+
         }
     </script>
 {% endblock doc-scripts %}

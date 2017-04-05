@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'dashboard',
     'document',
     'homepage',
+    'pdfforms',
     'service',
     'stock',
     'system',
@@ -120,14 +121,20 @@ USE_L10N = True
 
 USE_TZ = True
 
+WKHTMLTOPDF_CMD = '/path/to/my/wkhtmltopdf'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'files', 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+PROFILE_IMAGE_DEFAULT_NAME = 'defaultprofileimage.jpg'
+PROFILE_IMAGE_DIR = 'profile/'
+
+DOCUMENT_DIR = 'documents/'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),

@@ -11,7 +11,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from TonerProject.settings import STATIC_URL
 from authentication.models import Account
 from contractor.models import Contractor, BANK
-from authentication.constants import PROFILE_IMAGE_DEFAULT_NAME, PROFILE_IMAGE_DIR
+from TonerProject.settings import PROFILE_IMAGE_DEFAULT_NAME, PROFILE_IMAGE_DIR
 
 
 def load_login_form(request):

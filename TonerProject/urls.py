@@ -15,11 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf.urls.static import static
 import homepage.views
 import authentication.views
 import dashboard.views
 from django.conf import settings
-
 
 urlpatterns = [
     # Examples:
@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^catalog/', include('system.urls')),
     url(r'^dashboard/', dashboard.views.dashboard),
     url(r'^document/', include('document.urls')),
+    url(r'^form/', include('pdfforms.urls')),
     url(r'^stock/', include('stock.urls')),
     url(r'^system/', include('system.urls')),
     # url(r'^test/', dashboard.views.testpage),
@@ -44,3 +45,6 @@ if settings.DEBUG:
     urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
+
+
+# urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

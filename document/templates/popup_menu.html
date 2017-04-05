@@ -2,12 +2,13 @@
 
 {% block popup-menu %}
     <div id="mm" class="easyui-menu" style="width:120px;">
-        <div data-options="iconCls:'icon-add'" onclick="popupMenuDispatcher(1);">Создать</div>
-        <div data-options="iconCls:'icon-edit'" onclick="popupMenuDispatcher(2);">Изменить</div>
-        <div data-options="iconCls:'icon-remove'" onclick="popupMenuDispatcher(3);">Удалить</div>
-        <div onclick="closeTab()">Закрыть</div>
-        <div data-options="iconCls:'icon-reload'" onclick="javascript:reload();">Обновить</div>
-        <div>
+        <div data-options="iconCls:'icon-add'" onclick="popupMenuDispatcher('add');">Добавить</div>
+        <div data-options="iconCls:'icon-edit'" onclick="popupMenuDispatcher('edit');">Изменить</div>
+        <div data-options="iconCls:'icon-remove'" onclick="popupMenuDispatcher('remove');">Удалить</div>
+        <div data-options="iconCls:'icon-reload'" onclick="popupMenuDispatcher('reload')">Обновить</div>
+        <div onclick="closeDoc()">Закрыть</div>
+        <div class="menu-sep"></div>
+        <div data-options="disabled:'True'">
             <span>Экспорт</span>
 
             <div style="width:150px;">
@@ -43,10 +44,10 @@
                 </div>
             </div>
         </div>
-        <div data-options="iconCls:'icon-save'">Save</div>
-        <div data-options="iconCls:'icon-print',disabled:true">Print</div>
+        <div data-options="iconCls:'icon-save'" onclick="popupMenuDispatcher('save')">Сохранить</div>
+        <div data-options="iconCls:'icon-print'" onclick="popupMenuDispatcher('print')">Печать</div>
         <div class="menu-sep"></div>
-        <div>Exit</div>
+        <div>Выход</div>
     </div>
 
     <script>
@@ -68,16 +69,25 @@
             if (tabIndex) {
                 // Действия с документами
                 switch (action) {
-                    case 1:
+                    case 'add':
                         addItem($("<div/>",
                                 {"html": selected.panel('options').content}).find('#consignment-id').html());
                         break;
-                    case 2:
+                    case 'edit':
                         editItem($("<div/>",
                                 {"html": selected.panel('options').content}).find('#consignment-id').html());
                         break;
-                    case 3:
+                    case 'remove':
                         deleteItem($("<div/>",
+                                {"html": selected.panel('options').content}).find('#consignment-id').html());
+                        break;
+                    case 'reload':
+                        var doc_id = $("<div/>",
+                                {"html": selected.panel('options').content}).find('#consignment-id').html();
+                        $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
+                        break;
+                    case 'save':
+                        saveDoc($("<div/>",
                                 {"html": selected.panel('options').content}).find('#consignment-id').html());
                         break;
                     default:
@@ -85,14 +95,17 @@
                 }
             } else {
                 switch (action) {
-                    case 1:
+                    case 'add':
                         newDocument();
                         break;
-                    case 2:
+                    case 'edit':
                         editDocument();
                         break;
-                    case 3:
+                    case 'remove':
                         destroyDocument();
+                        break;
+                    case 'reload':
+                        $('#common-tab').datagrid('reload');
                         break;
                     default:
                         break;

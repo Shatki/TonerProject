@@ -209,6 +209,31 @@ def consignment_item_add(request, consignment_id):
         return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
 
 
+# Дублирование товара из сохраненного в куках и добавление его в накладную
+@csrf_protect
+@login_required
+def consignment_item_paste(request, consignment_id):
+    if request.POST and consignment_id and request.POST.get('item'):
+        # Возможно нужно перенести часть функции в stock.view.item_add
+        try:
+            consignment_id = Consignment.objects.get(id=consignment_id).id
+
+            if consignment_id:
+                ConsignmentTable.objects.create(
+                    item=get_item,  # Недоделал еще
+                    consignment_id=consignment_id,
+                )
+            else:
+                return HttpResponse("item_add: DB error", content_type='text/html')
+        except:
+            return HttpResponse("consignment_item_add: DB error", content_type='text/html')
+        # response.update(csrf(request))
+        return HttpResponse("Ok", content_type='text/html')
+    else:
+        return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
+
+
+
 @csrf_protect
 @login_required
 def consignment_item_edit(request, consignment_id, item_id):

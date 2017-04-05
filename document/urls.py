@@ -1,6 +1,4 @@
-from django.conf.urls import include, url
-from django.contrib import admin
-import authentication.views
+from django.conf.urls import url
 import document.views
 
 urlpatterns = [
@@ -9,6 +7,7 @@ urlpatterns = [
     url(r'^consignment/(?P<consignment_id>\d+)/save/$', document.views.consignment_save),
     url(r'^consignment/(?P<consignment_id>\d+)/delete/$', document.views.consignment_delete),
     url(r'^consignment/(?P<consignment_id>\d+)/item/add/$', document.views.consignment_item_add),
+    url(r'^consignment/(?P<consignment_id>\d+)/item/paste/$', document.views.consignment_item_paste),
     url(r'^consignment/(?P<consignment_id>\d+)/item/(?P<item_id>\d+)/edit/$', document.views.consignment_item_edit),
     url(r'^consignment/(?P<consignment_id>\d+)/item/(?P<item_id>\d+)/delete/$', document.views.consignment_item_delete),
     url(r'^consignment/(?P<consignment_id>\d+)/items/json/$', document.views.consignment_items_json),
