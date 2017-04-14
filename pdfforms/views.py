@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 # from io import BytesIO
 import os
-from reportlab.lib import colors
 from TonerProject.settings import BASE_DIR, STATIC_URL, DOCUMENT_DIR
 from io import StringIO
-from io import BytesIO
 
 # общие
 from django.http import HttpResponse
@@ -14,7 +12,7 @@ from datetime import datetime
 from document.models import Consignment
 
 # forms
-from pdfforms.forms import Form, XLSX, PDF, landscape, portrait, A4, mm
+from pdfforms.forms import Form, landscape, portrait, A4, mm
 
 
 # Заготовка функции печати первичных форм
@@ -75,16 +73,21 @@ def torg12(request, consignment_id):
     except Consignment.DoesNotExist:
         return False
     # Подготавливаем данные
-    args = {
-        'title': 'Накладная',
-        'data': consignment,
+    context = {
+        'document_title': 'Накладная',
+        'document_number': consignment.number,
+        'document_date': consignment.date,
+        'product': consignment.items,
+
     }
 
     # Отправляем их в шаблом
-    print_form = Form(os.path.join(BASE_DIR, 'pdfforms', 'forms', 'torg12.xlsx'), u'torg12', args, 'consignment')
+    print_form = Form(context, 'consignment')
+    print_form.load_xlsx(os.path.join(BASE_DIR, 'pdfforms', 'forms', 'torg12.xlsx'), u'torg12')
+    print_form.render()
 
     # return HttpResponse(pdf_file, content_type='application/pdf')
-    return redirect(os.path.join(STATIC_URL, DOCUMENT_DIR + print_form.pdf_file_name))
+    return redirect(os.path.join(STATIC_URL, DOCUMENT_DIR + str(print_form)))
 
 
 def torg12_reportlab(request, consignment_id):
