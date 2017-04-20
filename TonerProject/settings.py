@@ -45,7 +45,7 @@ INSTALLED_APPS = (
     'dashboard',
     'document',
     'homepage',
-    'pdfforms',
+    'forms',
     'service',
     'stock',
     'system',

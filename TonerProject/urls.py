@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^catalog/', include('system.urls')),
     url(r'^dashboard/', dashboard.views.dashboard),
     url(r'^document/', include('document.urls')),
-    url(r'^form/', include('pdfforms.urls')),
+    url(r'^form/', include('forms.urls')),
     url(r'^stock/', include('stock.urls')),
     url(r'^system/', include('system.urls')),
     # url(r'^test/', dashboard.views.testpage),

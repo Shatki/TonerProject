@@ -1,95 +1,190 @@
-# -*- coding: utf-8 -*-
-# from io import BytesIO
-import os
-from TonerProject.settings import BASE_DIR, STATIC_URL, DOCUMENT_DIR
-from io import StringIO
-
-# общие
-from django.http import HttpResponse
-from django.template.loader import get_template
-from django.shortcuts import render_to_response, redirect
-from datetime import datetime
-from document.models import Consignment
-
-# forms
-from pdfforms.forms import Form, landscape, portrait, A4, mm
-
-
-# Заготовка функции печати первичных форм
-def invoice(request, invoice_id):
-    # Создаём объект HttpResponse с соответствующим PDF заголовком.
-    # response = HttpResponse(content_type='application/pdf',  charset='utf-8')
-    # response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
-
-    pdf_file_name = 'invoice-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '.pdf'
-    pdf_file = os.path.join(BASE_DIR, 'static', 'documents', pdf_file_name)
-
-    buffer = StringIO()
-    # Создаём объект PDF, используя объект HttpResponse как файл.
-    doc = canvas.Canvas(pdf_file, pagesize=portrait(A4))
-
-    width, height = A4
-    print(width, height)
-
-    # Draw things on the PDF. Here's where the PDF generation happens.
-    # See the ReportLab documentation for the full list of functionality.
-    pdfmetrics.registerFont(TTFont('Arial', os.path.join(BASE_DIR, 'pdfforms', 'fonts', 'Arial_Cyr.ttf')))
-
-    doc.setFont('Arial', 8)
-
-    doc.drawString(33 * mm, 9 * mm,
-                   u'Внимание! Оплата данного счета означает согласие с условиями поставки товара. Уведомление об оплате')
-    doc.drawString(33 * mm, 10 * mm,
-                   u'обязательно, в противном случае не гарантируется наличие товара на складе. Товар отпускается по факту')
-    doc.drawString(33 * mm, 20 * mm,
-                   u'прихода денег на р/с Поставщика, самовывозом, при наличии доверенности и паспорта.')
-
-    doc.setLineWidth(1)
-    # doc.line(480, 747, 580, 747)
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+import reportlab
+from reportlab import rl_config
+from reportlab.pdfbase.pdfmetrics import registerFont
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.fonts import addMapping
+from reportlab.pdfgen.canvas import Canvas
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus.paragraph import Paragraph
+from reportlab.platypus.tables import Table, TableStyle
+from PIL import Image, ImageDraw
 
 
-
-    # Close the PDF object cleanly.
-    doc.showPage()
-    doc.save()
-
-    # Get the value of the BytesIO buffer and write it to the response.
-    pdf = buffer.getvalue()
-    buffer.close()
-    # request.write(pdf)
-
-    # Строим страницу и отправляем
-    args = {
-        'title': 'Счет на оплату',
-        'file_name': DOCUMENT_DIR + pdf_file_name,
-    }
-    return render_to_response('pdf.html', args)
+def createSampleImage():
+    img = Image.new('RGB', (10, 10), '#fff')
+    w, h = img.size
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, w - 1, h - 1), outline='#000')
+    draw.line((0, 0, w - 1, h - 1), fill='#000')
+    draw.line((0, w - 1, h - 1, 0), fill='#000')
+    img.save('x.png')
 
 
-def torg12(request, consignment_id):
-    """ Читаем накладную из БД """
-    try:
-        consignment = Consignment.objects.get(id=consignment_id)
-    except Consignment.DoesNotExist:
-        return False
-    # Подготавливаем данные
-    context = {
-        'document_title': 'Накладная',
-        'document_number': consignment.number,
-        'document_date': consignment.date,
-        'product': consignment.items,
-
-    }
-
-    # Отправляем их в шаблом
-    print_form = Form(context, 'consignment')
-    print_form.load_xlsx(os.path.join(BASE_DIR, 'pdfforms', 'forms', 'torg12.xlsx'), u'torg12')
-    print_form.render()
-
-    # return HttpResponse(pdf_file, content_type='application/pdf')
-    return redirect(os.path.join(STATIC_URL, DOCUMENT_DIR + str(print_form)))
+def drawOutline(canvas, x, y, width, height):
+    canvas.saveState()
+    canvas.setStrokeColorCMYK(0, 0, 0, .2)
+    canvas.line(x, y + height, x + width, y + height)
+    canvas.line(x, y, x + width, y)
+    canvas.setFillColorCMYK(0, 0, 0, .6)
+    canvas.circle(x, y, 1, fill=True, stroke=False)
+    canvas.restoreState()
 
 
+def drawTestParagraph(canvas, x, y, width=None, style=None, text='Why?'):
+    if width is None:
+        width = A4[0] - 2 * x
+
+    if style is None:
+        style = ParagraphStyle('normal')
+
+    p = Paragraph(text, style)
+    p.wrap(width, y)
+
+    drawOutline(canvas, x, y, p.width, p.height)
+    p.drawOn(canvas, x, y)
+
+
+def drawTestString(canvas, x, y, width=None, style=None, text='Why?'):
+    if width is None:
+        width = A4[0] - 2 * x
+
+    if style is None:
+        style = ParagraphStyle('normal')
+
+    drawOutline(canvas, x, y, width, style.leading)
+
+    canvas.saveState()
+    canvas.setFont(style.fontName, style.fontSize)
+    canvas.drawString(x, y, text)
+    canvas.restoreState()
+
+
+def drawTestTable(canvas, x, y, width=None, style=None, text='Why?'):
+    if width is None:
+        width = A4[0] - 2 * x
+
+    if style is None:
+        style = ParagraphStyle('normal')
+
+    table_style = TableStyle([
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('FONTNAME', (0, 0), (-1, -1), style.fontName),
+        ('SIZE', (0, 0), (-1, -1), style.fontSize),
+    ])
+
+    table = Table([[text]], style=table_style)
+    table.wrap(width, y)
+    table.drawOn(canvas, x, y)
+
+
+def registerTTFont(fontname, filename):
+    """Register a TrueType font with ReportLab.
+
+    Clears up the incorrect straight-through mappings that ReportLab 1.19
+    unhelpfully gives us.
+    """
+    registerFont(TTFont(fontname, filename))
+    # For some reason pdfmetrics.registerFont for TrueType fonts explicitly
+    # calls addMapping with incorrect straight-through mappings.  We thus need
+    # to stick our dirty fingers in reportlab's internal data structures and
+    # undo those changes so that we can call addMapping with correct values.
+    key = fontname.lower()
+    del reportlab.lib.fonts._tt2ps_map[key, 0, 0]
+    del reportlab.lib.fonts._tt2ps_map[key, 0, 1]
+    del reportlab.lib.fonts._tt2ps_map[key, 1, 0]
+    del reportlab.lib.fonts._tt2ps_map[key, 1, 1]
+    del reportlab.lib.fonts._ps2tt_map[key]
+
+
+def registerFonts():
+    rl_config.TTFSearchPath.append('/usr/share/fonts/truetype/msttcorefonts')
+
+    registerTTFont('Times_New_Roman', 'Times_New_Roman.ttf')
+    registerTTFont('Times_New_Roman_Bold', 'Times_New_Roman_Bold.ttf')
+    registerTTFont('Times_New_Roman_Italic', 'Times_New_Roman_Italic.ttf')
+    registerTTFont('Times_New_Roman_Bold_Italic',
+                   'Times_New_Roman_Bold_Italic.ttf')
+
+    addMapping('Times_New_Roman', 0, 0, 'Times_New_Roman')
+    addMapping('Times_New_Roman', 0, 1, 'Times_New_Roman_Italic')
+    addMapping('Times_New_Roman', 1, 0, 'Times_New_Roman_Bold')
+    addMapping('Times_New_Roman', 1, 1, 'Times_New_Roman_Bold_Italic')
+
+
+def draw(filename):
+    canvas = Canvas(filename, A4)
+
+    style = ParagraphStyle('normal')
+
+    canvas.drawString(25, 800, 'ReportLab %s, default font (%s, %spt)'
+                      % (reportlab.Version, style.fontName, style.fontSize))
+
+    x = 100
+    y = 750
+
+    img = '<img src="x.png" />'
+    u = u'\n{LATIN CAPITAL LETTER E WITH DOT ABOVE}'  # something definitely not in Type 1
+
+    def testCases(y):
+        canvas.drawString(x - 50, y + 25, 'canvas.drawString:')
+        drawTestString(canvas, x, y, style=style, text=u'Why? ' + u)
+        y -= 50
+
+        canvas.drawString(x - 50, y + 25, 'Paragraph.drawOn:')
+        drawTestParagraph(canvas, x, y, style=style, text=u'Why? ' + u)
+        y -= 50
+
+        canvas.drawString(x - 50, y + 25, 'Paragraph.drawOn, with an image:')
+        drawTestParagraph(canvas, x, y, style=style, text=img + 'Why? ' + u)
+        y -= 50
+
+        canvas.drawString(x - 50, y + 25, 'Table.drawOn')
+        drawTestTable(canvas, x, y, style=style, text='Why? ' + u)
+        y -= 50
+
+        canvas.drawString(x - 50, y + 25, 'Table.drawOn, with an image')
+        drawTestTable(canvas, x, y, style=style, text=img + 'Why? ' + u)
+        y -= 50
+
+        canvas.drawString(x - 50, y + 25, 'Table.drawOn, with a paragraph')
+        drawTestTable(canvas, x, y, style=style, text=Paragraph('Why? ' + u,
+                                                                style))
+        y -= 50
+
+        canvas.drawString(x - 50, y + 25, 'Table.drawOn, with a paragraph and an image')
+        drawTestTable(canvas, x, y, style=style, text=Paragraph(img + 'Why? ' + u,
+                                                                style))
+        y -= 50
+
+        return y
+
+    y = testCases(y)
+
+    style.fontName = 'Times_New_Roman'
+    canvas.drawString(x - 75, y + 25, '%s, %spt'
+                      % (style.fontName, style.fontSize))
+    y -= 25
+
+    y = testCases(y)
+
+    canvas.showPage()
+    canvas.save()
+
+
+def main():
+    createSampleImage()
+    registerFonts()
+    draw('test.pdf')
+
+
+if __name__ == '__main__':
+    main()
+
+"""
 def torg12_reportlab(request, consignment_id):
     try:
         consignment = Consignment.objects.get(id=consignment_id)
@@ -108,7 +203,7 @@ def torg12_reportlab(request, consignment_id):
     # Настраиваем шрифт
     # Draw things on the PDF. Here's where the PDF generation happens.
     # See the ReportLab documentation for the full list of functionality.
-    pdfmetrics.registerFont(TTFont('Arial', os.path.join(BASE_DIR, 'pdfforms', 'fonts', 'Arial_Cyr.ttf')))
+    pdfmetrics.registerFont(TTFont('Arial', os.path.join(BASE_DIR, 'forms', 'fonts', 'Arial_Cyr.ttf')))
 
     document.setFont('Arial', 7)
     # canvas.rect(x, y, width, height, stroke=1, fill=0)
@@ -205,8 +300,41 @@ def torg12_old(request, consignment_id):
 
     return HttpResponse(html)
 
+    @classmethod
+    def hexpr(cls, text):
+        ret = ''
+        for t in text:
+            ret += hex(ord(t)) + '/'
+        return ret    @classmethod
+    def hexpr(cls, text):
+        ret = ''
+        for t in text:
+            ret += hex(ord(t)) + '/'
+        return ret    @classmethod
+    def hexpr(cls, text):
+        ret = ''
+        for t in text:
+            ret += hex(ord(t)) + '/'
+        return ret
 
-"""
+     @classmethod
+    def hexpr(cls, text):
+        ret = ''
+        for t in text:
+            ret += hex(ord(t)) + '/'
+        return ret
+
+
+
+
+
+ @classmethod
+    def hexpr(cls, text):
+        ret = ''
+        for t in text:
+            ret += hex(ord(t)) + '/'
+        return ret
+
 class PDF(object):
     def __init__(self, page_size=A4, font_face='Helvetica'):
         self.page_size = page_size
