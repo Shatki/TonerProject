@@ -3,13 +3,14 @@
 import os
 from TonerProject.settings import BASE_DIR, STATIC_URL, DOCUMENT_DIR
 from io import StringIO
+from document.models import Consignment, ConsignmentTable
 
 # общие
 from django.http import HttpResponse
-from django.template.loader import get_template
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import redirect
 from datetime import datetime
 from document.models import Consignment
+from document.views import consignment_items_json
 
 # forms
 from forms.forms import Form
@@ -17,68 +18,46 @@ from forms.forms import Form
 
 # Заготовка функции печати первичных форм
 def invoice(request, invoice_id):
-    # Создаём объект HttpResponse с соответствующим PDF заголовком.
-    # response = HttpResponse(content_type='application/pdf',  charset='utf-8')
-    # response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
-
-    pdf_file_name = 'invoice-' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S') + '.pdf'
-    pdf_file = os.path.join(BASE_DIR, 'static', 'documents', pdf_file_name)
-
-    buffer = StringIO()
-    # Создаём объект PDF, используя объект HttpResponse как файл.
-    doc = canvas.Canvas(pdf_file, pagesize=portrait(A4))
-
-    width, height = A4
-    print(width, height)
-
-    # Draw things on the PDF. Here's where the PDF generation happens.
-    # See the ReportLab documentation for the full list of functionality.
-    pdfmetrics.registerFont(TTFont('Arial', os.path.join(BASE_DIR, 'forms', 'fonts', 'Arial_Cyr.ttf')))
-
-    doc.setFont('Arial', 8)
-
-    doc.drawString(33 * mm, 9 * mm,
-                   u'Внимание! Оплата данного счета означает согласие с условиями поставки товара. Уведомление об оплате')
-    doc.drawString(33 * mm, 10 * mm,
-                   u'обязательно, в противном случае не гарантируется наличие товара на складе. Товар отпускается по факту')
-    doc.drawString(33 * mm, 20 * mm,
-                   u'прихода денег на р/с Поставщика, самовывозом, при наличии доверенности и паспорта.')
-
-    doc.setLineWidth(1)
-    # doc.line(480, 747, 580, 747)
-
-
-
-    # Close the PDF object cleanly.
-    doc.showPage()
-    doc.save()
-
-    # Get the value of the BytesIO buffer and write it to the response.
-    pdf = buffer.getvalue()
-    buffer.close()
-    # request.write(pdf)
-
-    # Строим страницу и отправляем
-    args = {
-        'title': 'Счет на оплату',
-        'file_name': DOCUMENT_DIR + pdf_file_name,
-    }
-    return render_to_response('pdf.html', args)
+    return
 
 
 def torg12(request, consignment_id):
     """ Читаем накладную из БД """
     try:
         consignment = Consignment.objects.get(id=consignment_id)
+        items = Consignment.objects.get(id=consignment_id).items.all()
     except Consignment.DoesNotExist:
         return False
-    # Подготавливаем данные
+    # Подготавливаем данные в шаблон
+    # Serialize
+    rows = []
+    for get_one in items:
+        obj = dict(
+            id=str(get_one.id),
+            name=str(get_one.product),
+            measure=str(get_one.measure),
+            quantity=str(get_one.quantity),
+            country=str(get_one.country),
+            code=str(get_one.serial_number),
+            OKEI=str(get_one.measure.OKEI),
+            tax='Без НДС',
+            cost_tax='-',
+
+            # cost=str(get_one.cost),
+            # total=str(get_one.total),
+        )
+        rows.append(obj)
+
     context = {
         'document_title': 'Накладная',
         'document_number': consignment.number,
-        'document_date': consignment.date,
-        'product': consignment.items,
-
+        'emitter': consignment.emitter,
+        'receiver': consignment.receiver,
+        'payer': consignment.receiver,
+        'contract': consignment.contract,
+        'document_date': consignment.date.strftime('%d.%m.%Y'),
+        # 'total': data['total'],
+        'rows': rows,
     }
     """ создаём наименование PDF файла """
     pdf_file_name = 'consignment' + datetime.now().strftime('-%Y-%m-%d-%H-%M-%S') + '.pdf'

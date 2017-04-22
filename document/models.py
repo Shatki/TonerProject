@@ -13,6 +13,37 @@ from TonerProject.constants import date_minimal, date_maximal
 
 
 # Приложение для формирования, хранения и обработки документации
+class Contract(models.Model):
+    class Meta:
+        verbose_name = 'контракт'
+        verbose_name_plural = 'контракты'
+        db_table = 'contract'
+
+    number = models.CharField(max_length=20, verbose_name=u'номер контракта')
+    seller = models.ForeignKey(Contractor, verbose_name=u'продавец',
+                               related_name='contract_seller')
+    buyer = models.ForeignKey(Contractor, verbose_name=u'покупатель',
+                              related_name='contract_buyer')
+    date_begin = models.DateField(verbose_name=u'дата заключения контракта', default=date_minimal)
+    date_expire = models.DateField(verbose_name=u'дата истечения контракта', default=date_maximal)
+
+    # Общие для всех документов поля
+    delete = models.BooleanField(verbose_name=u'Черновик/Подлежит удалению', default=True)
+    enable = models.BooleanField(verbose_name=u'действующий документ', default=False)
+    created = models.DateTimeField(verbose_name=u'время/дата создания документа')
+    creator = models.ForeignKey(Account, verbose_name=u'автор документа', related_name='contract_creator')
+    modified = models.DateTimeField(verbose_name=u'время/дата изменения документа')
+    modificator = models.ForeignKey(Account, verbose_name=u'изменил документ', related_name='contract_modificator')
+
+    def save(self, *args, **kwargs):
+        # On save, update timestamps
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(Contract, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return 'Контракт № ' + self.number + ' от ' + str(self.date_begin)
 
 
 # Consignment
@@ -31,6 +62,9 @@ class Consignment(models.Model):
                                 related_name='consignment_emitter', default=None, null=True)
     receiver = models.ForeignKey(Contractor, verbose_name=u'организация принимающая груз',
                                  related_name='consignment_receiver', default=None, null=True)
+    contract = models.ForeignKey(Contract, verbose_name=u'контракт',
+                                 related_name='consignment_contract', default=None, null=True)
+
     items = models.ManyToManyField(Item, verbose_name=u'перемещаемый товар',
                                    through='ConsignmentTable',
                                    through_fields=('consignment', 'item'),
@@ -77,35 +111,3 @@ class ConsignmentTable(models.Model):
     def __str__(self):
         return self.item.product.category.name
 
-
-class Contract(models.Model):
-    class Meta:
-        verbose_name = 'контракт'
-        verbose_name_plural = 'контракты'
-        db_table = 'contract'
-
-    number = models.CharField(max_length=20, verbose_name=u'номер контракта')
-    seller = models.ForeignKey(Contractor, verbose_name=u'продавец',
-                               related_name='contract_seller')
-    buyer = models.ForeignKey(Contractor, verbose_name=u'покупатель',
-                              related_name='contract_buyer')
-    date_begin = models.DateField(verbose_name=u'дата заключения контракта', default=date_minimal)
-    date_expire = models.DateField(verbose_name=u'дата истечения контракта', default=date_maximal)
-
-    # Общие для всех документов поля
-    delete = models.BooleanField(verbose_name=u'Черновик/Подлежит удалению', default=True)
-    enable = models.BooleanField(verbose_name=u'действующий документ', default=False)
-    created = models.DateTimeField(verbose_name=u'время/дата создания документа')
-    creator = models.ForeignKey(Account, verbose_name=u'автор документа', related_name='contract_creator')
-    modified = models.DateTimeField(verbose_name=u'время/дата изменения документа')
-    modificator = models.ForeignKey(Account, verbose_name=u'изменил документ', related_name='contract_modificator')
-
-    def save(self, *args, **kwargs):
-        # On save, update timestamps
-        if not self.id:
-            self.created = timezone.now()
-        self.modified = timezone.now()
-        return super(Contract, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return 'Контракт № ' + self.number + ' от ' + str(self.date_begin)

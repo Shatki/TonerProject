@@ -282,6 +282,8 @@ class Measure(models.Model):
     )
     name = models.CharField(verbose_name=u"наименование единицы", unique=True, default=QUANTITY,
                             max_length=20, blank=False, choices=MEASURE_CHOICES)
+    OKEI = models.CharField(verbose_name=u"код в Российской классификации единиц измерения",
+                            unique=False, max_length=3, blank=False)
 
     def __str__(self):
         return self.name

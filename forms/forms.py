@@ -81,18 +81,20 @@ class Form(object):
         self.worksheet = ''
         self.work_file = u'Empty'
         self.title = u'Form'
-        self.width = 0
-        self.height = 0
+        self.width = 0  # Ширина XLSX страницы прочитанного шаблона
+        self.height = 0  # Высота XLSX страницы прочитанного шаблона
 
-        self.pdf_width = 0
-        self.pdf_height = 0
-        self.pages = 0
+        self.pdf_width = 0  # Ширина PDF страницы выбранной в качестве шаблона
+        self.pdf_height = 0  # Высота PDF страницы выбранной в качестве шаблона
+        self.pages = 0  # Текущая страница построенной формы или конечное значение
+        # числа страниц итоговой формы
 
-        self.sizes = {}
-        self._part = self.PARTS['HEADER']
-        self.parts = []
-        self._row = 0
-        self.rows = {}
+        self.rows = {}  # Словарь частей прочитанного шаблона со списком высот ячеек
+        self.sizes = {}  # Словарь высот частей шаблона в px {'part': size}
+        self.parts = []  # Список частей шаблона
+        self._part = self.PARTS['HEADER']  # Текущая часть шаблона при чтении или построении формы (служебная)
+        self._row = 0  # Текущая высота построенной формы шаблона в ячейках (служебная)
+        self._height = 0  # Текущая высота построенной формы шаьлона в px (служебная)
 
         """ Настраиваем шрифт """
         # Draw things on the PDF. Here's where the PDF generation happens.
@@ -101,15 +103,15 @@ class Form(object):
         # pdfmetrics.registerFont(TTFont('Arial Bold', '../fonts/Arial_Cyr.ttf'))
 
         """ Настраиваем стили и данные для report lab """
-        self._data = {}
-        self._heights = {}
-        self._widths = {}
-        self._style = {}
+        self._data = {}  # Служебный словарь данных частей прочитанных из шаблона
+        self._heights = {}  # Служебный словарь высот ячеек частей прочитанных из шаблона
+        # self._widths = {}
+        self._style = {}  # Служебный словарь стилей частей прочитанных из шаблона
 
-        self.data = []
-        self.heights = []
-        self.widths = []
-        self.style = []
+        self.data = []  # Подготовленный список данных предназначенный для рендера формы
+        self.heights = []  # Подготовленный список высот строк предназначенный для рендера формы
+        self.widths = []  # Подготовленный список ширин ячеек  предназначенный для рендера формы
+        self.style = []  # Подготовленный список стилей предназначенный для рендера формы
 
         self.init_style = [
             ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
@@ -136,15 +138,44 @@ class Form(object):
         self.pdf_width, self.pdf_height = self.orientation
         self.pages = 0
         self._row = 0
+        self._number = 0  # Номер обрабатываемой строки
+        self._height = 0
         self.data = []
         self.heights = []
-        self.style = []
+        self.style = []  # ????????????
         self.style.extend(self.init_style)  # добавляем в стиль каждой страницы
         return True
 
-    def _extend(self, part=u'HEADER'):
+    def _extend(self, part, context):
         # функция присоединяет другую часть шаблона к существующему
-        self.data.extend(self._data[part])
+        # if part == self.PARTS['ROW']:
+        #    print(self._data[part][0])
+        # print(self._data[part])
+
+        # Обработка данных с добавлением значений в теги
+        _data = []
+        if context and part == self.PARTS['ROW']:
+            self._number += 1
+            for value in self._data[part][0]:  # Индекс 0 потому-что в списке находится 1 подсписок row(строка)
+                if value[-2:] == '}}' and value[:2] == '{{':
+                    # Вставляем значение из контекста документа
+                    # На случай отсутствующих ключей обернём в try
+                    try:
+                        if value[2:-2] == 'number':
+                            # Обработка номера строки
+                            _data.append(str(self._number))
+                        else:
+                            _data.append(context[value[2:-2]])
+                    except:
+                        _data.append(value)  # Выводим не найденный тег
+                        print('render(): Key Does not exist:', value[2:-2])
+                else:
+                    _data.append(value)
+            self.data.extend([_data])  # Со строковой обработкой
+        else:
+            # print(self._data[part])
+            self.data.extend(self._data[part])  # Если обработка не требуется как в строках
+
         # обработка стилей с добавлением смещения
         for style in self._style[part]:
             sx, sy = style[1]
@@ -163,7 +194,7 @@ class Form(object):
                     (style[0], (sx, sy + self._row), (ex, ey + self._row), style[3], style[4])
                 )
             else:
-                print('Не могу сдвинуть стиль:', style)
+                print('Can\'t understand the style:', style)
                 self.style.append(style)
 
         # print(self.style)
@@ -171,6 +202,7 @@ class Form(object):
         self.heights.extend(self._heights[part])
         # Прибавляем row
         self._row += self.rows[part]
+        self._height += self.sizes[part]
         return True
 
     def _make_page(self):
@@ -182,12 +214,16 @@ class Form(object):
 
         self.table_width, self.table_height = self.table.wrapOn(self.document, self.width, self.height)
         # print(table_height)
-        self.table.drawOn(self.document, 0 + self.widths[0], 0 + self.pdf_height / mm, mm)
+        self.table.drawOn(self.document, (self.pdf_width - self.width) / 2, self.height - self._height, mm)
 
         # Создаём страницу
         self.document.showPage()
+        self.data = []
+        self.heights = []
+        self.style = self.init_style
         self.pages += 1
         self._row = 0
+        self._height = 0
         return True
 
     def render(self):
@@ -197,31 +233,54 @@ class Form(object):
                 return False
 
             # Сначала шапку
-            self._extend(self.PARTS['TABLE'])
+            self._extend(self.PARTS['HEADER'], None)
 
-            # Рисуем таблицы
-            while True:
-                # Добавляем таблицу
-                # self._extend(self.PARTS['TABLE'])
+            # Добавляем таблицу
+            self._extend(self.PARTS['TABLE'], None)
+            # добавляем строки
 
-                # Добавляем строку
-                self._extend(self.PARTS['ROW'])
+            _row = 0
+            _rows = len(self.context['rows'])
+            # Перебераем все строки из контекста
+            for item in self.context['rows']:
+                _row += 1
+                _height = self._height + self.sizes[self.PARTS['TOTAL']]
+                # print(self._height, self.sizes[self.PARTS['TOTAL']], self.height)
+                if _height < self.height:
+                    if _row == _rows:
+                        # Ситуация 1: Если все строки вмещаются на странице и на последнюю переносятся только footer
+                        # то мы последнюю строку отдадим на другую страницу
+                        # Перенос на другую страницу
+                        # Добавляем итоговою сроку
+                        self._extend(self.PARTS['TOTAL'], None)
+                        # Создаём страницу
+                        self._make_page()
+                        # Добавляем таблицу
+                        self._extend(self.PARTS['TABLE'], None)
+                    # Ситуация 2: Добавляем строку
+                    # Добавляем строку
+                    self._extend(self.PARTS['ROW'], item)
+                else:
+                    # Ситуация 2: Страница закончилась нужно переносить остальные строки на другой лист
+                    # Добавляем итоговою сроку в каждом листе
+                    self._extend(self.PARTS['TOTAL'], None)
+                    # Далее строим новый лист
+                    self._make_page()
+                    # Рисуем шапку таблицы
+                    # Добавляем таблицу
+                    self._extend(self.PARTS['TABLE'], None)
 
-                # Добавляем итоговою сроку в каждом листе
-                self._extend(self.PARTS['TOTAL'])
+            # Финализируем
+            # Добавляем итоговою сроку в каждом листе
+            self._extend(self.PARTS['TOTAL'], None)
+            # Добавляем подвал
+            self._extend(self.PARTS['FOOTER'], None)
 
+            # Создаём страницу
+            self._make_page()
 
-                # Добавляем подвал
-                # self._extend(self.PARTS['FOOTER'])
-
-                # Создаём страницу
-                self._make_page()
-
-                # Создаём документ
-                self.document.save()
-
-                break
-
+            # Сохраняем документ
+            self.document.save()
 
             # Информация для разработки
             # for part in self._data.keys():
@@ -335,13 +394,13 @@ class Form(object):
                 # self.heights.append(cell.height)
 
                 self.sizes[self._part] += cell.height  # new
-                # self.height += cell.height
+                self.height += cell.height
             else:
                 self._heights[self._part].append(self.DEFAULT_CELL_HEIGHT)  # new
                 # self.heights.append(self.DEFAULT_CELL_HEIGHT)
 
                 self.sizes[self._part] += self.DEFAULT_CELL_HEIGHT  # new
-                # self.height += self.DEFAULT_CELL_HEIGHT
+                self.height += self.DEFAULT_CELL_HEIGHT
 
         """ Getting values and styles of cells """
         #   Сформируем коллекцию из всех ячеек
@@ -410,7 +469,6 @@ class Form(object):
         # for cell in self.worksheet['AY7:BF8']:
         #            print('Ячейка: ', cell, 'Border-')
 
-        # print(self.worksheet._styles)
 
         ranges = []
         self._row = 0
@@ -428,10 +486,7 @@ class Form(object):
                     break  # Вычислили первую и часть в которой она находится в шаблоне
                 else:
                     _start_row -= self.rows[self._part]
-
             _end_row += _start_row  # Нижная будет разница + верхняя
-
-            print(self._part, _start_row, _end_row)
 
             # Создаем список стилей
             ranges.append([self._part, cell_start.col_idx - 1, _start_row, cell_end.col_idx - 1, _end_row])
