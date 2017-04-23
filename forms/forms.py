@@ -4,7 +4,6 @@
 """
 # openpyxl
 from openpyxl import load_workbook
-from openpyxl.utils.units import DEFAULT_ROW_HEIGHT, DEFAULT_COLUMN_WIDTH
 
 # reportlab
 from reportlab.pdfgen import canvas
@@ -16,6 +15,9 @@ from reportlab.platypus import Table
 # для шрифтов
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+
+# цифра в текст
+from .num2text import num2text, decimal2text, int_units, exp_units
 
 
 class Form(object):
@@ -61,6 +63,13 @@ class Form(object):
                'TOTAL': 'total',
                'FOOTER': 'footer',
                }
+    # Внутренний контекст
+    CONTEXT = {
+        'pages': 1,  # Текущая страница построенной формы или конечное значение
+        'numbers': 0,
+        'cost_with_tax': 500.5,
+        'total_cost_with_tax': 2555.00,
+    }
 
     def __init__(self, output_file, context, file_prefix=u'document'):
         """ Initialise an object of the class Form
@@ -86,7 +95,7 @@ class Form(object):
 
         self.pdf_width = 0  # Ширина PDF страницы выбранной в качестве шаблона
         self.pdf_height = 0  # Высота PDF страницы выбранной в качестве шаблона
-        self.pages = 0  # Текущая страница построенной формы или конечное значение
+
         # числа страниц итоговой формы
 
         self.rows = {}  # Словарь частей прочитанного шаблона со списком высот ячеек
@@ -136,9 +145,9 @@ class Form(object):
         # создает начало шаблона
         self.document = canvas.Canvas(self.output_file, pagesize=self.orientation, bottomup=1)
         self.pdf_width, self.pdf_height = self.orientation
-        self.pages = 0
+        self.CONTEXT['pages'] = 1
         self._row = 0
-        self._number = 0  # Номер обрабатываемой строки
+        self.CONTEXT['numbers'] = 0  # Номер обрабатываемой строки
         self._height = 0
         self.data = []
         self.heights = []
@@ -146,16 +155,15 @@ class Form(object):
         self.style.extend(self.init_style)  # добавляем в стиль каждой страницы
         return True
 
-    def _extend(self, part, context):
+    def _extend(self, part, _context):
         # функция присоединяет другую часть шаблона к существующему
-        # if part == self.PARTS['ROW']:
-        #    print(self._data[part][0])
-        # print(self._data[part])
+        if not _context:
+            _context = self.context
 
         # Обработка данных с добавлением значений в теги
         _data = []
-        if context and part == self.PARTS['ROW']:
-            self._number += 1
+        if _context and part == self.PARTS['ROW']:
+            self.CONTEXT['numbers'] += 1
             for value in self._data[part][0]:  # Индекс 0 потому-что в списке находится 1 подсписок row(строка)
                 if value[-2:] == '}}' and value[:2] == '{{':
                     # Вставляем значение из контекста документа
@@ -163,9 +171,9 @@ class Form(object):
                     try:
                         if value[2:-2] == 'number':
                             # Обработка номера строки
-                            _data.append(str(self._number))
+                            _data.append(str(self.CONTEXT['numbers']))
                         else:
-                            _data.append(context[value[2:-2]])
+                            _data.append(_context[value[2:-2]])
                     except:
                         _data.append(value)  # Выводим не найденный тег
                         print('render(): Key Does not exist:', value[2:-2])
@@ -173,8 +181,56 @@ class Form(object):
                     _data.append(value)
             self.data.extend([_data])  # Со строковой обработкой
         else:
+            # Обработка части данных с заменой тегов на значения из посчитанных данных
+            # Данные многостройные
+            for data_row in self._data[part]:
+                data_cells = []
+                for val in data_row:
+                    val = str(val)
+                    # Если попался тег
+                    if val[-2:] == '}}' and val[:2] == '{{':
+                        # Вставляем значение из контекста документа
+                        try:
+                            value = val[2:-2]
+                            # Поддержка каскадных тегов value.tag1.tag2
+                            values = value.split('.')
+                            # Есть теги...
+                            if len(values) > 1:
+                                # Берем значение из контекста по ключу
+                                _v = self.CONTEXT[values[0]]
+                                for value in values:
+                                    # Первым идет ключ - пропускаем
+                                    if value != values[0]:
+                                        # Каскады тегов
+                                        # total
+                                        if value == 'total':
+                                            # Берем специально подготовленное значение из контекста
+                                            values[0] = 'total_' + values[0]
+                                            _v = self.CONTEXT[values[0]]
+                                            val = str(_v)
+                                        # textcost
+                                        elif value == 'textcost':
+                                            val = decimal2text(_v, 2, int_units, exp_units)
+                                            break
+                                        # textvalue
+                                        elif value == 'textvalue':
+                                            val = num2text(_v)
+                                            break
+                                        else:
+                                            # Тег не найден
+                                            print('Cannot find tag:', value)
+                            # После обработки добавим значение
+                            data_cells.append(val)
+                        except:
+                            # Просто выводим тег
+                            data_cells.append(val)
+                    else:
+                        data_cells.append(val)
+                _data.append(data_cells)
+
+            self.data.extend(_data)  # Если обработка не требуется как в строках
             # print(self._data[part])
-            self.data.extend(self._data[part])  # Если обработка не требуется как в строках
+            # self.data.extend(self._data[part])  # Если обработка не требуется как в строках
 
         # обработка стилей с добавлением смещения
         for style in self._style[part]:
@@ -221,7 +277,7 @@ class Form(object):
         self.data = []
         self.heights = []
         self.style = self.init_style
-        self.pages += 1
+        self.CONTEXT['pages'] += 1
         self._row = 0
         self._height = 0
         return True
@@ -233,10 +289,10 @@ class Form(object):
                 return False
 
             # Сначала шапку
-            self._extend(self.PARTS['HEADER'], None)
+            self._extend(self.PARTS['HEADER'], self.context)
 
             # Добавляем таблицу
-            self._extend(self.PARTS['TABLE'], None)
+            self._extend(self.PARTS['TABLE'], self.context)
             # добавляем строки
 
             _row = 0
@@ -252,29 +308,29 @@ class Form(object):
                         # то мы последнюю строку отдадим на другую страницу
                         # Перенос на другую страницу
                         # Добавляем итоговою сроку
-                        self._extend(self.PARTS['TOTAL'], None)
+                        self._extend(self.PARTS['TOTAL'], self.context)
                         # Создаём страницу
                         self._make_page()
                         # Добавляем таблицу
-                        self._extend(self.PARTS['TABLE'], None)
+                        self._extend(self.PARTS['TABLE'], self.context)
                     # Ситуация 2: Добавляем строку
                     # Добавляем строку
                     self._extend(self.PARTS['ROW'], item)
                 else:
                     # Ситуация 2: Страница закончилась нужно переносить остальные строки на другой лист
                     # Добавляем итоговою сроку в каждом листе
-                    self._extend(self.PARTS['TOTAL'], None)
+                    self._extend(self.PARTS['TOTAL'], self.context)
                     # Далее строим новый лист
                     self._make_page()
                     # Рисуем шапку таблицы
                     # Добавляем таблицу
-                    self._extend(self.PARTS['TABLE'], None)
+                    self._extend(self.PARTS['TABLE'], self.context)
 
             # Финализируем
             # Добавляем итоговою сроку в каждом листе
-            self._extend(self.PARTS['TOTAL'], None)
+            self._extend(self.PARTS['TOTAL'], self.context)
             # Добавляем подвал
-            self._extend(self.PARTS['FOOTER'], None)
+            self._extend(self.PARTS['FOOTER'], self.context)
 
             # Создаём страницу
             self._make_page()
@@ -285,6 +341,8 @@ class Form(object):
             # Информация для разработки
             # for part in self._data.keys():
             print(self.rows)
+
+            print(self.height, decimal2text(self.height, 2, int_units, exp_units))
 
             print('Размеры PDF страницы(px): ', self.pdf_width, self.pdf_height)
             print('Размеры PDF страницы(mm): ', self.pdf_width / mm, self.pdf_height / mm)

@@ -38,10 +38,13 @@ def torg12(request, consignment_id):
             measure=str(get_one.measure),
             quantity=str(get_one.quantity),
             country=str(get_one.country),
-            code=str(get_one.serial_number),
+            code=str(get_one.id),  # Тут нужен артикул товара
             OKEI=str(get_one.measure.OKEI),
-            tax='Без НДС',
-            cost_tax='-',
+            cost='1000.00',
+            cost_without_tax='1000.00',
+            tax='c НДС',
+            cost_tax='24.00',
+            cost_with_tax='1024.00',
 
             # cost=str(get_one.cost),
             # total=str(get_one.total),
@@ -56,7 +59,7 @@ def torg12(request, consignment_id):
         'payer': consignment.receiver,
         'contract': consignment.contract,
         'document_date': consignment.date.strftime('%d.%m.%Y'),
-        # 'total': data['total'],
+        'emitter_position': 'Руководитель',
         'rows': rows,
     }
     """ создаём наименование PDF файла """
