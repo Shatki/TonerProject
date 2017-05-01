@@ -458,8 +458,8 @@
       <foreign-key name="#FAKE_account_1" columns="contractor_id" ref-table="contractor" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
       <exported-key name="#FAKE_account_groups_2" table="account_groups" schema="" catalog="" columns="account_id"/>
       <exported-key name="#FAKE_account_user_permissions_2" table="account_user_permissions" schema="" catalog="" columns="account_id"/>
-      <exported-key name="#FAKE_consignment_1" table="consignment" schema="" catalog="" columns="creator_id"/>
-      <exported-key name="#FAKE_consignment_2" table="consignment" schema="" catalog="" columns="modificator_id"/>
+      <exported-key name="#FAKE_consignment_2" table="consignment" schema="" catalog="" columns="creator_id"/>
+      <exported-key name="#FAKE_consignment_3" table="consignment" schema="" catalog="" columns="modificator_id"/>
       <exported-key name="#FAKE_contract_1" table="contract" schema="" catalog="" columns="modificator_id"/>
       <exported-key name="#FAKE_contract_2" table="contract" schema="" catalog="" columns="creator_id"/>
       <exported-key name="#FAKE_django_admin_log_1" table="django_admin_log" schema="" catalog="" columns="user_id"/>
@@ -557,11 +557,13 @@
       <column name="modificator_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="creator_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="delete" sqlType="BOOL" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
+      <column name="contract_id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="true" jdbcType="4"/>
       <primary-key columns="id"/>
-      <foreign-key name="#FAKE_consignment_1" columns="creator_id" ref-table="account" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
-      <foreign-key name="#FAKE_consignment_2" columns="modificator_id" ref-table="account" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
-      <foreign-key name="#FAKE_consignment_3" columns="receiver_id" ref-table="contractor" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
-      <foreign-key name="#FAKE_consignment_4" columns="emitter_id" ref-table="contractor" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
+      <foreign-key name="#FAKE_consignment_1" columns="contract_id" ref-table="contract" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
+      <foreign-key name="#FAKE_consignment_2" columns="creator_id" ref-table="account" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
+      <foreign-key name="#FAKE_consignment_3" columns="modificator_id" ref-table="account" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
+      <foreign-key name="#FAKE_consignment_4" columns="receiver_id" ref-table="contractor" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
+      <foreign-key name="#FAKE_consignment_5" columns="emitter_id" ref-table="contractor" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
       <exported-key name="#FAKE_consignment_table_2" table="consignment_table" schema="" catalog="" columns="consignment_id"/>
       <exported-key name="#FAKE_document_consignmenttable_2" table="document_consignmenttable" schema="" catalog="" columns="consignment_id"/>
     </table>
@@ -591,6 +593,7 @@
       <foreign-key name="#FAKE_contract_2" columns="creator_id" ref-table="account" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
       <foreign-key name="#FAKE_contract_3" columns="seller_id" ref-table="contractor" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
       <foreign-key name="#FAKE_contract_4" columns="buyer_id" ref-table="contractor" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
+      <exported-key name="#FAKE_consignment_1" table="consignment" schema="" catalog="" columns="contract_id"/>
     </table>
     <table name="contractor" schema="" catalog="" type="TABLE">
       <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
@@ -612,8 +615,8 @@
       <foreign-key name="#FAKE_contractor_1" columns="bank_id" ref-table="contractor" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
       <foreign-key name="#FAKE_contractor_2" columns="type_id" ref-table="contractor_type" ref-schema="" ref-catalog="" ref-columns="id" update-rule="3" delete-rule="3" deferrability="1"/>
       <exported-key name="#FAKE_account_1" table="account" schema="" catalog="" columns="contractor_id"/>
-      <exported-key name="#FAKE_consignment_3" table="consignment" schema="" catalog="" columns="receiver_id"/>
-      <exported-key name="#FAKE_consignment_4" table="consignment" schema="" catalog="" columns="emitter_id"/>
+      <exported-key name="#FAKE_consignment_4" table="consignment" schema="" catalog="" columns="receiver_id"/>
+      <exported-key name="#FAKE_consignment_5" table="consignment" schema="" catalog="" columns="emitter_id"/>
       <exported-key name="#FAKE_contract_3" table="contract" schema="" catalog="" columns="seller_id"/>
       <exported-key name="#FAKE_contract_4" table="contract" schema="" catalog="" columns="buyer_id"/>
       <exported-key name="#FAKE_contractor_1" table="contractor" schema="" catalog="" columns="bank_id"/>
@@ -763,6 +766,7 @@
     <table name="measure" schema="" catalog="" type="TABLE">
       <column name="id" sqlType="INTEGER" precision="2000000000" scale="10" nullable="false" jdbcType="4"/>
       <column name="name" sqlType="VARCHAR(20)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
+      <column name="OKEI" sqlType="VARCHAR(3)" precision="2000000000" scale="10" nullable="false" jdbcType="12"/>
       <primary-key columns="id"/>
       <exported-key name="#FAKE_item_3" table="item" schema="" catalog="" columns="measure_id"/>
     </table>

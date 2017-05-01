@@ -8,12 +8,14 @@ from openpyxl import load_workbook
 # reportlab
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
+from reportlab.lib.utils import simpleSplit
 from reportlab.lib.units import mm
 from reportlab.lib.pagesizes import A4, portrait, landscape
 from reportlab.platypus import Table
 
 # для шрифтов
 from reportlab.pdfbase import pdfmetrics
+from  reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfbase.ttfonts import TTFont
 
 # цифра в текст
@@ -29,6 +31,8 @@ class Form(object):
     DEFAULT_CELL_HEIGHT = 11.0  # 15.0
     DEFAULT_CELL_WIDTH = 14.0  # 51.85
     DEFAULT_SHEET_ORIENTATION = PORTRAIT
+
+    FONT_NAME = 'Arial'
 
     horizontal_align = {
         'right': 'RIGHT',
@@ -105,10 +109,12 @@ class Form(object):
         self._row = 0  # Текущая высота построенной формы шаблона в ячейках (служебная)
         self._height = 0  # Текущая высота построенной формы шаьлона в px (служебная)
 
+        self.tags = {}  # Словарь всех тегов в шаблоне
+
         """ Настраиваем шрифт """
         # Draw things on the PDF. Here's where the PDF generation happens.
         # See the ReportLab documentation for the full list of functionality.
-        pdfmetrics.registerFont(TTFont('Arial', '../fonts/Arial.ttf'))
+        pdfmetrics.registerFont(TTFont(self.FONT_NAME, '../fonts/Arial.ttf'))
         # pdfmetrics.registerFont(TTFont('Arial Bold', '../fonts/Arial_Cyr.ttf'))
 
         """ Настраиваем стили и данные для report lab """
@@ -123,7 +129,7 @@ class Form(object):
         self.style = []  # Подготовленный список стилей предназначенный для рендера формы
 
         self.init_style = [
-            ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
+            ('FONTNAME', (0, 0), (-1, -1), self.FONT_NAME),
             ('LEFTPADDING', (0, 0), (-1, -1), 2),
             ('RIGHTPADDING', (0, 0), (-1, -1), 2),
             ('TOPPADDING', (0, 0), (-1, -1), 0),
@@ -139,6 +145,41 @@ class Form(object):
 
     def __repr__(self):
         return u"<Form %s.%s>" % (self.title, self.work_file)
+
+    def _hyphen(self, part, string, tag_name):
+        """Making a multi line string from string value and correcting lenght of the string
+        :param string: string value
+        :param tag_name: tag name of value for getting string from context
+        :return string: a reformat string
+        """
+        try:
+            # Алгоритм обработки строки из однострочной в многострочную согласно вычисленным данным
+            _w, _h, _fs = self.tags[part][tag_name]
+            _new_val = ''
+            _line = 0
+            for _val in string.split(' '):
+                _len_val = stringWidth(_val + ' ', self.FONT_NAME, _fs)
+                # расставляем переноcы
+                if _line + _len_val > _w:
+                    _h -= _fs
+                    if _h < _fs:
+                        # Ограничение максимального количества строк
+                        break
+                    _new_val += '\n'
+                    _new_val += _val
+                    _line = 0
+                else:
+                    if _new_val:
+                        _new_val += ' ' + _val
+                        _line += _len_val + 1
+                    else:
+                        _new_val += _val
+                        _line += _len_val
+
+            string = _new_val
+        except:
+            print('Не найден тег: %s' % tag_name)
+        return string
 
     # методы для сборки шаблона
     def _create(self):
@@ -162,6 +203,7 @@ class Form(object):
 
         # Обработка данных с добавлением значений в теги
         _data = []
+        # Тут только строки ROW
         if _context and part == self.PARTS['ROW']:
             self.CONTEXT['numbers'] += 1
             for value in self._data[part][0]:  # Индекс 0 потому-что в списке находится 1 подсписок row(строка)
@@ -173,7 +215,9 @@ class Form(object):
                             # Обработка номера строки
                             _data.append(str(self.CONTEXT['numbers']))
                         else:
-                            _data.append(_context[value[2:-2]])
+                            # Заменяем тег на значение из контекста в строке
+                            # Используем функуию преобразования строки по "габаритам"
+                            _data.append(self._hyphen(part, _context[value[2:-2]], value[2:-2]))
                     except:
                         _data.append(value)  # Выводим не найденный тег
                         print('render(): Key Does not exist:', value[2:-2])
@@ -183,6 +227,7 @@ class Form(object):
         else:
             # Обработка части данных с заменой тегов на значения из посчитанных данных
             # Данные многостройные
+            # Все остальные части шаблона
             for data_row in self._data[part]:
                 data_cells = []
                 for val in data_row:
@@ -201,7 +246,7 @@ class Form(object):
                                 for value in values:
                                     # Первым идет ключ - пропускаем
                                     if value != values[0]:
-                                        # Каскады тегов
+                                        # Каскады тегов - чем выше тут в ветке if, тем больше приоритет тега
                                         # total
                                         if value == 'total':
                                             # Берем специально подготовленное значение из контекста
@@ -220,7 +265,12 @@ class Form(object):
                                             # Тег не найден
                                             print('Cannot find tag:', value)
                             # После обработки добавим значение
-                            data_cells.append(val)
+                            # self._hyphen(part, _context[value], val)
+                            # print(part, val, value)
+                            else:
+                                # Обработка тегов из  всех частей кроме ROW, заменяем значением из контекста
+                                val = self.context[value]
+                            data_cells.append(self._hyphen(part, val, value))  # Форматируем строчку по размеру
                         except:
                             # Просто выводим тег
                             data_cells.append(val)
@@ -264,13 +314,17 @@ class Form(object):
     def _make_page(self):
         # функция рисует подготовленный лист
         # Подготовка таблицы
+
+
         self.table = Table(self.data, colWidths=self.widths, rowHeights=self.heights, repeatRows=1)
         # Подготовка стилей
         self.table.setStyle(self.style)
 
+        # w, h = self.table.wrap(self.width, self.height)
         self.table_width, self.table_height = self.table.wrapOn(self.document, self.width, self.height)
         # print(table_height)
-        self.table.drawOn(self.document, (self.pdf_width - self.width) / 2, self.height - self._height, mm)
+        self.table.drawOn(self.document, (self.pdf_width - self.width) / 2,
+                          self.height - self._height + self.DEFAULT_CELL_HEIGHT, mm)
 
         # Создаём страницу
         self.document.showPage()
@@ -281,6 +335,35 @@ class Form(object):
         self._row = 0
         self._height = 0
         return True
+
+    def _wrap(self, cell):
+        """ Prepare a read's value from XLSX and wrapping value out of a context
+            Функция подготовки прочитанных значений из XLSX и обработки значений из контекста
+        """
+        value = str(cell.value)
+        br = chr(0x5c) + chr(0x6e)
+        if value[0] == '#':
+            #  Наименование части шаблона
+            self._part = value[1:]
+            self.parts.append(self._part)
+            self._row = 0  # Каждую часть начинаем с нового отсчета
+            print('найден маркер строки: %s' % value[1:])
+            return ''
+            # elif value[-2:] == '}}' and value[:2] == '{{':
+            # Вставляем значение из контекста документа
+            # try:
+            #    # На случай отсутствующих ключей
+            #    if self._part != self.PARTS['ROW']:
+            #        value = self.context[value[2:-2]]
+            #    #else:
+            # Тут попадаем на теги из ROW части
+            # Мы их обрабатывает не тут а в методе _extend
+            #    print('!---------------', str(cell.value), self.worksheet.column_dimensions[cell.column].width)
+            #       return value
+            # except:
+            #    print('Key Does not exist:', value[2:-2])
+            # return value
+        return value.replace(br, chr(10))  # Когда исправят в openpyxl убрать
 
     def render(self):
         if self._data and self._heights and self.widths and self.orientation:
@@ -303,7 +386,7 @@ class Form(object):
                 _height = self._height + self.sizes[self.PARTS['TOTAL']]
                 # print(self._height, self.sizes[self.PARTS['TOTAL']], self.height)
                 if _height < self.height:
-                    if _row == _rows:
+                    if _row == _rows and _rows > 1:
                         # Ситуация 1: Если все строки вмещаются на странице и на последнюю переносятся только footer
                         # то мы последнюю строку отдадим на другую страницу
                         # Перенос на другую страницу
@@ -340,7 +423,8 @@ class Form(object):
 
             # Информация для разработки
             # for part in self._data.keys():
-            print(self.rows)
+            print(self.tags)
+            #print(self.worksheet.merged_cell_ranges)
 
             print(self.height, decimal2text(self.height, 2, int_units, exp_units))
 
@@ -362,31 +446,6 @@ class Form(object):
             print('Error: Load a form first!')
             return None
         return True
-
-    def wrap(self, cell):
-        """ Prepare a read's value from XLSX and wrapping value out of a context
-            Функция подготовки прочитанных значений из XLSX и обработки значений из контекста
-        """
-        value = str(cell.value)
-        br = chr(0x5c) + chr(0x6e)
-        if value[0] == '#':
-            #  Наименование части шаблона
-            self._part = value[1:]
-            self.parts.append(self._part)
-            self._row = 0  # Каждую часть начинаем с нового отсчета
-            print('найден маркер строки: %s' % value[1:])
-            return ''
-        elif value[-2:] == '}}' and value[:2] == '{{':
-            # Вставляем значение из контекста документа
-            try:
-                # На случай отсутствующих ключей
-                if self._part != self.PARTS['ROW']:
-                    value = self.context[value[2:-2]]
-                return value
-            except:
-                print('Key Does not exist:', value[2:-2])
-            return value
-        return value.replace(br, chr(10))  # Когда исправят в openpyxl убрать
 
     def load_xlsx(self, template_file_name, sheet_name=u'Sheet1'):
         """ Loading a template
@@ -439,6 +498,8 @@ class Form(object):
                 self.sizes.update({value: 0})
                 # добавляем словарь строк в частях
                 self.rows.update({value: 0})
+                # добавляем словарь пространства тегов
+                self.tags.update({value: {}})
 
             cell = self.worksheet.row_dimensions[row[0].row]
             # print(value)
@@ -466,7 +527,7 @@ class Form(object):
             data_cells = []
             for cell in row:
                 if cell.value:
-                    _wrap_cell = self.wrap(cell)
+                    _wrap_cell = self._wrap(cell)
                     data_cells.append(_wrap_cell)
                     # размер шрифта
                     # print(cell.alignment.vertical)
@@ -523,11 +584,6 @@ class Form(object):
 
         """ Формируем стили для объединённых ячеек """
         """ Make styles for merged cells """
-
-        # for cell in self.worksheet['AY7:BF8']:
-        #            print('Ячейка: ', cell, 'Border-')
-
-
         ranges = []
         self._row = 0
         # Список объединений переведенных в цифровое обозначение
@@ -548,6 +604,23 @@ class Form(object):
 
             # Создаем список стилей
             ranges.append([self._part, cell_start.col_idx - 1, _start_row, cell_end.col_idx - 1, _end_row])
+
+            # Тут мы собираем все теги в один словарь для формирования справочника
+            # Это необходимо для форматирования значений из контекста подставляемые в теги
+            value = str(cell_start.value)
+            _w, _h = 0, 0
+            if value[-2:] == '}}' and value[:2] == '{{':
+                # Вычисление ширины окна тега
+                for idx in range(cell_start.col_idx - 1, cell_end.col_idx):
+                    _w += self.widths[idx]
+                for idx in range(_start_row, _end_row + 1):
+                    _h += self._heights[self._part][idx]
+                # Добавляем в словарь именованную ширину и высоту окна тега, а также координаты для
+                # отличия одноименных тегов в местах расположения в шаблоне
+                # Значения в словаре вида {xx$yy$tag_name: (width, height)}
+                self.tags[self._part].update(
+                    {value[2:-2]: (_w, _h, cell_start.font.sz)}
+                )
 
             # Верхная граница
             if cell_start.border.top.border_style:
