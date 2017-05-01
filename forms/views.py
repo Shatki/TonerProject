@@ -54,6 +54,7 @@ def torg12(request, consignment_id):
     context = {
         'document_title': 'Накладная',
         'document_number': consignment.number,
+        'company': 'I understand (I think). Please explain how the wanted value is specified. Is it a (the only) leaf in the tree which fits a certain condition? What is this condition? To perform a search in a tree you can use breadth-search or depth-search or a more custom-tailored variant. But I need to know more about the situation you are in to give qualified advice. ',
         'emitter': 'I understand (I think). Please explain how the wanted value is specified. Is it a (the only) leaf in the tree which fits a certain condition? What is this condition? To perform a search in a tree you can use breadth-search or depth-search or a more custom-tailored variant. But I need to know more about the situation you are in to give qualified advice. ',
         'receiver': consignment.receiver,
         'payer': consignment.receiver,

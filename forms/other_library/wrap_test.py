@@ -3,15 +3,17 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfbase.ttfonts import TTFont
 
 pdfmetrics.registerFont(TTFont('Arial', '../fonts/Arial.ttf'))
-_w, _h, _fs = 566.6, 22.5, 8.0
+_w, _h, _fs = 587.31, 22.5, 8.0
 
-string = 'I understand (I think). Please explain how the wanted value is specified. Is it a (the only) leaf in the tree which fits a certain condition? What is this condition? To perform a search in a tree you can use breadth-search or depth-search or a more custom-tailored variant. But I need to know more about the situation you are in to give qualified advice. '
+string = 'Индивидуальный предприниматель Селиверстов Дмитрий Юрьевич'
+# string = 'I understand (I think). Please explain how the wanted value is specified. Is it a (the only) leaf in the tree which fits a certain condition? What is this condition? To perform a search in a tree you can use breadth-search or depth-search or a more custom-tailored variant. But I need to know more about the situation you are in to give qualified advice. '
 
 _new_val = ''
 _line = 0
+_space = stringWidth(' ', 'Arial', _fs)
 
 for _val in string.split(' '):
-    _len_val = stringWidth(_val + ' ', 'Arial', _fs)
+    _len_val = stringWidth(_val, 'Arial', _fs)
     # print(_get_string_width(_new_val))
     # расставляем переноcы
     print(_line)
@@ -23,11 +25,11 @@ for _val in string.split(' '):
             break
         _new_val += '\n'
         _new_val += _val
-        _line = 0
+        _line = stringWidth(_val + ' ', 'Arial', _fs)
     else:
         if _new_val:
             _new_val += ' ' + _val
-            _line += _len_val + 1
+            _line += _len_val + _space
         else:
             _new_val += _val
             _line += _len_val

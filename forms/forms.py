@@ -18,7 +18,7 @@ from reportlab.pdfbase import pdfmetrics
 from  reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfbase.ttfonts import TTFont
 
-# цифра в текст
+# цифра в текст, внешняя библиотека
 from .num2text import num2text, decimal2text, int_units, exp_units
 
 
@@ -71,7 +71,7 @@ class Form(object):
     CONTEXT = {
         'pages': 1,  # Текущая страница построенной формы или конечное значение
         'numbers': 0,
-        'cost_with_tax': 500.5,
+        'total': {},
         'total_cost_with_tax': 2555.00,
     }
 
@@ -157,28 +157,30 @@ class Form(object):
             _w, _h, _fs = self.tags[part][tag_name]
             _new_val = ''
             _line = 0
+            _space = stringWidth(' ', self.FONT_NAME, _fs)
+            _w -= _space  # Убавим максимальную ширину на пробел чтоб не попасть точно на границы
             for _val in string.split(' '):
-                _len_val = stringWidth(_val + ' ', self.FONT_NAME, _fs)
+                _len_val = stringWidth(_val, self.FONT_NAME, _fs)
                 # расставляем переноcы
                 if _line + _len_val > _w:
+                    # Этот способ ограничения количества строк не учитывает межстрочные интервалы
                     _h -= _fs
                     if _h < _fs:
                         # Ограничение максимального количества строк
                         break
                     _new_val += '\n'
                     _new_val += _val
-                    _line = 0
+                    _line = stringWidth(_val, self.FONT_NAME, _fs)
                 else:
                     if _new_val:
                         _new_val += ' ' + _val
-                        _line += _len_val + 1
+                        _line += _len_val + _space
                     else:
                         _new_val += _val
                         _line += _len_val
-
             string = _new_val
         except:
-            print('Не найден тег: %s' % tag_name)
+            print('_hyphen: Не найден тег: {{%s}} в части %s' % (tag_name, part))
         return string
 
     # методы для сборки шаблона
@@ -208,19 +210,24 @@ class Form(object):
             self.CONTEXT['numbers'] += 1
             for value in self._data[part][0]:  # Индекс 0 потому-что в списке находится 1 подсписок row(строка)
                 if value[-2:] == '}}' and value[:2] == '{{':
+                    tag = value[2:-2]
                     # Вставляем значение из контекста документа
                     # На случай отсутствующих ключей обернём в try
                     try:
-                        if value[2:-2] == 'number':
+                        if tag == 'number':
                             # Обработка номера строки
                             _data.append(str(self.CONTEXT['numbers']))
                         else:
                             # Заменяем тег на значение из контекста в строке
                             # Используем функуию преобразования строки по "габаритам"
-                            _data.append(self._hyphen(part, _context[value[2:-2]], value[2:-2]))
+                            _data.append(self._hyphen(part, _context[tag], tag))
+                            # Прибавим счетчики если такие ключи есть в CONTEXT
+                            if tag in self.CONTEXT['total']:
+                                self.CONTEXT['total'][tag][0] += float(_context[tag])
+                                self.CONTEXT['total'][tag][self.CONTEXT['pages']] += float(_context[tag])
                     except:
                         _data.append(value)  # Выводим не найденный тег
-                        print('render(): Key Does not exist:', value[2:-2])
+                        print('_extend(): Ошибка шаблона или неверные данные получены в контексте по ключу: %s' % tag)
                 else:
                     _data.append(value)
             self.data.extend([_data])  # Со строковой обработкой
@@ -235,45 +242,53 @@ class Form(object):
                     # Если попался тег
                     if val[-2:] == '}}' and val[:2] == '{{':
                         # Вставляем значение из контекста документа
+                        tags = val[2:-2]
                         try:
-                            value = val[2:-2]
                             # Поддержка каскадных тегов value.tag1.tag2
-                            values = value.split('.')
+                            values = tags.split('.')
                             # Есть теги...
                             if len(values) > 1:
-                                # Берем значение из контекста по ключу
-                                _v = self.CONTEXT[values[0]]
-                                for value in values:
+                                for tag in values:
+                                    # print(tags, tag)
                                     # Первым идет ключ - пропускаем
-                                    if value != values[0]:
+                                    if tag != values[0]:
                                         # Каскады тегов - чем выше тут в ветке if, тем больше приоритет тега
+                                        # totalpage  - предварительный итог по странице
+                                        if tag == 'totalpage':
+                                            # Берем значение из контекста, а данные по индексу страницы
+                                            val = self.CONTEXT['total'][values[0]][self.CONTEXT['pages']]
                                         # total
-                                        if value == 'total':
-                                            # Берем специально подготовленное значение из контекста
-                                            values[0] = 'total_' + values[0]
+                                        elif tag == 'total':
+                                            # Берем специально подготовленное значение из контекста: индекс 0
+                                            val = self.CONTEXT['total'][values[0]][0]
+                                        # textcost  - перевод цифрового значения стоимости в
+                                        elif tag == 'textcost':
+                                            # Берем значение из контекста по ключу
                                             _v = self.CONTEXT[values[0]]
-                                            val = str(_v)
-                                        # textcost
-                                        elif value == 'textcost':
                                             val = decimal2text(_v, 2, int_units, exp_units)
                                             break
-                                        # textvalue
-                                        elif value == 'textvalue':
+                                        # textvalue -  перевод цифрового значяения в строковой
+                                        elif tag == 'textvalue':
+                                            # Берем значение из контекста по ключу
+                                            _v = self.CONTEXT[values[0]]
                                             val = num2text(_v)
                                             break
                                         else:
                                             # Тег не найден
-                                            print('Cannot find tag:', value)
+                                            print('Cannot find tag:', tag)
                             # После обработки добавим значение
                             # self._hyphen(part, _context[value], val)
                             # print(part, val, value)
                             else:
-                                # Обработка тегов из  всех частей кроме ROW, заменяем значением из контекста
-                                val = self.context[value]
-                            data_cells.append(self._hyphen(part, val, value))  # Форматируем строчку по размеру
+                                # Тег не каскадный
+                                # Обработка тегов из всех частей кроме ROW, заменяем значением из контекста
+                                val = self.context[tags]
+                            # print(val, value)
+                            data_cells.append(self._hyphen(part, val, tags))  # Форматируем строчку по размеру
                         except:
-                            # Просто выводим тег
-                            data_cells.append(val)
+                            print('_extend: Данные тега {{%s}} не обнаружены' % tags)
+                            # Просто выводим пустое значение вмето тега value
+                            data_cells.append('')
                     else:
                         data_cells.append(val)
                 _data.append(data_cells)
@@ -315,7 +330,6 @@ class Form(object):
         # функция рисует подготовленный лист
         # Подготовка таблицы
 
-
         self.table = Table(self.data, colWidths=self.widths, rowHeights=self.heights, repeatRows=1)
         # Подготовка стилей
         self.table.setStyle(self.style)
@@ -332,37 +346,33 @@ class Form(object):
         self.heights = []
         self.style = self.init_style
         self.CONTEXT['pages'] += 1
+        # Добавим контекст итогов, будет на одно значение больше из-за расположения)
+        for tag in self.CONTEXT['total']:
+            self.CONTEXT['total'][tag].append(0)
         self._row = 0
         self._height = 0
         return True
 
     def _wrap(self, cell):
         """ Prepare a read's value from XLSX and wrapping value out of a context
-            Функция подготовки прочитанных значений из XLSX и обработки значений из контекста
+            Функция обработки прочитанных значений из XLSX, кроме тегов
         """
         value = str(cell.value)
-        br = chr(0x5c) + chr(0x6e)
-        if value[0] == '#':
+        br = chr(0x5c)
+        if value[-12:] == '.totalpage}}' and value[:2] == '{{' and self._part == self.PARTS['TOTAL']:
+            # Заполнение коллекции ключей в CONTEXT
+            try:
+                # Делаем запись в контекст и добавляем 0 - общий итог и 0 по первой странице
+                self.CONTEXT['total'].update({value[2:-2].split('.')[0]: [0, 0]})
+            except:
+                print('_wrap: Не могу добавить {total} ключ %s' % value[2:-2])
+        elif value[0] == '#':
             #  Наименование части шаблона
             self._part = value[1:]
             self.parts.append(self._part)
             self._row = 0  # Каждую часть начинаем с нового отсчета
-            print('найден маркер строки: %s' % value[1:])
+            print('_wrap: найден маркер строки: %s' % value[1:])
             return ''
-            # elif value[-2:] == '}}' and value[:2] == '{{':
-            # Вставляем значение из контекста документа
-            # try:
-            #    # На случай отсутствующих ключей
-            #    if self._part != self.PARTS['ROW']:
-            #        value = self.context[value[2:-2]]
-            #    #else:
-            # Тут попадаем на теги из ROW части
-            # Мы их обрабатывает не тут а в методе _extend
-            #    print('!---------------', str(cell.value), self.worksheet.column_dimensions[cell.column].width)
-            #       return value
-            # except:
-            #    print('Key Does not exist:', value[2:-2])
-            # return value
         return value.replace(br, chr(10))  # Когда исправят в openpyxl убрать
 
     def render(self):
@@ -423,8 +433,8 @@ class Form(object):
 
             # Информация для разработки
             # for part in self._data.keys():
-            print(self.tags)
-            #print(self.worksheet.merged_cell_ranges)
+            print(self.CONTEXT['total'])
+            # print(self.worksheet.merged_cell_ranges)
 
             print(self.height, decimal2text(self.height, 2, int_units, exp_units))
 
@@ -507,17 +517,12 @@ class Form(object):
             if cell.hidden:
                 # Скрытые строки
                 self._heights[self._part].append(0)  # new
-                # self.heights.append(0)
             elif cell.height:
                 self._heights[self._part].append(cell.height)  # new
-                # self.heights.append(cell.height)
-
                 self.sizes[self._part] += cell.height  # new
                 self.height += cell.height
             else:
                 self._heights[self._part].append(self.DEFAULT_CELL_HEIGHT)  # new
-                # self.heights.append(self.DEFAULT_CELL_HEIGHT)
-
                 self.sizes[self._part] += self.DEFAULT_CELL_HEIGHT  # new
                 self.height += self.DEFAULT_CELL_HEIGHT
 
