@@ -72,7 +72,6 @@ class Form(object):
         'pages': 1,  # Текущая страница построенной формы или конечное значение
         'numbers': 0,
         'total': {},
-        'total_cost_with_tax': 2555.00,
     }
 
     def __init__(self, output_file, context, file_prefix=u'document'):
@@ -180,7 +179,9 @@ class Form(object):
                         _line += _len_val
             string = _new_val
         except:
-            print('_hyphen: Не найден тег: {{%s}} в части %s' % (tag_name, part))
+            if not tag_name.split('.')[0] in self.CONTEXT['total']:
+                # Если тег даже не из внутреннего контекста 'CONTEXT'
+                print('_hyphen: Не найден тег: {{%s}} в части %s' % (tag_name, part))
         return string
 
     # методы для сборки шаблона
@@ -248,6 +249,7 @@ class Form(object):
                             values = tags.split('.')
                             # Есть теги...
                             if len(values) > 1:
+                                _val = ''
                                 for tag in values:
                                     # print(tags, tag)
                                     # Первым идет ключ - пропускаем
@@ -256,22 +258,26 @@ class Form(object):
                                         # totalpage  - предварительный итог по странице
                                         if tag == 'totalpage':
                                             # Берем значение из контекста, а данные по индексу страницы
-                                            val = self.CONTEXT['total'][values[0]][self.CONTEXT['pages']]
+                                            _val = self.CONTEXT['total'][values[0]][self.CONTEXT['pages']]
                                         # total
                                         elif tag == 'total':
                                             # Берем специально подготовленное значение из контекста: индекс 0
-                                            val = self.CONTEXT['total'][values[0]][0]
+                                            _val = self.CONTEXT['total'][values[0]][0]
                                         # textcost  - перевод цифрового значения стоимости в
                                         elif tag == 'textcost':
-                                            # Берем значение из контекста по ключу
-                                            _v = self.CONTEXT[values[0]]
-                                            val = decimal2text(_v, 2, int_units, exp_units)
+                                            # Берем значение из внутреннего или внешнего контекста по ключу
+                                            if _val:
+                                                _val = decimal2text(_val, 2, int_units, exp_units)
+                                            else:
+                                                _val = decimal2text(self.CONTEXT[values[0]], 2, int_units, exp_units)
                                             break
                                         # textvalue -  перевод цифрового значяения в строковой
                                         elif tag == 'textvalue':
-                                            # Берем значение из контекста по ключу
-                                            _v = self.CONTEXT[values[0]]
-                                            val = num2text(_v)
+                                            # Берем значение из внутреннего или внешнего контекста по ключу
+                                            if _val:
+                                                _val = num2text(_val)
+                                            else:
+                                                _val = num2text(self.CONTEXT[values[0]])
                                             break
                                         else:
                                             # Тег не найден
@@ -282,9 +288,9 @@ class Form(object):
                             else:
                                 # Тег не каскадный
                                 # Обработка тегов из всех частей кроме ROW, заменяем значением из контекста
-                                val = self.context[tags]
+                                _val = self.context[tags]
                             # print(val, value)
-                            data_cells.append(self._hyphen(part, val, tags))  # Форматируем строчку по размеру
+                            data_cells.append(self._hyphen(part, _val, tags))  # Форматируем строчку по размеру
                         except:
                             print('_extend: Данные тега {{%s}} не обнаружены' % tags)
                             # Просто выводим пустое значение вмето тега value

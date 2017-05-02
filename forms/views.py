@@ -60,7 +60,8 @@ def torg12(request, consignment_id):
         'payer': consignment.receiver,
         'contract': consignment.contract,
         'document_date': consignment.date.strftime('%d.%m.%Y'),
-        'emitter_position': 'Руководитель',
+        'emitter_boss_position': 'Руководитель',
+        'emitter_position': 'Менеджер',
         'rows': rows,
     }
     """ создаём наименование PDF файла """
