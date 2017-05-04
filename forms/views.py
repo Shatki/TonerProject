@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # from io import BytesIO
-import os
+import os, time
 from TonerProject.settings import BASE_DIR, STATIC_URL, DOCUMENT_DIR
 from io import StringIO
 from document.models import Consignment, ConsignmentTable
+import cProfile
 
 # общие
 from django.http import HttpResponse
@@ -54,7 +55,7 @@ def torg12(request, consignment_id):
     context = {
         'document_title': 'Накладная',
         'document_number': consignment.number,
-        'company': 'I understand (I think). Please explain how the wanted value is specified. Is it a (the only) leaf in the tree which fits a certain condition? What is this condition? To perform a search in a tree you can use breadth-search or depth-search or a more custom-tailored variant. But I need to know more about the situation you are in to give qualified advice. ',
+        'company': consignment.receiver,
         'emitter': 'I understand (I think). Please explain how the wanted value is specified. Is it a (the only) leaf in the tree which fits a certain condition? What is this condition? To perform a search in a tree you can use breadth-search or depth-search or a more custom-tailored variant. But I need to know more about the situation you are in to give qualified advice. ',
         'receiver': consignment.receiver,
         'payer': consignment.receiver,
@@ -69,10 +70,12 @@ def torg12(request, consignment_id):
     # создаем PDF файл документа для отдачи
     pdf_file = os.path.join(BASE_DIR, 'static', 'documents', pdf_file_name)
 
+    t1 = time.time()
     # Отправляем их в шаблом
     print_form = Form(pdf_file, context)
-    print_form.load_xlsx(os.path.join(BASE_DIR, 'forms', 'forms', 'torg12.xlsx'), u'torg12')
+    print_form.load_xlsx(os.path.join(BASE_DIR, 'forms', 'forms', 'torg12.xlsx'), )
     print_form.render()
+    print('Время генерирования шаблона: ', time.time() - t1)
 
     # return HttpResponse(pdf_file, content_type='application/pdf')
     return redirect(os.path.join(STATIC_URL, DOCUMENT_DIR + pdf_file_name))
