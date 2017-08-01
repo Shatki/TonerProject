@@ -77,7 +77,7 @@ def item_edit(request, item_id):
         item.country_id = request.POST.get('country')
         item.warranty = request.POST.get('warranty')
         item.package_id = request.POST.get('package')
-        item.serial_number = int(request.POST.get('serial_number'))
+        item.serial_number = request.POST.get('serial_number')
         item.quantity = float(request.POST.get('quantity'))
         item.measure_id = request.POST.get('measure')
         item.save()

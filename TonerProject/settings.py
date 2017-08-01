@@ -41,15 +41,15 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'authentication',
     'blog',
+    'business',
     'contractor',
     'dashboard',
     'document',
-    'homepage',
     'forms',
+    'homepage',
     'service',
     'stock',
     'system',
-    'trade',
 )
 
 MIDDLEWARE = [

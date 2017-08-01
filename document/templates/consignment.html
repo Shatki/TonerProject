@@ -11,7 +11,7 @@
 
         {% block reqvisites %}
             <div id="header-toolbar-consignment-{{ consignment.id }}" style="margin: 5px 20px 5px 20px">
-                <form id="doc-reqv-fm-consignment-{{ consignment.id }}">
+                <form id="doc-req-fm-consignment-{{ consignment.id }}">
                     {% block consignment_number %}
                         <input class="easyui-textbox" name="number" required="required" style="width: 100px"
                                label="Накладная №"
@@ -68,28 +68,68 @@
         {% endblock reqvisites %}
 
         {% block maintab %}
-            <table id="item-table-consignment-{{ consignment.id }}" title="Таблица товаров"
-                   class="easyui-datagrid" width="100% "
+            <table id="item-table-consignment-{{ consignment.id }}" title="Таблица товаров" width="100% "
+                   class="easyui-datagrid"
                     {% if consignment.id %}
                    url="/document/consignment/{{ consignment.id }}/items/json/"
                     {% endif %}
-                   toolbar="#item-toolbar" pagination="true"
-                   rownumbers="true"
-                   fitColumns="true"
-                   singleSelect="true">
+                   idField="id" toolbar="#item-toolbar" pagination="true" rownumbers="true"
+                   fitColumns="true" singleSelect="true">
                 <thead>
                 <tr>
                     <th field="ck" checkbox="true"></th>
-                    <th field="name" width="30%" align="left">Наименование товара, работ, услуг</th>
-                    <th field="measure" width="5%" align="center">
-                        <strong>Ед. </strong>изм.<br><em>(шт., кг и т.д.)</em></th>
-                    <th field="quantity" width="5%" align="center">Кол-во<br><em>(единиц)</em></th>
-                    <th field="country" width="10%" align="center"><p>Страна<br>изготовитель</p></th>
-                    <th field="cost" width="10%" align="center"><p>Цена<br>за единицу</p></th>
-                    <th field="total" width="5%" align="center">Сумма</th>
-
+                    <th field="id" align="center">id</th>
+                    <th field="name" width="30%" align="left"
+                        editor="{type:'product', options:{
+                            url:'/catalog/product/all/json/',
+                            rownumbers: true,
+                            idField:'id',
+                            treeField:'name',
+                            columns:[[
+                                    {field:'name',title:'Наименование',width:'100%'},
+                                    ]]
+                                    }}">
+                        <div align="center">Наименование товара, работ, услуг</div>
+                    </th>
+                    <th field="measure" width="5%" align="center"
+                        editor="{type: 'combogrid', options:{
+                            valueField: 'name',
+                            idField:'id',
+                            scrollbarSize:0,
+                            url:'/system/measure/json/',
+                            columns:[[
+                                    {field:'name',title:'Единица измерения',width:'100%'},
+                                    ]]
+                            }}"><strong>Ед. </strong>изм.<br><em>(шт., кг и т.д.)</em></th>
+                    <th field="quantity" width="5%" align="center"
+                        editor="{type:'calcnumberbox',options:{precision:2}}">Кол-во<br><em>(единиц)</em></th>
+                    <th field="country" width="10%" align="center"
+                        editor="{type: 'combogrid', options:{
+                            valueField: 'name',
+                            url:'/system/country/json/',
+                            columns:[[
+                                    {field:'name',title:'Страна изготовитель',width:'100%'},
+                                    ]]
+                            }}"><p>Страна<br>изготовитель</p></th>
+                    <th field="cost" width="10%" align="center"
+                        editor="{type:'calcnumberbox',options:{precision:2}}"><p>Цена<br>за единицу</p></th>
+                    <th field="total" width="5%" align="center"
+                        editor="{type:'calcnumberbox',options:{precision:2}}">Сумма
+                    </th>
                 </tr>
                 </thead>
+                <script type="text/javascript">
+                    $(function () {
+                        var docTab = $('#item-table-consignment-' + '{{ consignment.id }}').datagrid({});
+                        docTab.datagrid('enableCellEditing').datagrid('gotoCell', {
+                            idField: 'id',
+                            field: 'name',
+                            index: 0
+                        });
+
+
+                    });
+                </script>
 
                 {% block itemtable-menu %}
                     <div id="item-toolbar-{{ consignment.id }}">
@@ -112,11 +152,12 @@
 {% endblock docview %}
 
 
+
 {% block doc-scripts %}
     <script type="text/javascript">
         // Скрипты для главного меню документа
         function saveDoc(doc_id) {
-            var doc_form = $('#doc-reqv-fm-consignment-' + doc_id);
+            var doc_form = $('#doc-req-fm-consignment-' + doc_id);
             // Записываем в том случае, если есть хотя бы одна позиция в таблице продукции
             //alert($("#item-table-consignment-" + doc_id).datagrid('getData').total);
             if ($("#item-table-consignment-" + doc_id).datagrid('getData').total > 0) {
@@ -173,7 +214,33 @@
         }
 
         function dublicateItem(doc_id) {
+        }
 
+        function row_calculator(doc_id) {
+            var doctab = $("#item-table-consignment-" + doc_id);
+            var lastIndex;
+            $(doctab).datagrid({
+                onClickRow: function (rowIndex) {
+                    if (lastIndex != rowIndex) {
+                        $(this).datagrid('endEdit', lastIndex);
+                        $(this).datagrid('beginEdit', rowIndex);
+                    }
+                    lastIndex = rowIndex;
+                },
+                onBeginEdit: function (rowIndex) {
+                    var editors = doctab.datagrid('getEditors', rowIndex);
+                    var n1 = $(editors[2].target);
+                    var n2 = $(editors[4].target);
+                    var n3 = $(editors[5].target);
+                    n1.add(n2).numberbox({
+                        onChange: function () {
+                            var cost = n1.numberbox('getValue') * n2.numberbox('getValue');
+                            n3.numberbox('setValue', cost);
+                        }
+                    })
+                }
+            });
         }
     </script>
+
 {% endblock doc-scripts %}

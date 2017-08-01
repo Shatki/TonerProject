@@ -2,9 +2,11 @@
 Библиотека для преобразования XLSX templates файлов в PDF для печати
 
 Created on 12.03.2017
-Changed on 04.05.2017
+Changed on 05.05.2017
 @author: Dmitriy Seliverstov <shatki@mail.ru>
 """
+# benchmark
+import time
 # load django settings
 from django.conf import settings
 # openpyxl
@@ -34,13 +36,14 @@ class Form(object):
     DEFAULT_CELL_WIDTH = 14.0  # 51.85
     DEFAULT_SHEET_ORIENTATION = PORTRAIT
     FONT_NAME = 'Arial'
+    CONTEXT_ROWS_DATA_NAME = 'rows'
 
     ORIENTATION = {
         LANDSCAPE: landscape(A4),
         PORTRAIT: portrait(A4),
     }
 
-    ''' openpyxl to report lab relation constants '''
+    ''' openpyxl to report lab relation's constants '''
     horizontal_align = {
         'right': 'RIGHT',
         'left': 'LEFT',
@@ -62,20 +65,37 @@ class Form(object):
     }
 
     # Template parts
-    PARTS = {
+    PARTS = (
+        'HEADER',
+        'TABLE',
+        'ROW',
+        'TOTAL',
+        'FOOTER',
+    )
+
+    # Template parts name converter
+    PART = dict(
         # названия в шаблоне частей: #header
-        'HEADER': 'header',
-        'TABLE': 'table',
-        'ROW': 'row',
-        'TOTAL': 'total',
-        'FOOTER': 'footer',
-    }
+        HEADER='header',
+        TABLE='table',
+        ROW='row',
+        TOTAL='total',
+        FOOTER='footer',
+    )
+
     # Template context
     CONTEXT = {
         'pages': 1,  # Текущая страница построенной формы или конечное значение
         'numbers': 0,
         'total': {},
     }
+
+    # Template short access's names
+    HEADER = PART['HEADER']
+    TABLE = PART['TABLE']
+    ROW = PART['ROW']
+    TOTAL = PART['TOTAL']
+    FOOTER = PART['FOOTER']
 
     def __init__(self, output_file, context, file_prefix=u'document'):
         """ Initialise an object of the class Form
@@ -89,13 +109,14 @@ class Form(object):
         :rtype: None
 
         """
+        self.template_name = ''
         self.output_file = output_file
         self.context = context
         self.orientation = self.DEFAULT_SHEET_ORIENTATION
         self.workbook = ''  # Название файла
         self.worksheet = ''
-        self.work_file = u'Empty'
-        self.title = u'Form'
+        self.work_file = u'NotLoad'
+        self.title = u'None'
         self.width = 0  # Ширина XLSX страницы прочитанного шаблона
         self.height = 0  # Высота XLSX страницы прочитанного шаблона
 
@@ -104,7 +125,7 @@ class Form(object):
         self.rows = {}  # Словарь частей прочитанного шаблона со списком высот ячеек
         self.sizes = {}  # Словарь высот частей шаблона в px {'part': size}
         self.parts = []  # Список частей шаблона
-        self._part = self.PARTS['HEADER']  # Текущая часть шаблона при чтении или построении формы (служебная)
+        self._part = self.HEADER  # Текущая часть шаблона при чтении или построении формы (служебная)
         self._row = 0  # Текущая высота построенной формы шаблона в ячейках (служебная)
         self._height = 0  # Текущая высота построенной формы шаьлона в px (служебная)
         self.tags = {}  # Словарь всех тегов в шаблоне
@@ -140,10 +161,16 @@ class Form(object):
         self.logo = None
 
     def __str__(self):
-        return self.output_file
+        if self.template_name:
+            return u"Form: [<Template ""%s"">, %s]" % (self.work_file.split('/')[-1], self.template_name)
+        else:
+            return u'The template isn''t loaded'
 
     def __repr__(self):
-        return u"<Form %s.%s>" % (self.title, self.work_file)
+        if self.template_name:
+            return u"Form: [<Template ""%s"">, %s]" % (self.work_file.split('/')[-1], self.template_name)
+        else:
+            return u'The template isn''t loaded'
 
     def _hyphen(self, part, string, tag_name):
         """Making a multi line string from string value and correcting lenght of the string
@@ -206,7 +233,7 @@ class Form(object):
 
         :param part: name of template part
         :param _context: the context with data to render the form
-        :return : boolean: result of action
+        :return : boolean: result of method's action
         """
         # функция присоединяет другую часть шаблона к существующему
         if not _context:
@@ -215,7 +242,7 @@ class Form(object):
         # Обработка данных с добавлением значений в теги
         _data = []
         # Тут только строки ROW
-        if _context and part == self.PARTS['ROW']:
+        if _context and part == self.ROW:
             self.CONTEXT['numbers'] += 1
             for value in self._data[part][0]:  # Индекс 0 потому-что в списке находится 1 подсписок row(строка)
                 if value[-2:] == '}}' and value[:2] == '{{':
@@ -339,8 +366,9 @@ class Form(object):
                     (style[0], (sx, sy + self._row), (ex, ey + self._row), style[3], style[4])
                 )
             else:
-                print('Can\'t understand the style:', style)
-                self.style.append(style)
+                if settings.DEBUG:
+                    print('_extend: Can\'t recognize the style:', style)
+                    # self.style.append(style)
 
         # print(self.style)
         # self.style.extend(self._style[part])
@@ -352,7 +380,7 @@ class Form(object):
 
     def _make_page(self):
         """ Make a page of the form used the data and 'reportlab' library
-        :return: boolean: result
+        :return: boolean: result of method's action
         """
         try:
             # функция рисует подготовленный лист
@@ -389,7 +417,7 @@ class Form(object):
         """
         value = str(cell.value)
         br = chr(0x5c)
-        if value[-12:] == '.totalpage}}' and value[:2] == '{{' and self._part == self.PARTS['TOTAL']:
+        if value[-12:] == '.totalpage}}' and value[:2] == '{{' and self._part == self.TOTAL:
             # Заполнение коллекции ключей в CONTEXT
             try:
                 # Делаем запись в контекст и добавляем 0 - общий итог и 0 по первой странице
@@ -405,64 +433,58 @@ class Form(object):
     def render(self):
         """
         Render the loaded template with class's load methods
-        :return: boolean: result of action method
+        :return: boolean: result of method's action
         """
+        _t = time.time()
         if self._data and self._heights and self.widths and self.orientation:
             if not self._create():
                 print('Error: Can\'t create a PDF page')
                 return False
 
-            # Сначала шапку
-            self._extend(self.PARTS['HEADER'], self.context)
-
-            # Добавляем таблицу
-            self._extend(self.PARTS['TABLE'], self.context)
-            # добавляем строки
-
-            _row = 0
-            _rows = len(self.context['rows'])
-            # Перебераем все строки из контекста
-            for item in self.context['rows']:
-                _row += 1
-                _height = self._height + self.sizes[self.PARTS['TOTAL']]
-                # print(self._height, self.sizes[self.PARTS['TOTAL']], self.height)
-                if _height < self.height:
-                    if _row == _rows and _rows > 1:
-                        # Ситуация 1: Если все строки вмещаются на странице и на последнюю переносятся только footer
-                        # то мы последнюю строку отдадим на другую страницу
-                        # Перенос на другую страницу
-                        # Добавляем итоговою сроку
-                        self._extend(self.PARTS['TOTAL'], self.context)
-                        # Создаём страницу
-                        self._make_page()
-                        # Добавляем таблицу
-                        self._extend(self.PARTS['TABLE'], self.context)
-                    # Ситуация 2: Добавляем строку
-                    # Добавляем строку
-                    self._extend(self.PARTS['ROW'], item)
+            for self._part in self.PARTS:
+                if self.PART[self._part] == self.ROW:
+                    _row = 0
+                    _rows = len(self.context[self.CONTEXT_ROWS_DATA_NAME])
+                    # Перебераем все строки из контекста
+                    for item in self.context[self.CONTEXT_ROWS_DATA_NAME]:
+                        _row += 1
+                        _height = self._height + self.sizes[self.TOTAL]
+                        if _height < self.height:
+                            if _row == _rows and _rows > 1:
+                                # Ситуация 1: Если все строки вмещаются на странице и на последнюю
+                                # переносятся только footer то мы последнюю строку отдадим на другую страницу
+                                # Перенос на другую страницу
+                                # Добавляем итоговою сроку
+                                self._extend(self.TOTAL, self.context)
+                                # Создаём страницу
+                                self._make_page()
+                                # Добавляем таблицу
+                                self._extend(self.TABLE, self.context)
+                            # Ситуация 2: Добавляем строку
+                            # Добавляем строку
+                            self._extend(self.ROW, item)
+                        else:
+                            # Ситуация 3: Страница закончилась нужно переносить остальные строки на другой лист
+                            # Добавляем итоговою сроку в каждом листе
+                            self._extend(self.TOTAL, self.context)
+                            # Далее строим новый лист
+                            self._make_page()
+                            # Рисуем шапку таблицы
+                            # Добавляем таблицу
+                            self._extend(self.TABLE, self.context)
                 else:
-                    # Ситуация 2: Страница закончилась нужно переносить остальные строки на другой лист
-                    # Добавляем итоговою сроку в каждом листе
-                    self._extend(self.PARTS['TOTAL'], self.context)
-                    # Далее строим новый лист
-                    self._make_page()
-                    # Рисуем шапку таблицы
-                    # Добавляем таблицу
-                    self._extend(self.PARTS['TABLE'], self.context)
+                    # Рисуем часть шаблона отличную от ROW
+                    self._extend(self.PART[self._part], self.context)
 
-            # Финализируем
-            # Добавляем итоговою сроку в каждом листе
-            self._extend(self.PARTS['TOTAL'], self.context)
-            # Добавляем подвал
-            self._extend(self.PARTS['FOOTER'], self.context)
-
-            # Создаём страницу
+            # Рисуем последнюю страницу
             self._make_page()
 
             # Сохраняем документ
             self.document.save()
 
             if settings.DEBUG:
+                print('Time of rendering template: ', time.time() - _t)
+
                 # Информация для разработки
                 # for part in self._data.keys():
                 # print(self.CONTEXT['total'])
@@ -473,22 +495,19 @@ class Form(object):
                 print('Размеры PDF страницы(mm): ', self.pdf_width / mm, self.pdf_height / mm)
                 print('Размеры XLSX страницы(px): ', self.width, self.height)
                 print('Размеры XLSX страницы(mm): ', self.width / mm, self.height / mm)
-
                 # print(self.data)
                 # print('width:', self.widths)
                 # print('height:', self.heights)
-
                 # my_cell = self.worksheet['AY6']
                 # print('Ячейка:', my_cell.border.top.border_style)
                 # print('Ячейки:', self.worksheet.merged_cells)
                 # print('Объединены ячейки:', self.worksheet.merged_cell_ranges)
-
         else:
             print('Error: Load a form first!')
             return None
         return True
 
-    def load_xlsx(self, template_file_name, sheet_name=''):
+    def load_template(self, template_file_name, sheet_name=''):
         """ Loading a template
             Загрузка шаблона
 
@@ -500,6 +519,7 @@ class Form(object):
 
         :rtype: None (changed self: data, style, widths, heights)
         """
+        _t = time.time()
         try:
             self.work_file = template_file_name
             self.title = sheet_name
@@ -535,7 +555,7 @@ class Form(object):
                     #  Наименование части шаблона
                     self.parts.append(value)
                     if settings.DEBUG:
-                        print('load_xlsx: найден маркер строки: %s' % value)
+                        print('load_xlsx: найден маркер раздела шаблона: %s' % value)
                     self._part = value
                     # добавляем словарь данных
                     self._data.update({value: []})
@@ -679,7 +699,7 @@ class Form(object):
                     else:
                         data_cells.append('')
 
-                    if cell.coordinate in cell_except:  # работает, но очень медленно
+                    if cell.coordinate in cell_except:  # исключаем стили в ячейках с объединением
                         cell_except.remove(cell.coordinate)
                     else:
                         # Верхная граница
@@ -706,11 +726,13 @@ class Form(object):
                                                             (cell.col_idx - 1, self._row),
                                                             self.cell_border[cell.border.right.border_style],
                                                             colors.black))
-
                 # добавляем list строки в list шаблона
                 self._data[self._part].append(data_cells)
                 self._row += 1
+                self.template_name = self.workbook.active
         except:
             print('Forms: Template did not load. Check the template for mistakes')
             return False
+        if settings.DEBUG:
+            print('Time of loading template: ', time.time() - _t)
         return True

@@ -58,12 +58,13 @@ def measure_json(request):
     return JsonResponse(response, safe=False)
 
 
-def items_json(request):
+def products_json(request):
     try:
         categories = Category.objects.all()
         products = Product.objects.all().order_by('name')
     except Product.DoesNotExist:
         return HttpResponse(u"Ошибка item_json. Ошибка БД", content_type='text/html')
+    response = []
     lists = []
     for category in categories:
         # создаем подготовительный список
@@ -79,7 +80,7 @@ def items_json(request):
                 elem = dict(
                     id='p' + str(product.id),
                     name=name,  # Наименование продукта
-                    iconCls="icon-print",  # Иконка продукта продукта, нужна?
+                    iconCls="icon-print",  # Иконка продукта, нужна?
                 )
                 collect.append(elem)
         if collect:
@@ -141,6 +142,7 @@ def items_json(request):
     return JsonResponse(response, safe=False)
 
 
+"""
 response_ = [{
     'children': [{
         'children': [{
@@ -248,3 +250,5 @@ response_ = [{
         }]
     }]
 }]
+
+"""

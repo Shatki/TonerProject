@@ -2,13 +2,12 @@ from django.db import models
 from authentication.models import Account
 from authentication.middleware import *
 from django.utils import timezone
-from django.contrib.auth import get_user
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from business.models import Cost, Tax
 from contractor.models import Contractor
-from stock.models import Item
+from system.models import Product, Measure, Country
 from TonerProject.constants import date_minimal, date_maximal
 
 
@@ -65,10 +64,10 @@ class Consignment(models.Model):
     contract = models.ForeignKey(Contract, verbose_name=u'контракт',
                                  related_name='consignment_contract', default=None, null=True)
 
-    items = models.ManyToManyField(Item, verbose_name=u'перемещаемый товар',
+    items = models.ManyToManyField(Product, verbose_name=u'перемещаемый товар',
                                    through='ConsignmentTable',
                                    through_fields=('consignment', 'item'),
-                                   related_name='consignment_table'
+                                   related_name='consignment_items'
                                    )
     # Общие для всех документов поля
     delete = models.BooleanField(verbose_name=u'Черновик/Подлежит удалению', default=True)
@@ -101,13 +100,18 @@ class Consignment(models.Model):
 
 class ConsignmentTable(models.Model):
     class Meta:
-        verbose_name = 'Продукция в накладной'
-        verbose_name_plural = 'Продукция в накладной'
-        db_table = 'consignment_table'
+        verbose_name = 'продукт в накладной'
+        verbose_name_plural = 'продукты в накладной'
+        db_table = 'consignment_items'
 
     consignment = models.ForeignKey(Consignment, verbose_name=u'накладная')
-    item = models.OneToOneField(Item, verbose_name=u'продукт')
+    number = models.IntegerField(verbose_name=u'номер в накладной')
+    item = models.ForeignKey(Product, verbose_name=u'продукт')
+    country = models.ForeignKey(Country, verbose_name=u'страна происхождения', default=None, null=True)
+    quantity = models.FloatField(verbose_name=u'количество')
+    measure = models.ForeignKey(Measure, verbose_name=u'единица измерения', default=1)
+    cost = models.FloatField(verbose_name=u'стоимость единицы продукта без налогов', default=0.0, null=True)
+    tax = models.ForeignKey(Tax, verbose_name=u'налоговая ставка', default=None, null=True)
 
     def __str__(self):
-        return self.item.product.category.name
-
+        return self.item.category.name

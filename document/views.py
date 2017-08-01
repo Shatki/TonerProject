@@ -158,20 +158,21 @@ def consignment_new(request):
 @login_required
 def consignment_items_json(request, consignment_id):
     try:
-        items = Consignment.objects.get(id=consignment_id).items.all()
-    except:
+        items = ConsignmentTable.objects.filter(consignment_id=consignment_id).all()
+        # rows = ConsignmentTable.objects.
+    except ConsignmentTable.DoesNotExist:
         return HttpResponse(u'items_json: Error DB', content_type='text/html')
     # Serialize
     rows = []
     for get_one in items:
         obj = dict(
             id=str(get_one.id),
-            name=str(get_one),
+            name=str(get_one.item),
             measure=str(get_one.measure),
             quantity=str(get_one.quantity),
             country=str(get_one.country),
-            # cost=str(get_one.cost),
-            # total=str(get_one.total),
+            cost=str(get_one.cost),
+            tax=str(get_one.tax),
         )
         rows.append(obj)
     # final preparing
@@ -195,7 +196,7 @@ def consignment_item_add(request, consignment_id):
         try:
             new_item = item_add(request, product_id)
             if new_item:
-                ConsignmentTable.objects.create(
+                Consignment.items.create(  # ????
                     item=new_item,
                     consignment_id=consignment_id,
                 )
@@ -219,7 +220,7 @@ def consignment_item_paste(request, consignment_id):
             consignment_id = Consignment.objects.get(id=consignment_id).id
 
             if consignment_id:
-                ConsignmentTable.objects.create(
+                Consignment.items.create(
                     item=get_item,  # Недоделал еще
                     consignment_id=consignment_id,
                 )
@@ -253,13 +254,13 @@ def consignment_item_delete(request, consignment_id, item_id):
     if consignment_id and item_id:
         try:
             # Удаляем запись о товаре в накладной из базы
-            ConsignmentTable.objects.get(item_id=item_id, consignment_id=consignment_id).delete()
+            Consignment.items.get(item_id=item_id, consignment_id=consignment_id).delete()
 
             # тут основной функционал, многое надо допилить
             # Удаляем товар!! очень аккуратно
             if not item_delete(item_id):
                 return HttpResponse("item_delete: Can't delete Item", content_type='text/html')
-        except ConsignmentTable.DoesNotExist:
+        except Consignment.DoesNotExist:
             return HttpResponse("consignment_item_delete: ConsignmentTable.DoesNotExist", content_type='text/html')
         return HttpResponse("Ok", content_type='text/html')
     return HttpResponse("consignment_item_delete: AJAX data error", content_type='text/html')

@@ -6,7 +6,6 @@ class ConsignmentTableInline(admin.TabularInline):
     model = ConsignmentTable
     extra = 1
 
-
 class ConsignmentAdmin(admin.ModelAdmin):
     list_display = ('__str__',
                     'emitter',

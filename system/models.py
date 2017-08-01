@@ -268,7 +268,6 @@ class Course(models.Model):
         return self.value.__str__() + ' (' + self.date.today().__str__() + ')'
 
 
-# Create your models here.
 class Measure(models.Model):
     class Meta:
         verbose_name = 'единица измерения'

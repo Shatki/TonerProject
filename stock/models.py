@@ -33,8 +33,8 @@ class Item(models.Model):
     # addition fields
     serial_number = models.CharField(max_length=30, verbose_name=u'серийный номер продукта',
                                      default=None, null=True, blank=True)
-    quantity = models.FloatField(verbose_name=u'Количество', default=1)
-    measure = models.ForeignKey(Measure, verbose_name=u'Единица измерения', default=1)
+    quantity = models.FloatField(verbose_name=u'количество', default=1)
+    measure = models.ForeignKey(Measure, verbose_name=u'единица измерения', default=1)
 
     def __str__(self):
         return str(self.product) + ', ' + self.package.name + ' [' + self.serial_number + ']'
