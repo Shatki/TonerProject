@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<title>Cell Editing in DataGrid - jQuery EasyUI Demo</title>
+
+<body>
+
+<table id="dg" title="Cell Editing in DataGrid" style="width:700px;height:200px">
+    <thead>
+    <tr>
+        <th data-options="field:'itemid',width:50">Item ID</th>
+        <th data-options="field:'productname',width:340, editor:{type: 'combotreegrid', options:{
+                            data:response,
+                            singleSelect:true,
+                            idField: 'id',
+                            treeField: 'name',
+                            panelWidth: 600,
+                            columns: [[
+                                     {field:'id',title:'Item ID',width:80},
+                                     {field:'name',title:'Name',width:400},
+                                     {field:'price',title:'Price',width:40},
+                                     {field:'attr2',title:'Attr',width:40}
+                                     ]]
+                                     }}">Product name
+        </th>
+        <th data-options="field:'measure',width:60,align:'center',editor:{type:'combobox',options:{
+                            valueField: 'name', 
+                            textField:'name', 
+                            data: [
+                                    {id: 1, name: 'pcs'},
+                                    {id: 2, name: 'wth'},
+                                    {id: 3, name: 'vol'},
+                                    ]}}">Measure
+        </th>
+        <th data-options="field:'price',width:60,align:'right',editor:{type:'numberbox',options:{precision:2}}">Price
+        </th>
+        <th data-options="field:'quantity',width:60,align:'right',editor:'numberbox'">Quantity</th>
+        <th data-options="field:'total',width:60,align:'right',editor:'numberbox'">Total</th>
+        <th data-options="field:'attr1',width:50,editor:'text',align:'center'">Attribute</th>
+    </tr>
+    </thead>
+</table>
+</body>

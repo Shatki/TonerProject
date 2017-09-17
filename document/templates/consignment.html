@@ -79,26 +79,33 @@
                 <tr>
                     <th field="ck" checkbox="true"></th>
                     <th field="id" align="center">id</th>
-                    <th field="name" width="30%" align="left"
-                        editor="{type:'product', options:{
+                    <th data-options="field:'name',width:'30%', editor:{
+                        type: 'combotreegrid',
+                        options: {
+                            columns: [[
+                                {field:'id',title:'Item ID',width:'10%'},
+                                {field:'name',title:'Name',width:'70%'},
+                                {field:'price',title:'Price',width:'10%'},
+                                {field:'attr2',title:'Attr',width:'10%'}
+                            ]],
+                            idField: 'id',
+                            textField: 'name',
+                            treeField: 'name',
                             url:'/catalog/product/all/json/',
-                            rownumbers: true,
-                            idField:'id',
-                            treeField:'name',
-                            columns:[[
-                                    {field:'name',title:'Наименование',width:'100%'},
-                                    ]]
-                                    }}">
+                            panelWidth: '50%'
+                        }}">
                         <div align="center">Наименование товара, работ, услуг</div>
                     </th>
-                    <th field="measure" width="5%" align="center"
-                        editor="{type: 'combogrid', options:{
+                    <th data-options="field:'measure',width:'5%',align:'center', editor:{
+                        type:'combogrid',
+                        options:{
                             valueField: 'name',
+                            textField:'name',
                             idField:'id',
                             scrollbarSize:0,
                             url:'/system/measure/json/',
                             columns:[[
-                                    {field:'name',title:'Единица измерения',width:'100%'},
+                                    {field:'name',title:'Ед. изм.',width:'100%'},
                                     ]]
                             }}"><strong>Ед. </strong>изм.<br><em>(шт., кг и т.д.)</em></th>
                     <th field="quantity" width="5%" align="center"
@@ -118,18 +125,6 @@
                     </th>
                 </tr>
                 </thead>
-                <script type="text/javascript">
-                    $(function () {
-                        var docTab = $('#item-table-consignment-' + '{{ consignment.id }}').datagrid({});
-                        docTab.datagrid('enableCellEditing').datagrid('gotoCell', {
-                            idField: 'id',
-                            field: 'name',
-                            index: 0
-                        });
-
-
-                    });
-                </script>
 
                 {% block itemtable-menu %}
                     <div id="item-toolbar-{{ consignment.id }}">
@@ -144,10 +139,6 @@
 
             </table>
         {% endblock maintab %}
-
-        {% block dialog %}
-            {% include 'item.html' %}
-        {% endblock dialog %}
     </div>
 {% endblock docview %}
 
@@ -155,6 +146,17 @@
 
 {% block doc-scripts %}
     <script type="text/javascript">
+        $(function () {
+            $('#item-table-consignment-' + '{{ consignment.id }}').datagrid({
+                clickToEdit: false,
+                dblclickToEdit: true
+            }).datagrid('enableCellEditing').datagrid('gotoCell', {
+                index: 0,
+                idField: 'id',
+                field: 'name'
+            });
+        });
+
         // Скрипты для главного меню документа
         function saveDoc(doc_id) {
             var doc_form = $('#doc-req-fm-consignment-' + doc_id);
