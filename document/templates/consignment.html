@@ -88,9 +88,9 @@
                                 {field:'price',title:'Price',width:'10%'},
                                 {field:'attr2',title:'Attr',width:'10%'}
                             ]],
-                            idField: 'id',
+                            idField: 'name',
                             textField: 'name',
-                            treeField: 'name',
+                            treeField: 'id',
                             url:'/catalog/product/all/json/',
                             panelWidth: '50%'
                         }}">
@@ -99,9 +99,8 @@
                     <th data-options="field:'measure',width:'5%',align:'center', editor:{
                         type:'combogrid',
                         options:{
-                            valueField: 'name',
-                            textField:'name',
-                            idField:'id',
+                            valueField: 'id',
+                            idField:'name',
                             scrollbarSize:0,
                             url:'/system/measure/json/',
                             columns:[[
@@ -109,19 +108,20 @@
                                     ]]
                             }}"><strong>Ед. </strong>изм.<br><em>(шт., кг и т.д.)</em></th>
                     <th field="quantity" width="5%" align="center"
-                        editor="{type:'calcnumberbox',options:{precision:2}}">Кол-во<br><em>(единиц)</em></th>
+                        editor="{type:'numberbox',options:{precision:2}}">Кол-во<br><em>(единиц)</em></th>
                     <th field="country" width="10%" align="center"
                         editor="{type: 'combogrid', options:{
-                            valueField: 'name',
+                            idField: 'name',
+                            valueField: 'id',
                             url:'/system/country/json/',
                             columns:[[
                                     {field:'name',title:'Страна изготовитель',width:'100%'},
                                     ]]
                             }}"><p>Страна<br>изготовитель</p></th>
                     <th field="cost" width="10%" align="center"
-                        editor="{type:'calcnumberbox',options:{precision:2}}"><p>Цена<br>за единицу</p></th>
+                        editor="{type:'numberbox',options:{precision:2}}"><p>Цена<br>за единицу</p></th>
                     <th field="total" width="5%" align="center"
-                        editor="{type:'calcnumberbox',options:{precision:2}}">Сумма
+                        editor="{type:'numberbox',options:{precision:2}}">Сумма
                     </th>
                 </tr>
                 </thead>
