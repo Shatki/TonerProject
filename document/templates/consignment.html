@@ -96,7 +96,7 @@
                         }}">
                         <div align="center">Наименование товара, работ, услуг</div>
                     </th>
-                    <th data-options="field:'measure',width:'5%',align:'center', editor:{
+                    <th data-options="field:'measure', width:'5%', align:'center', editor:{
                         type:'combogrid',
                         options:{
                             valueField: 'id',
@@ -104,24 +104,38 @@
                             scrollbarSize:0,
                             url:'/system/measure/json/',
                             columns:[[
-                                    {field:'name',title:'Ед. изм.',width:'100%'},
+                                    {field:'name',
+                                     title:'Ед. изм.',
+                                     width:'100%'},
                                     ]]
                             }}"><strong>Ед. </strong>изм.<br><em>(шт., кг и т.д.)</em></th>
-                    <th field="quantity" width="5%" align="center"
-                        editor="{type:'numberbox',options:{precision:2}}">Кол-во<br><em>(единиц)</em></th>
-                    <th field="country" width="10%" align="center"
-                        editor="{type: 'combogrid', options:{
+                    <th data-options="field:'quantity', width:'5%', align:'center', editor:{
+                        type:'numberbox',
+                        options:{
+                            precision:2
+                            }}">Кол-во<br><em>(единиц)</em></th>
+                    <th data-options="field:'country', width:'10%', align:'center', editor:{
+                        type: 'combogrid',
+                        options:{
                             idField: 'name',
                             valueField: 'id',
                             url:'/system/country/json/',
                             columns:[[
-                                    {field:'name',title:'Страна изготовитель',width:'100%'},
+                                    {field:'name',
+                                     title:'Страна изготовитель',
+                                     width:'100%'},
                                     ]]
                             }}"><p>Страна<br>изготовитель</p></th>
-                    <th field="cost" width="10%" align="center"
-                        editor="{type:'numberbox',options:{precision:2}}"><p>Цена<br>за единицу</p></th>
-                    <th field="total" width="5%" align="center"
-                        editor="{type:'numberbox',options:{precision:2}}">Сумма
+                    <th data-options="field:'cost', width:'10%', align:'center', editor:{
+                        type:'numberbox',
+                        options:{
+                            precision:2
+                            }}"><p>Цена<br>за единицу</p></th>
+                    <th data-options="field:'total', width:'5%', align:'center', editor:{
+                        type:'numberbox',
+                        options:{
+                            precision:2
+                            }}">Сумма
                     </th>
                 </tr>
                 </thead>
@@ -142,8 +156,6 @@
     </div>
 {% endblock docview %}
 
-
-
 {% block doc-scripts %}
     <script type="text/javascript">
         $(function () {
@@ -154,6 +166,40 @@
                 index: 0,
                 idField: 'id',
                 field: 'name'
+            }).datagrid({
+                onAfterEdit: function (rowIndex, row, changes) {
+                    //alert(changes.toSource());
+                    if (changes) {
+                        if (changes.cost) {
+                            //alert(changes.cost);
+                            // autosumm column   total = quantity * cost
+                            $(this).datagrid('updateRow', {
+                                index: rowIndex,
+                                row: {
+                                    total: row.cost * row.quantity
+                                }
+                            });
+                        } else if (changes.quantity) {
+                            //alert(changes.quantity);
+                            // autosumm column   total = quantity * cost
+                            $(this).datagrid('updateRow', {
+                                index: rowIndex,
+                                row: {
+                                    total: row.cost * row.quantity
+                                }
+                            });
+                        } else if (changes.total) {
+                            //alert(changes.total);
+                            // autosumm column   cost = total / quantity
+                            $(this).datagrid('updateRow', {
+                                index: rowIndex,
+                                row: {
+                                    cost: row.total / row.quantity
+                                }
+                            });
+                        }
+                    }
+                }
             });
         });
 
