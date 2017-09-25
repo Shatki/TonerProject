@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="keywords" content="jquery,ui,easy,easyui,web">
+    <meta name="description" content="easyui help you build your web page easily!">
+    <title>Dynamic Loading TreeGrid - jQuery EasyUI Demo</title>
+    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/demo/demo.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="http://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+</head>
+<body>
+<h2>Dynamic Loading TreeGrid</h2>
+
+<div class="demo-info" style="margin-bottom:10px">
+    <div class="demo-tip icon-tip">&nbsp;</div>
+    <div>Click the node expand button to load its child nodes.</div>
+</div>
+
+<table title="Products" class="easyui-treegrid" style="width:700px;height:300px"
+       url="treegrid3_getdata.php"
+       rownumbers="true"
+       idField="id" treeField="name">
+    <thead>
+    <tr>
+        <th field="name" width="250">Name</th>
+        <th field="quantity" width="100" align="right">Quantity</th>
+        <th field="price" width="150" align="right" formatter="formatDollar">Price</th>
+        <th field="total" width="150" align="right" formatter="formatDollar">Total</th>
+    </tr>
+    </thead>
+</table>
+<script>
+    function formatDollar(value) {
+        if (value) {
+            return '$' + value;
+        } else {
+            return '';
+        }
+    }
+</script>
+</body>
+</html>

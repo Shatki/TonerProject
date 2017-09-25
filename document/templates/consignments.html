@@ -137,7 +137,7 @@
         }
 
         // СДЕЛАТЬ смена даты на панели журнала накладных
-        function renameConsignmentTab() {
+        function renameDocumentTab() {
             $('#common-tab').title()
         }
 
@@ -203,6 +203,22 @@
 
 {% block common-scripts %}
     <script type="text/javascript">
+        function formatDollar(value) {
+            if (value) {
+                return '$' + value;
+            } else {
+                return '';
+            }
+        }
+
+        function formatRouble(value) {
+            if (value) {
+                return 'P' + value;
+            } else {
+                return '';
+            }
+        }
+
         function newDocument(date) {
             addTab('Новая накладная от ' + date, '../consignment/new/');
         }

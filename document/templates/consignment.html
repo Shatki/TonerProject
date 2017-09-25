@@ -130,7 +130,7 @@
                         type:'numberbox',
                         options:{
                             precision:2
-                            }}"><p>Цена<br>за единицу</p></th>
+                            }}" formatter="formatDollar"><p>Цена<br>за единицу</p></th>
                     <th data-options="field:'total', width:'5%', align:'center', editor:{
                         type:'numberbox',
                         options:{
@@ -171,12 +171,12 @@
                     //alert(changes.toSource());
                     if (changes) {
                         if (changes.cost) {
-                            //alert(changes.cost);
+                            //alert(ed.toSource);
                             // autosumm column   total = quantity * cost
                             $(this).datagrid('updateRow', {
                                 index: rowIndex,
                                 row: {
-                                    total: row.cost * row.quantity
+                                    total: (row.cost * row.quantity).toFixed(2)
                                 }
                             });
                         } else if (changes.quantity) {
@@ -185,7 +185,7 @@
                             $(this).datagrid('updateRow', {
                                 index: rowIndex,
                                 row: {
-                                    total: row.cost * row.quantity
+                                    total: (row.cost * row.quantity).toFixed(2)
                                 }
                             });
                         } else if (changes.total) {
@@ -194,7 +194,7 @@
                             $(this).datagrid('updateRow', {
                                 index: rowIndex,
                                 row: {
-                                    cost: row.total / row.quantity
+                                    cost: (row.total / row.quantity).toFixed(2)
                                 }
                             });
                         }
