@@ -1,6 +1,6 @@
 /**
- * jQuery EasyUI 1.5.2
- *
+ * EasyUI for jQuery 1.5.3
+ * 
  * Copyright (c) 2009-2017 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
@@ -139,6 +139,7 @@
         var _18 = $.data(e.data.target, "draggable");
         var _19 = _18.proxy;
         var _1a = _18.options;
+        _1a.onEndDrag.call(e.data.target, e);
         if (_1a.revert) {
             if (_1b() == true) {
                 $(e.data.target).css({position: e.data.startPosition, left: e.data.startLeft, top: e.data.startTop});
@@ -189,7 +190,7 @@
                             top: e.data.startTop
                         });
                     }
-                    $(this).trigger("_drop", [e.data.target]);
+                    $(this).triggerHandler("_drop", [e.data.target]);
                     _1d();
                     _1e = true;
                     this.entered = false;
@@ -336,6 +337,8 @@
         onStartDrag: function (e) {
         },
         onDrag: function (e) {
+        },
+        onEndDrag: function (e) {
         },
         onStopDrag: function (e) {
         }

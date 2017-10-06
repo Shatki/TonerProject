@@ -172,7 +172,8 @@ def consignment_items_json(request, consignment_id):
             quantity=str(get_one.quantity),
             country=str(get_one.country),
             cost=str(get_one.cost),
-            tax=str(get_one.tax),
+            tax=str(get_one.tax.value * get_one.cost),
+            total=str(get_one.quantity * get_one.cost),
         )
         rows.append(obj)
     # final preparing

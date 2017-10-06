@@ -1,6 +1,6 @@
 /**
- * jQuery EasyUI 1.5.2
- *
+ * EasyUI for jQuery 1.5.3
+ * 
  * Copyright (c) 2009-2017 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
@@ -8,7 +8,7 @@
  *
  */
 /**
- * combobox - jQuery EasyUI
+ * combobox - EasyUI for jQuery
  * 
  * Dependencies:
  *   combo
@@ -548,6 +548,7 @@
 			var row = {};
 			row[opts.valueField] = t.attr('value') != undefined ? t.attr('value') : t.text();
 			row[opts.textField] = t.text();
+			row['iconCls'] = $.parser.parseOptions(el, ['iconCls']).iconCls;
 			row['selected'] = t.is(':selected');
 			row['disabled'] = t.is(':disabled');
 			if (group) {
@@ -658,7 +659,15 @@
 							if (opts.reversed) {
 								$(target).combobox('setValues', $(target).combobox('getValues'));
 							} else if (opts.limitToList) {
-								doEnter(target);
+								//doEnter(target);
+								var vv = [];
+								$.map($(target).combobox('getValues'), function (v) {
+									var index = $.easyui.indexOfArray($(target).combobox('getData'), opts.valueField, v);
+									if (index >= 0) {
+										vv.push(v);
+									}
+								});
+								$(target).combobox('setValues', vv);
 							}
 							opts.blurTimer = null;
 						}

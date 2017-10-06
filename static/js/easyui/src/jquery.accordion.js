@@ -1,6 +1,6 @@
 /**
- * jQuery EasyUI 1.5.2
- *
+ * EasyUI for jQuery 1.5.3
+ * 
  * Copyright (c) 2009-2017 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
@@ -8,14 +8,14 @@
  *
  */
 /**
- * accordion - jQuery EasyUI
+ * accordion - EasyUI for jQuery
  * 
  * Dependencies:
  *     panel
  * 
  */
 (function ($) {
-
+	
 	// function setSize(container, param){
 	// 	var state = $.data(container, 'accordion');
 	// 	var opts = state.options;

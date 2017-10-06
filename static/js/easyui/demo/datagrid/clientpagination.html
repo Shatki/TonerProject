@@ -89,7 +89,7 @@
                     opts.onBeforeLoad = function (param) {
                         state.allRows = null;
                         return onBeforeLoad.call(this, param);
-                    }
+                        }
                     var pager = dg.datagrid('getPager');
                     pager.pagination({
                         onSelectPage: function (pageNum, pageSize) {
@@ -105,7 +105,7 @@
                     $(this).datagrid('loadData', state.data);
                     if (opts.url) {
                         $(this).datagrid('reload');
-                    }
+                        }
                 });
             },
             loadData: function (jq, data) {

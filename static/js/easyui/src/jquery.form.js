@@ -1,6 +1,6 @@
 /**
- * jQuery EasyUI 1.5.2
- *
+ * EasyUI for jQuery 1.5.3
+ * 
  * Copyright (c) 2009-2017 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
@@ -8,7 +8,7 @@
  *
  */
 /**
- * form - jQuery EasyUI
+ * form - EasyUI for jQuery
  * 
  */
 (function ($) {
@@ -191,7 +191,7 @@
 
 	/**
 	 * load form data
-	 * if data is a URL string type load from remote site,
+	 * if data is a URL string type load from remote site, 
 	 * otherwise load from local data object. 
 	 */
 	function load(target, data) {
@@ -479,7 +479,7 @@
 	};
 
 	$.fn.form.defaults = {
-		fieldTypes: ['combobox', 'combotree', 'combogrid', 'combotreegrid', 'datetimebox', 'datebox', 'combo',
+		fieldTypes: ['tagbox', 'combobox', 'combotree', 'combogrid', 'combotreegrid', 'datetimebox', 'datebox', 'combo',
 			'datetimespinner', 'timespinner', 'numberspinner', 'spinner',
 			'slider', 'searchbox', 'numberbox', 'passwordbox', 'filebox', 'textbox', 'switchbutton'],
 		novalidate: false,

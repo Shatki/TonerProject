@@ -1,6 +1,6 @@
 /**
- * jQuery EasyUI 1.5.2
- *
+ * EasyUI for jQuery 1.5.3
+ * 
  * Copyright (c) 2009-2017 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
@@ -490,6 +490,7 @@
         _7c.each(function () {
             $(this).resizable({
                 handles: _7d,
+                edge: _79.resizeEdge,
                 disabled: ($(this).attr("resizable") ? $(this).attr("resizable") == "false" : false),
                 minWidth: 25,
                 onStartResize: function (e) {
@@ -498,7 +499,12 @@
                     if (!_77.proxy) {
                         _77.proxy = $("<div class=\"datagrid-resize-proxy\"></div>").appendTo(dc.view);
                     }
-                    _77.proxy.css({left: e.pageX - $(_78).offset().left - 1, display: "none"});
+                    if (e.data.dir == "e") {
+                        e.data.deltaEdge = $(this)._outerWidth() - (e.pageX - $(this).offset().left);
+                    } else {
+                        e.data.deltaEdge = $(this).offset().left - e.pageX - 1;
+                    }
+                    _77.proxy.css({left: e.pageX - $(_78).offset().left - 1 + e.data.deltaEdge, display: "none"});
                     setTimeout(function () {
                         if (_77.proxy) {
                             _77.proxy.show();
@@ -506,7 +512,7 @@
                     }, 500);
                 },
                 onResize: function (e) {
-                    _77.proxy.css({left: e.pageX - $(_78).offset().left - 1, display: "block"});
+                    _77.proxy.css({left: e.pageX - $(_78).offset().left - 1 + e.data.deltaEdge, display: "block"});
                     return false;
                 },
                 onStopResize: function (e) {
@@ -514,7 +520,7 @@
                     $(this).css("height", "");
                     var _7e = $(this).parent().attr("field");
                     var col = _74(_76, _7e);
-                    col.width = $(this)._outerWidth();
+                    col.width = $(this)._outerWidth() + 1;
                     col.boxWidth = col.width - col.deltaWidth;
                     col.auto = undefined;
                     $(this).css("width", "");
@@ -1168,7 +1174,7 @@
         if (_112.length) {
             var _113 = _112.pagination("options");
             if (_113.total != data.total) {
-                _112.pagination("refresh", {total: data.total});
+                _112.pagination("refresh", {pageNumber: opts.pageNumber, total: data.total});
                 if (opts.pageNumber != _113.pageNumber && _113.pageNumber > 0) {
                     opts.pageNumber = _113.pageNumber;
                     _bf(_10d);
@@ -1776,6 +1782,7 @@
             $.extend(_1ab, {sort: opts.sortName, order: opts.sortOrder});
         }
         if (opts.onBeforeLoad.call(_1a9, _1ab) == false) {
+            opts.view.setEmptyMsg(_1a9);
             return;
         }
         $(_1a9).datagrid("loading");
@@ -1791,6 +1798,7 @@
         });
         if (_1ac == false) {
             $(_1a9).datagrid("loaded");
+            opts.view.setEmptyMsg(_1a9);
         }
     };
     function _1ad(_1ae, _1af) {
@@ -1872,7 +1880,6 @@
                 if (data.total > 0) {
                     $(this).datagrid("loadData", data);
                 } else {
-                    opts.view.setEmptyMsg(this);
                     $(this).datagrid("autoSizeColumn");
                 }
             }
@@ -2330,7 +2337,7 @@
     var _20d = {
         render: function (_20e, _20f, _210) {
             var rows = $(_20e).datagrid("getRows");
-            $(_20f).html(this.renderTable(_20e, 0, rows, _210));
+            $(_20f).empty().html(this.renderTable(_20e, 0, rows, _210));
         }, renderFooter: function (_211, _212, _213) {
             var opts = $.data(_211, "datagrid").options;
             var rows = $.data(_211, "datagrid").footer || [];
@@ -2595,6 +2602,7 @@
         columns: undefined,
         fitColumns: false,
         resizeHandle: "right",
+        resizeEdge: 5,
         autoRowHeight: true,
         toolbar: null,
         striped: false,

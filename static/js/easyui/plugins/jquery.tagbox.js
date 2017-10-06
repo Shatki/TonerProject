@@ -1,6 +1,6 @@
 /**
- * jQuery EasyUI 1.5.2
- *
+ * EasyUI for jQuery 1.5.3
+ * 
  * Copyright (c) 2009-2017 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
@@ -197,6 +197,10 @@
         }, setValues: function (jq, _3b) {
             return jq.each(function () {
                 _33(this, _3b);
+            });
+        }, reset: function (jq) {
+            return jq.each(function () {
+                $(this).combobox("reset").combobox("setText", "");
             });
         }
     };

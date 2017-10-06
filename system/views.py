@@ -8,7 +8,6 @@ from system.models import Product, Features, Developer, Type, Country, Category,
 
 
 # Create your views here.
-
 def product_view(request, product_id):
     args = {}
     args.update(csrf(request))
@@ -59,6 +58,53 @@ def measure_json(request):
 
 
 def products_json(request):
+    """
+        Обработка POST запроса на предоставление JSON каталога продукции из базы
+        Иерархия создается на Фронтэнде
+        - При первом запросе, т.е  id = 0 или None выдаем дерево каталога
+        - При id > 0 or id != None выдаем содержание родительского узла из базы
+    """
+    # Запрос содержания узла категории
+    node_id = request.POST.get('id')
+    response = []
+    if not node_id or node_id == 0:
+        try:
+            categories = Category.objects.all().order_by('name')
+        except Product.DoesNotExist:
+            return HttpResponse(u"Ошибка product_json. Запрос узла %s Ошибка БД" % node_id, content_type='text/html')
+        # Сначала идут категории
+        for category in categories:
+            # Создание обычного элемента категории
+            parent_id = 'DIR-' + str(category.parent_id or 0)
+            item = dict(
+                id='DIR-' + str(category.id),
+                parentId=parent_id,
+                name=str(category),  # Наименование категории
+                # iconCls="icon-print",      # Иконка категории, нужна?
+                state='closed',
+            )
+            response.append(item)
+    else:
+        try:
+            products = Product.objects.filter(category_id=node_id[4:]).order_by('name')
+        except Product.DoesNotExist:
+            return HttpResponse(u"Ошибка product_json. Запрос узла %s Ошибка БД" % node_id, content_type='text/html')
+        for product in products:
+            # Создание обычного элемента с заполнением его значений
+            item = dict(
+                id='ITM-' + str(product.id),
+                parentId=str(node_id or 0),
+                name=str(product),  # Наименование продукта
+                iconCls="icon-print",  # Иконка продукта, нужна?
+                state='open',
+            )
+            response.append(item)
+    return JsonResponse(response, safe=False)
+
+
+def products_all_json(request):
+    # Запрос общего списка продукции в базе
+    # с создание JSON иерархии в бэкэнде
     try:
         categories = Category.objects.all()
         products = Product.objects.all().order_by('name')
@@ -78,7 +124,7 @@ def products_json(request):
                 name = str(product)
                 # Создание обычного элемента с заполнением его значений
                 elem = dict(
-                    id='p' + str(product.id),
+                    id='ITEM-' + str(product.id),
                     name=name,  # Наименование продукта
                     iconCls="icon-print",  # Иконка продукта, нужна?
                 )
@@ -96,7 +142,7 @@ def products_json(request):
             else:
                 # Корневая директория??? Сюда не должно попадать
                 lists.append({
-                    'id': 'c' + str(category.id),
+                    'id': 'DIR-' + str(category.id),
                     'name': category.name,
                     'iconCls': "icon-save",  # Иконка категории
                     'children': dirs,
@@ -122,7 +168,7 @@ def products_json(request):
             if len(dirs):
                 if category.parent:
                     dirs = dict(
-                        id='c' + str(category.id),
+                        id='DIR-' + str(category.id),
                         name=category.name,
                         iconCls="icon-save",  # Иконка категории
                         children=dirs,
@@ -131,7 +177,7 @@ def products_json(request):
                     still = True
                 else:
                     response.append({
-                        'id': 'c' + str(category.id),
+                        'id': 'DIR-' + str(category.id),
                         'name': category.name,
                         'iconCls': "icon-save",  # Иконка категории
                         'children': dirs,
