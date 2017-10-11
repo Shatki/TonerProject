@@ -67,7 +67,7 @@ def products_json(request):
     # Запрос содержания узла категории
     node_id = request.POST.get('id')
     response = []
-    if not node_id or node_id == 0:
+    if not node_id or node_id == 'DIR-0':
         try:
             categories = Category.objects.all().order_by('name')
         except Product.DoesNotExist:
@@ -77,7 +77,7 @@ def products_json(request):
             # Создание обычного элемента категории
             parent_id = 'DIR-' + str(category.parent_id or 0)
             item = dict(
-                id='DIR-' + str(category.id),
+                itemId='DIR-' + str(category.id),
                 parentId=parent_id,
                 name=str(category),  # Наименование категории
                 # iconCls="icon-print",      # Иконка категории, нужна?
@@ -92,7 +92,7 @@ def products_json(request):
         for product in products:
             # Создание обычного элемента с заполнением его значений
             item = dict(
-                id='ITM-' + str(product.id),
+                itemId='ITM-' + str(product.id),
                 parentId=str(node_id or 0),
                 name=str(product),  # Наименование продукта
                 iconCls="icon-print",  # Иконка продукта, нужна?

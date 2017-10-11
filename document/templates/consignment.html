@@ -73,7 +73,7 @@
                     {% if consignment.id %}
                    url="/document/consignment/{{ consignment.id }}/items/json/"
                     {% endif %}
-                   idField="id" toolbar="#item-toolbar" pagination="true" rownumbers="true"
+                   idField="id" textField='name' toolbar="#item-toolbar" pagination="true" rownumbers="true"
                    fitColumns="true" singleSelect="true">
                 <thead>
                 <tr>
@@ -83,12 +83,11 @@
                         type: 'combotreegrid',
                         options: {
                             columns: [[
-                                {field:'id',title:'Item ID',width:'10%'},
+                                {field:'itemId',title:'Item ID',width:'10%'},
                                 {field:'name',title:'Name',width:'70%'},
                                 {field:'parentId',title:'parentId',width:'10%'}
                             ]],
-                            idField: 'id',
-                            textField: 'name',
+                            idField: 'itemId',
                             treeField: 'name',
                             url:'/catalog/product/json/',
                             animate:true,
@@ -100,8 +99,8 @@
                     <th data-options="field:'measure', width:'5%', align:'center', editor:{
                         type:'combogrid',
                         options:{
-                            valueField: 'id',
-                            idField:'name',
+                            idField:'id',
+                            textField: 'name',
                             scrollbarSize:0,
                             url:'/system/measure/json/',
                             columns:[[
@@ -118,8 +117,8 @@
                     <th data-options="field:'country', width:'10%', align:'center', editor:{
                         type: 'combogrid',
                         options:{
-                            idField: 'name',
-                            valueField: 'id',
+                            idField: 'id',
+                            textField: 'name',
                             url:'/system/country/json/',
                             columns:[[
                                     {field:'name',
@@ -164,165 +163,9 @@
 
 {% block doc-scripts %}
     <script type="text/javascript">
-        // Активация cell-editing функции, а также запуск дополнительных возможностей datagrid
         $(function () {
-            $('#item-table-consignment-' + '{{ consignment.id }}').datagrid({
-                clickToEdit: false,
-                dblclickToEdit: true
-            }).datagrid('enableCellEditing').datagrid('gotoCell', {
-                index: 0,
-                idField: 'id',
-                field: 'name'
-            }).datagrid({
-                onAfterEdit: function (rowIndex, row, changes) {
-                    // Автокалькуляция значений в строках
-                    if (changes) {
-                        if (changes.cost) {
-                            //alert(ed.toSource);
-                            // autosumm column   total = quantity * cost
-                            $(this).datagrid('updateRow', {
-                                index: rowIndex,
-                                row: {
-                                    total: (row.cost * row.quantity).toFixed(2)
-                                }
-                            });
-                        } else if (changes.quantity) {
-                            //alert(changes.quantity);
-                            // autosumm column   total = quantity * cost
-                            $(this).datagrid('updateRow', {
-                                index: rowIndex,
-                                row: {
-                                    total: (row.cost * row.quantity).toFixed(2)
-                                }
-                            });
-                        } else if (changes.total) {
-                            //alert(changes.total);
-                            // autosumm column   cost = total / quantity
-                            $(this).datagrid('updateRow', {
-                                index: rowIndex,
-                                row: {
-                                    cost: (row.total / row.quantity).toFixed(2)
-                                }
-                            });
-                        }
-                    }
-                }
-            });
+            enableDoc('#item-table-consignment-' + '{{ consignment.id }}');
         });
-
-        // Функция создание иерархии каталога продукции на Фронтэнде
-        function productLoadFilter(rows) {
-            function exists(rows, parentId) {
-                for (var i = 0; i < rows.length; i++) {
-                    if (rows[i].id == parentId) return true;
-                }
-                return false;
-            }
-
-            var nodes = [];
-            // get the top level nodes
-            for (var i = 0; i < rows.length; i++) {
-                var row = rows[i];
-                if (!exists(rows, row.parentId)) {
-                    nodes.push({
-                        id: row.id,
-                        name: row.name,
-                        state: row.state,
-                        parentId: row.parentId
-                        //добавить еще данные
-                    });
-                }
-            }
-            var toDo = [];
-            for (var i = 0; i < nodes.length; i++) {
-                toDo.push(nodes[i]);
-            }
-            while (toDo.length) {
-                var node = toDo.shift();    // the parent node
-                // get the children nodes
-                for (var i = 0; i < rows.length; i++) {
-                    var row = rows[i];
-                    if (row.parentId == node.id) {
-                        var child = {
-                            id: row.id,
-                            name: row.name,
-                            state: row.state,
-                            parentId: row.parentId
-                        };
-                        if (node.children) {
-                            node.children.push(child);
-                        } else {
-                            node.children = [child];
-                        }
-                        toDo.push(child);
-                    }
-                }
-            }
-            return nodes;
-        }
-
-        // Скрипты для главного меню документа
-        function saveDoc(doc_id) {
-            var doc_form = $('#doc-req-fm-consignment-' + doc_id);
-            // Записываем в том случае, если есть хотя бы одна позиция в таблице продукции
-            //alert($("#item-table-consignment-" + doc_id).datagrid('getData').total);
-            if ($("#item-table-consignment-" + doc_id).datagrid('getData').total > 0) {
-                if (doc_form.form('validate')) {
-                    var data = doc_form.serialize();
-                    $.ajax({
-                        url: '/document/consignment/' + doc_id + '/save/',
-                        method: 'POST',
-                        data: data,
-                        cache: false,
-                        success: function (data) {
-                            if (data == 'Ok') {
-                                // Пока кокой-то деревянный способ
-                                alert(' Документ успешно сохранен');
-                                //$('#item-add-dlg-consignment-' + doc_id).dialog('close');      // close the dialog
-                                //$('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
-                            } else {
-                                alert(data);
-                                // Данные получены кривые
-
-                            }
-                        }
-                    });
-
-                }
-            } else {
-                alert('Заполните таблицу товаров!');
-            }
-        }
-
-        function copyItem(doc_id) {
-            setCookie('copyItem', $("#item-table-consignment-" + doc_id).datagrid('getSelected').id);
-        }
-
-        // Вставка скопированного элемента из буфера
-        function pasteItem(doc_id) {
-            $.ajax({
-                url: '/document/consignment/' + doc_id + '/item/paste/',
-                method: 'POST',
-                data: {'item': getCookie('copyItem')},
-                cache: false,
-                success: function (data) {
-                    if (data == 'Ok') {
-                        // Пока кокой-то деревянный способ
-                        // alert('Данные получены');
-                        $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
-                    } else {
-                        alert(data);
-                        // Данные получены кривые
-                        // location.href = "#";
-                        // location.reload();
-                    }
-                }
-            });
-        }
-
-        // Дубликация элемента в документе
-        function dublicateItem(doc_id) {
-        }
     </script>
 
 {% endblock doc-scripts %}

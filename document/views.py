@@ -168,6 +168,7 @@ def consignment_items_json(request, consignment_id):
         obj = dict(
             id=str(get_one.id),
             name=str(get_one.item),
+            productid=str(get_one.id),  # Потом сделать артикулом
             measure=str(get_one.measure),
             quantity=str(get_one.quantity),
             country=str(get_one.country),
