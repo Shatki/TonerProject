@@ -31,6 +31,18 @@
 
         {% block maintab %}
             <div id="docs" title="Журнал накладных">
+
+                {% block docdate %}
+                    <div style="margin: 5px 20px 5px 20px">
+                        От: <input class="easyui-datebox" name="date" required="required" style="width: 285px"
+                                   data-options="panelWidth:285,currentText:'Сегодня',closeText:'Закрыть',
+                       onChange:function(date){renameDocTab(0,date)}">
+                        До: <input class="easyui-datebox" name="date" required="required" style="width: 285px"
+                                   data-options="panelWidth:285,currentText:'Сегодня',closeText:'Закрыть',
+                       onChange:function(date){renameDocTab(0,date)}">
+                    </div>
+                {% endblock docdate %}
+
                 {% block doctable %}
                     <table id="common-tab" title="Журнал накладных за 31/10/1985 - 26/01/2017" class="easyui-datagrid"
                            url="/document/consignment/all/json/"
@@ -53,11 +65,11 @@
                     {% block doctable-menu %}
                         <div id="toolbar">
                             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
-                               onclick="newDocument('{{ system_date }}')">Создать</a>
+                               onclick="newDoc('{{ system_date }}')">Создать</a>
                             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
-                               onclick="editDocument()">Редактировать</a>
+                               onclick="editDoc()">Редактировать</a>
                             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
-                               onclick="destroyDocument()">Удалить</a>
+                               onclick="destroyDoc()">Удалить</a>
                         </div>
                     {% endblock doctable-menu %}
 
@@ -68,7 +80,7 @@
 
     {% block buttons %}
         <div id="dlg-buttons">
-            <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="savedocument()"
+            <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveDoc()"
                style="width:90px">Save</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
                onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Cancel</a>
@@ -101,156 +113,9 @@
     {% include "popup_menu.html" %}
 {% endblock popup-menu %}
 
-{% block mainscripts %}
+{% block scripts %}
     <script type="text/javascript">
-        function addTab(title, url) {
-            if ($('#doc-tab').tabs('exists', title)) {
-                $('#doc-tab').tabs('select', title);
-            } else {
-                $.ajax({
-                    url: url,
-                    cache: true,
-                    success: function (html) {
-                        $('#doc-tab').tabs('add', {
-                            //id: index,
-                            title: title,
-                            content: html,
-                            closable: true
-                        });
-                    }
-                });
-            }
-        }
-
-        function closeDoc() {
-            var jqtab = $('#doc-tab');
-            var t = jqtab.tabs('getSelected');
-            var index = jqtab.tabs('getTabIndex', t);
-            // Общий журнал не закрывается
-            if (index) {
-                jqtab.tabs('close', index);
-            }
-        }
-
-        function printDoc(doc_id) {
-            window.open('/form/consignment/' + doc_id + '/print/pdf/', '_blank');
-            //location.href='/form/consignment/' + doc_id +'/print/pdf/';
-        }
-
-        // СДЕЛАТЬ смена даты на панели журнала накладных
-        function renameDocumentTab() {
-            $('#common-tab').title()
-        }
-
-        // Смена наименования панели
-        function renameTab(number, date) {
-            var jqtab = $('#doc-tab');
-            var t = jqtab.tabs('getSelected');
-            var titleParts = t.panel('options').title.split(" ", 5);
-
-            if (!number) {
-                number = titleParts[2];
-            }
-            if (titleParts[4]) {
-                // Наименование будет из 5  частей
-                if (!date) {
-                    date = titleParts[4];
-                }
-            } else {
-                // Наименование будет из 4  частей
-                if (!date) {
-                    date = titleParts[3];
-                }
-            }
-
-            var title = 'Накладная № ' + number + ' от ' + date;
-
-            jqtab.tabs('updateTitle', {
-                tab: t,
-                title: title
-            });
-        }
-
-        // EASYUI переименование tabs без перезагрузки
-        $.extend($.fn.tabs.methods, {
-            updateTitle: function (jq, param) {
-                return jq.each(function () {
-                    var t = $(param.tab);
-                    var opts = t.panel('options');
-                    opts.title = param.title;
-                    opts.tab.find('.tabs-title').html(param.title);
-                })
-            }
-        });
-
-        // Методы для управления выводом datebox
-        $.fn.datebox.defaults.parser = function (s) {
-            var dateParts = s.split("/", 3);
-            if (dateParts[0] != s) {
-                return new Date(dateParts[2], (dateParts[1] - 1), dateParts[0]);
-            } else {
-                return new Date();
-            }
-        };
-
-        $.fn.datebox.defaults.formatter = function (date) {
-            var y = date.getFullYear();
-            var m = date.getMonth() + 1;
-            var d = date.getDate();
-            return d + '/' + m + '/' + y;
-        };
     </script>
-{% endblock mainscripts %}
+{% endblock scripts %}
 
-{% block common-scripts %}
-    <script type="text/javascript">
-        function formatDollar(value) {
-            if (value) {
-                return '$' + value;
-            } else {
-                return '';
-            }
-        }
-
-        function formatRouble(value) {
-            if (value) {
-                return 'P' + value;
-            } else {
-                return '';
-            }
-        }
-
-        function newDocument(date) {
-            addTab('Новая накладная от ' + date, '../consignment/new/');
-        }
-
-        function editDocument() {
-            var row = $('#common-tab').datagrid('getSelected');
-            if (row) {
-                addTab(row.name, '/document/consignment/' + row.id + '/edit/');
-            }
-        }
-
-        function destroyDocument() {
-            var row = $('#common-tab').datagrid('getSelected');
-            if (row) {
-                $.ajax({
-                    method: 'POST',
-                    url: '/document/consignment/' + row.id + '/delete/',
-                    cache: false,
-                    success: function () {
-                        $('#common-tab').datagrid('reload');
-                    }
-                });
-            }
-        }
-
-        $(document).ready(function () {
-            if (!navigator.cookieEnabled) {
-                alert('Включите cookie для комфортной работы с этим сайтом');
-            }
-        })
-
-    </script>
-{% endblock common-scripts %}
 
