@@ -79,7 +79,7 @@ def products_json(request):
             item = dict(
                 itemId='DIR-' + str(category.id),
                 parentId=parent_id,
-                name=str(category),  # Наименование категории
+                itemName=str(category),  # Наименование категории
                 # iconCls="icon-print",      # Иконка категории, нужна?
                 state='closed',
             )
@@ -94,7 +94,7 @@ def products_json(request):
             item = dict(
                 itemId='ITM-' + str(product.id),
                 parentId=str(node_id or 0),
-                name=str(product),  # Наименование продукта
+                itemName=str(product),  # Наименование продукта
                 iconCls="icon-print",  # Иконка продукта, нужна?
                 state='open',
             )

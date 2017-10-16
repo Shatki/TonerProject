@@ -164,11 +164,13 @@ def consignment_items_json(request, consignment_id):
         return HttpResponse(u'items_json: Error DB', content_type='text/html')
     # Serialize
     rows = []
+    item_id = 0
     for get_one in items:
+        item_id += 1
         obj = dict(
-            id=str(get_one.id),
-            name=str(get_one.item),
-            productid=str(get_one.id),  # Потом сделать артикулом
+            itemId=str(item_id),
+            itemName=str(get_one.item),
+            productId=str(get_one.id),
             measure=str(get_one.measure),
             quantity=str(get_one.quantity),
             country=str(get_one.country),
@@ -199,9 +201,9 @@ def consignment_item_add(request, consignment_id):
             new_item = item_add(request, product_id)
             if new_item:
                 Consignment.items.create(  # ????
-                    item=new_item,
-                    consignment_id=consignment_id,
-                )
+                                           item=new_item,
+                                           consignment_id=consignment_id,
+                                           )
             else:
                 return HttpResponse("item_add: DB error", content_type='text/html')
         except:
@@ -234,7 +236,6 @@ def consignment_item_paste(request, consignment_id):
         return HttpResponse("Ok", content_type='text/html')
     else:
         return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
-
 
 
 @csrf_protect

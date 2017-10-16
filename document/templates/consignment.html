@@ -2,7 +2,7 @@
     <div style="width:100%;height:100%;padding:0">
 
         {% block index %}
-            <div id="consignment-id" hidden="hidden">{{ consignment.id }}</div>
+            <div id="doc-id" hidden="hidden">{{ consignment.id }}</div>
         {% endblock index %}
 
         {% block mainmenu %}
@@ -79,16 +79,16 @@
                 <tr>
                     <th field="ck" checkbox="true"></th>
                     <th field="id" align="center">id</th>
-                    <th data-options="field:'name',width:'30%', editor:{
+                    <th data-options="field:'itemName',width:'30%', editor:{
                         type: 'combotreegrid',
                         options: {
                             columns: [[
                                 {field:'itemId',title:'Item ID',width:'10%'},
-                                {field:'name',title:'Name',width:'70%'},
+                                {field:'itemName',title:'Name',width:'70%'},
                                 {field:'parentId',title:'parentId',width:'10%'}
                             ]],
                             idField: 'itemId',
-                            treeField: 'name',
+                            treeField: 'itemName',
                             url:'/catalog/product/json/',
                             animate:true,
                             panelWidth: '50%',
@@ -148,11 +148,11 @@
                 {% block itemtable-menu %}
                     <div id="item-toolbar-{{ consignment.id }}">
                         <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
-                           onclick="addItem({{ consignment.id }})">Добавить</a>
+                           onclick="addItem('#item-table-consignment-' + '{{ consignment.id }}')">Добавить</a>
                         <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
-                           onclick="editItem({{ consignment.id }})">Редактировать</a>
+                           onclick="editItem('#item-table-consignment-' + '{{ consignment.id }}')">Редактировать</a>
                         <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
-                           onclick="deleteItem({{ consignment.id }})">Удалить</a>
+                           onclick="deleteItem('#item-table-consignment-' + '{{ consignment.id }}')">Удалить</a>
                     </div>
                 {% endblock itemtable-menu %}
 

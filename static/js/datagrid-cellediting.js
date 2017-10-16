@@ -444,7 +444,7 @@
 				}
 			}
 			opts.oldOnClickCell.call(this, index, field, value);
-		}
+		};
 		if (opts.dblclickToEdit) {
 			opts.onDblClickCell = function (index, field, value) {
 				$(this).datagrid('editCell', {index: index, field: field});

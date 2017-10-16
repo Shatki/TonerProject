@@ -5,6 +5,11 @@
         <div data-options="iconCls:'icon-add'" onclick="popupMenuDispatcher('add');">Добавить</div>
         <div data-options="iconCls:'icon-edit'" onclick="popupMenuDispatcher('edit');">Изменить</div>
         <div data-options="iconCls:'icon-remove'" onclick="popupMenuDispatcher('remove');">Удалить</div>
+        <div class="menu-sep"></div>
+        <div data-options="iconCls:'icon-copy'" onclick="popupMenuDispatcher('copy');">Копировать</div>
+        <div data-options="iconCls:'icon-paste'" onclick="popupMenuDispatcher('paste');">Вставить</div>
+        <div data-options="iconCls:'icon-paste'" onclick="popupMenuDispatcher('dublicate');">Дублировать</div>
+        <div class="menu-sep"></div>
         <div data-options="iconCls:'icon-reload'" onclick="popupMenuDispatcher('reload')">Обновить</div>
         <div onclick="closeDoc()">Закрыть</div>
         <div class="menu-sep"></div>
@@ -49,68 +54,4 @@
         <div class="menu-sep"></div>
         <div>Выход</div>
     </div>
-
-    <script>
-        $(function () {
-            $(document).bind('contextmenu', function (e) {
-                e.preventDefault();
-                $('#mm').menu('show', {
-                    left: e.pageX,
-                    top: e.pageY
-                });
-            });
-        });
-
-        function popupMenuDispatcher(action) {
-            var tab = $('#doc-tab');
-            var selected = tab.tabs('getSelected');
-            var tabIndex = tab.tabs('getTabIndex', selected);
-            //alert(tabIndex);
-            if (tabIndex) {
-                // Действия с документами
-                switch (action) {
-                    case 'add':
-                        addItem($("<div/>",
-                                {"html": selected.panel('options').content}).find('#consignment-id').html());
-                        break;
-                    case 'edit':
-                        editItem($("<div/>",
-                                {"html": selected.panel('options').content}).find('#consignment-id').html());
-                        break;
-                    case 'remove':
-                        deleteItem($("<div/>",
-                                {"html": selected.panel('options').content}).find('#consignment-id').html());
-                        break;
-                    case 'reload':
-                        var doc_id = $("<div/>",
-                                {"html": selected.panel('options').content}).find('#consignment-id').html();
-                        $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
-                        break;
-                    case 'save':
-                        saveDoc($("<div/>",
-                                {"html": selected.panel('options').content}).find('#consignment-id').html());
-                        break;
-                    default:
-                        break;
-                }
-            } else {
-                switch (action) {
-                    case 'add':
-                        newDocument();
-                        break;
-                    case 'edit':
-                        editDocument();
-                        break;
-                    case 'remove':
-                        destroyDocument();
-                        break;
-                    case 'reload':
-                        $('#common-tab').datagrid('reload');
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    </script>
 {% endblock popup-menu %}

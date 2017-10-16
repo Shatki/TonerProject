@@ -1,3 +1,101 @@
+// В стадии разработки для созданияя плагина 'document'
+(function ($) {
+    var methods = {
+        'add': function (doc_id) {
+            var doc = $(doc_id);
+            var rowIndex = doc.datagrid('getRows').length;
+            doc.datagrid('insertRow', {
+                    index: rowIndex,
+                    row: {
+                        itemId: 'ITM-' + rowIndex + 1,
+                        itemName: 'Не выбран',
+                        measure: '-',   //Переделать
+                        country: '-',
+                        cost: '0.00',
+                        quantity: '0.00',
+                        tax: '0.00',
+                        total: '0.00'
+                    }
+                }
+            );
+            // autoedit 'item' field added's row
+            param = doc.datagrid('cell');
+            if (param) {
+                doc.datagrid('gotoCell', param).datagrid('editCell', param);
+            }
+        },
+        'edit': function (doc_id, param) {
+            //alert(doc_id);
+            var doc = $(doc_id);
+            if (!param) {
+                param = doc.datagrid('cell');
+                if (param) {
+                    doc.datagrid('gotoCell', param).datagrid('editCell', param);
+                }
+            }
+        },
+        'copy': function (doc_id) {
+            var doc = $(doc_id);
+            var rowIndex = doc.datagrid('cell').index;
+            //var row = doc.datagrid('getRows')[rowIndex];
+            setCookie('bufferItem', rowIndex);
+        },
+        'paste': function (doc_id) {
+            var doc = $(doc_id);
+            //Вставляем в конец списка
+            var rowIndex = doc.datagrid('getRows').length;
+            var row = doc.datagrid('getRows')[getCookie('bufferItem')];
+            row.itemId = rowIndex;
+            doc.datagrid('insertRow', {
+                    index: rowIndex,
+                    row: row
+                }
+            );
+            //$.ajax({
+            //    url: '/document/consignment/' + doc_id + '/item/paste/',
+            //    method: 'POST',
+            //    data: {'item': getCookie('copyItem')},
+            //    cache: false,
+            //    success: function (data) {
+            //        if (data == 'Ok') {
+            //            // Пока кокой-то деревянный способ
+            //            // alert('Данные получены');
+            //            $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
+            //        } else {
+            //            alert(data);
+            //            // Данные получены кривые
+            //            // location.href = "#";
+            //            // location.reload();
+            //        }
+            //    }
+            //});
+        },
+        'dublicate': function (doc_id) {
+            var doc = $(doc_id);
+            var rowIndex = doc.datagrid('cell').index;
+            var row = doc.datagrid('getRows')[rowIndex];
+            row.itemId = rowIndex;
+            doc.datagrid('insertRow', {
+                    index: rowIndex,
+                    row: row
+                }
+            );
+        }
+    };
+
+    $.fn.document = function (method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Метод с именем ' + method + ' не существует для jQuery.tooltip');
+        }
+    };
+})(jQuery);
+
+
+
 // Tab functions
 function addTab(title, url) {
     if ($('#doc-tab').tabs('exists', title)) {
@@ -8,7 +106,7 @@ function addTab(title, url) {
             cache: true,
             success: function (html) {
                 $('#doc-tab').tabs('add', {
-                    //id: index,
+                    //id: doc_id.substring(1),
                     title: title,
                     content: html,
                     closable: true
@@ -53,6 +151,67 @@ function renameDocTab() {
 }
 
 // Document functions
+// Активация cell-editing функции, а также запуск дополнительных возможностей datagrid
+function enableDoc(doc_id) {
+    $(doc_id).datagrid({
+        clickToEdit: false,
+        dblclickToEdit: true
+    }).datagrid('enableCellEditing').datagrid({
+        onEndEdit: function (rowIndex, row, changes) {
+            // get all changes
+            for (var name in changes) {
+                // Изменяем текствовое поле на  c id на name
+                var ed = $(this).datagrid('getEditor', {index: rowIndex, field: name});
+                row[name] = $(ed.target).combotreegrid('getText');
+
+                // Автокалькуляция значений в строках
+                if (changes.cost) {
+                    // autosumm column   total = quantity * cost
+                    $(this).datagrid('updateRow', {
+                        index: rowIndex,
+                        row: {
+                            total: (row.cost * row.quantity).toFixed(2)
+                        }
+                    });
+                } else if (changes.quantity) {
+                    //alert(changes.quantity);
+                    // autosumm column   total = quantity * cost
+                    $(this).datagrid('updateRow', {
+                        index: rowIndex,
+                        row: {
+                            total: (row.cost * row.quantity).toFixed(2)
+                        }
+                    });
+                } else if (changes.total) {
+                    //alert(changes.total);
+                    // autosumm column   cost = total / quantity
+                    $(this).datagrid('updateRow', {
+                        index: rowIndex,
+                        row: {
+                            cost: (row.total / row.quantity).toFixed(2)
+                        }
+                    });
+                }
+            }
+        },
+        onRowContextMenu: function (e, index, row) {
+            e.preventDefault();
+            $('#mm').menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
+            if (index >= 0) {
+                //($(this).datagrid('cell'));
+                //console.log(index);
+            } else {
+                alert(row.toSource());
+            }
+        }
+
+    });
+}
+
+
 function newDoc(date) {
     addTab('Новая накладная от ' + date, '../consignment/new/');
 }
@@ -91,56 +250,6 @@ function destroyDoc() {
             }
         });
     }
-}
-
-// Активация cell-editing функции, а также запуск дополнительных возможностей datagrid
-function enableDoc(doc_id) {
-    $(doc_id).datagrid({
-        clickToEdit: false,
-        dblclickToEdit: true
-    }).datagrid('enableCellEditing').datagrid('gotoCell', {
-        index: 0,
-        field: 'name'
-    }).datagrid({
-        onEndEdit: function (rowIndex, row, changes) {
-            // get all changes
-            for (var k in changes) {
-                // Изменяем текствовое поле на  c id на name
-                var ed = $(this).datagrid('getEditor', {index: rowIndex, field: k});
-                row[k] = $(ed.target).combotreegrid('getText');
-
-                // Автокалькуляция значений в строках
-                if (changes.cost) {
-                    // autosumm column   total = quantity * cost
-                    $(this).datagrid('updateRow', {
-                        index: rowIndex,
-                        row: {
-                            total: (row.cost * row.quantity).toFixed(2)
-                        }
-                    });
-                } else if (changes.quantity) {
-                    //alert(changes.quantity);
-                    // autosumm column   total = quantity * cost
-                    $(this).datagrid('updateRow', {
-                        index: rowIndex,
-                        row: {
-                            total: (row.cost * row.quantity).toFixed(2)
-                        }
-                    });
-                } else if (changes.total) {
-                    //alert(changes.total);
-                    // autosumm column   cost = total / quantity
-                    $(this).datagrid('updateRow', {
-                        index: rowIndex,
-                        row: {
-                            cost: (row.total / row.quantity).toFixed(2)
-                        }
-                    });
-                }
-            }
-        }
-
-    });
 }
 
 // Скрипты для главного меню документа
@@ -192,7 +301,7 @@ function productLoadFilter(rows) {
         if (!exists(rows, row.parentId)) {
             nodes.push({
                 itemId: row.itemId,
-                name: row.name,
+                itemName: row.itemName,
                 state: row.state,
                 parentId: row.parentId
                 //добавить еще данные
@@ -211,7 +320,7 @@ function productLoadFilter(rows) {
             if (row.parentId == node.itemId) {
                 var child = {
                     itemId: row.itemId,
-                    name: row.name,
+                    itemName: row.itemName,
                     state: row.state,
                     parentId: row.parentId
                 };
@@ -243,45 +352,177 @@ function formatRouble(value) {
     }
 }
 
-//  Item functions
+
+function editItem(doc_id, param) {
+    //alert(doc_id);
+    var doc = $(doc_id);
+    if (!param) {
+        param = doc.datagrid('cell');
+        if (param) {
+            doc.datagrid('gotoCell', param).datagrid('editCell', param);
+        }
+    }
+}
+
 function addItem(doc_id) {
-    var doc = $('#item-table-consignment-' + doc_id).datagrid('appendRow', {
-        name: 'new',
-        cost: 0,
-        quality: 0,
-        tax: 0,
-        total: 0
+    var doc = $(doc_id);
+    var rowIndex = doc.datagrid('getRows').length;
+    doc.datagrid('insertRow', {
+            index: rowIndex,
+            row: {
+                itemId: 'ITM-' + rowIndex + 1,
+                itemName: 'Не выбран',
+                measure: '-',   //Переделать
+                country: '-',
+                cost: '0.00',
+                quantity: '0.00',
+                tax: '0.00',
+                total: '0.00'
+            }
+        }
+    );
+
+    editItem(doc_id, {
+        index: rowIndex,
+        field: 'itemName'
     });
 }
 
 function copyItem(doc_id) {
-    setCookie('copyItem', $("#item-table-consignment-" + doc_id).datagrid('getSelected').id);
+    var doc = $(doc_id);
+    var rowIndex = doc.datagrid('cell').index;
+    //var row = doc.datagrid('getRows')[rowIndex];
+    setCookie('bufferItem', rowIndex);
+    //alert(row.toSource());
 }
 
 // Вставка скопированного элемента из буфера
 function pasteItem(doc_id) {
-    $.ajax({
-        url: '/document/consignment/' + doc_id + '/item/paste/',
-        method: 'POST',
-        data: {'item': getCookie('copyItem')},
-        cache: false,
-        success: function (data) {
-            if (data == 'Ok') {
-                // Пока кокой-то деревянный способ
-                // alert('Данные получены');
-                $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
-            } else {
-                alert(data);
-                // Данные получены кривые
-                // location.href = "#";
-                // location.reload();
-            }
+    var doc = $(doc_id);
+    //Вставляем в конец списка
+    var rowIndex = doc.datagrid('getRows').length;
+    var row = doc.datagrid('getRows')[getCookie('bufferItem')];
+    row.itemId = rowIndex;
+    doc.datagrid('insertRow', {
+            index: rowIndex,
+            row: row
         }
-    });
+    );
+    //$.ajax({
+    //    url: '/document/consignment/' + doc_id + '/item/paste/',
+    //    method: 'POST',
+    //    data: {'item': getCookie('copyItem')},
+    //    cache: false,
+    //    success: function (data) {
+    //        if (data == 'Ok') {
+    //            // Пока кокой-то деревянный способ
+    //            // alert('Данные получены');
+    //            $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
+    //        } else {
+    //            alert(data);
+    //            // Данные получены кривые
+    //            // location.href = "#";
+    //            // location.reload();
+    //        }
+    //    }
+    //});
+}
+
+// Дубликация элемента в документе без записи в буффер
+function dublicateItem(doc_id) {
+    var doc = $(doc_id);
+    var rowIndex = doc.datagrid('cell').index;
+    var rows = doc.datagrid('getRows');
+    var row = rows[rowIndex];
+    row.itemId = rows.length;
+    doc.datagrid('insertRow', {
+            index: row.itemId,
+            row: row
+        }
+    );
 }
 
 // Дубликация элемента в документе
-function dublicateItem(doc_id) {
+function deleteItem(doc_id) {
+    // Доработать функционал выделения и удаления, возможно множественного удаления
+    var doc = $(doc_id);
+    rowIndex = doc.datagrid('cell').index;
+    //checkedIndex = doc.datagrid('getChecked');
+    //alert(checkedIndex);
+    if (rowIndex) {
+        doc.datagrid('deleteRow', rowIndex);
+    }
+    //if(checkedIndex){
+    //    doc.datagrid('deleteRow', checkedIndex);
+    //}else{
+    //    doc.datagrid('deleteRow', rowIndex);
+    //}
+}
+
+// Activate pop-up context menu in documents
+function popupMenuDispatcher(action) {
+    // Сделать чтоб idшник сам находился #item-table-consignment-
+    var tab = $('#doc-tab');
+    var selected = tab.tabs('getSelected');
+    var tabIndex = tab.tabs('getTabIndex', selected);
+    //alert(tabIndex);
+    if (tabIndex) {
+        // Действия в документе
+        switch (action) {
+            case 'add':
+                addItem($("<div/>",
+                    {"html": selected.panel('options').content}).find('#doc-id').html());
+                break;
+            case 'edit':
+                editItem('#item-table-consignment-' + $("<div/>",
+                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                break;
+            case 'remove':
+                deleteItem('#item-table-consignment-' + $("<div/>",
+                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                break;
+            case 'copy':
+                copyItem('#item-table-consignment-' + $("<div/>",
+                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                break;
+            case 'paste':
+                pasteItem('#item-table-consignment-' + $("<div/>",
+                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                break;
+            case 'dublicate':
+                dublicateItem('#item-table-consignment-' + $("<div/>",
+                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                break;
+            case 'reload':
+                var doc_id = $("<div/>",
+                    {"html": selected.panel('options').content}).find('#doc-id').html();
+                $(doc_id).datagrid('reload');    // reload the data table
+                break;
+            case 'save':
+                saveDoc($("<div/>",
+                    {"html": selected.panel('options').content}).find('#doc-id').html());
+                break;
+            default:
+                break;
+        }
+    } else {
+        switch (action) {
+            case 'add':
+                newDoc();
+                break;
+            case 'edit':
+                editDoc();
+                break;
+            case 'remove':
+                destroyDoc();
+                break;
+            case 'reload':
+                $('#common-tab').datagrid('reload');
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 // EASYUI переименование tabs без перезагрузки
@@ -335,5 +576,6 @@ $(document).ready(function () {
         alert('Включите cookie для комфортной работы с этим сайтом');
     }
 });
+;
 
 
