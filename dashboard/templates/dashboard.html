@@ -1,190 +1,80 @@
-{% extends 'base.html' %}
 {% load staticfiles %}
 
-{% block header %}
-    <div class="userprofile">
-        <nav id="nav-wrap">
-            <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
-            <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
-            {% block nav %}
-                <ul id="nav" class="nav">
-                    <li><a class="logo" href="/">Toner Project</a></li>
-                    <li><a href="/{{ userprofile.username }}">Профиль</a></li>
-                    <li class="current"><a href="/dashboard/">Dashboard</a></li>
-                    <li><a class="smoothscroll" href="#Raports">Отчёты</a></li>
-                    {% if userprofile.username %}
-                        <li><a href="/auth/logout/">Выйти</a>
-                            <a href="/{{ username }}"><img class="photo" title="{{ userprofile.username }}"
-                                                           src="/{{ userprofile.username }}/photo"/></a>
-                        </li>
-                    {% else %}
-                        <li id="loadloginform"><a id="login" href="#">Вход в систему</a></li>
-                    {% endif %}
-                </ul>
-            {% endblock nav %}
-            <!-- end #nav -->
-        </nav>
+<!DOCTYPE html>
+<html>
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        <title>Журнал накладных</title>
 
-        {% block banner %}
-            <!--Профильная панель -->
-            <form id="personalinfo" class="row">
-                <div class="twelve columns">
-                    <div class="panel">
-                        <div id="person-block">
-                            <!--Фото слева -->
-                            <div class="four columns">
-                                <img class="profile-photo" src="/{{ userprofile.username }}/photo" alt="Профильное фото"
-                                     title="Изменить фото..."/>
-                                <!-- радиосвич компания или нет -->
+        {% block theme %}
+            <link rel="stylesheet" type="text/css" href="{% static "css/themes/metro-blue/easyui.css" %}">
+            <link rel="stylesheet" type="text/css" href="{% static "css/themes/icon.css" %}">
+            <link rel="stylesheet" type="text/css" href="{% static "css/themes/color.css" %}">
+            <link rel="stylesheet" type="text/css" href="{% static "css/themes/demo.css" %}">
+        {% endblock theme %}
 
-                                <input class="checkbox" type="checkbox" name="userprofile_is_company"
-                                        {% if userprofile.is_company %}
-                                       checked
-                                        {% endif %}
-                                       id="iscompany">
-                                <label for="person">Я представляю организацию</label>
+        <script type='text/javascript' src="{% static 'js/jquery.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/easyui/jquery.easyui.min.js' %}"></script>
+        <script type='text/javascript' src="{% static 'js/easyui/locale/easyui-lang-ru.js' %}"></script>
 
-                            </div>
+        <script type='text/javascript' src="{% static 'js/datagrid-cellediting.js' %}"></script>
+        <script type='text/javascript' src="{% static 'js/datagrid-scrollview.js' %}"></script>
 
-                            <!--Панель данных слева -->
-                            <div class="eight columns">
-                                <h1>Персональные данные</h1>
-                            </div>
-                            <div class="four columns">
-                                <label class="">Логин*:</label>
-                                <input type="text" name="userprofile_username" value="{{ userprofile.username }}"
-                                       placeholder='Логин, e-mail или номер телефона'/>
-                            </div>
-                            <div class="four columns">
-                                <label class="">E-mail*:</label>
-                                <input type="text" name="userprofile_email" value="{{ userprofile.email }}"
-                                       placeholder="Электронная почта"/>
-                            </div>
+        <script type='text/javascript' src="{% static 'js/document.js' %}"></script>
+        <script type='text/javascript' src="{% static 'js/ajax.js' %}"></script>
+        <script type='text/javascript' src="{% static 'js/cookies.js' %}"></script>
 
-                            <div class="four columns ">
-                                <label class="">Имя пользователя*:</label>
-                                <input type="text" name="userprofile_first_name"
-                                       value='{{ userprofile.first_name }}' placeholder='Имя'
-                                       autocomplete="on">
-                            </div>
+    {% endblock head %}
+</head>
 
-                            <div class="four columns">
-                                <label class="">Фамилия*:</label>
-                                <input type="text" name="userprofile_last_name" value="{{ userprofile.last_name }}"
-                                       placeholder="Фамилия"/>
-                            </div>
-
-                            <div class="eight columns">
-                                <label class="">Tag-Line:</label>
-                                <input type="text" name="userprofile_tagline" value="{{ userprofile.tagline }}"
-                                       placeholder="Тут можно оставить себе заметку или задачу на будущее"/>
-                            </div>
-
-                        </div>
-
-                        <div id="company-block"
-                                {% if userprofile.is_company %}
-                             style="display: block;"
-                                {% else %}
-                             style="display: none;"
-                                {% endif %}
-                                >
-                            <!--Данные компании -->
-                            <div class="nine columns">
-                                <label class="">Полное наименование организации:</label>
-                                <input type="text" name="userprofile_company_name"
-                                       value="{{ userprofile.company_name }}"
-                                       placeholder="Полное юридическое наименование организации для документов"/>
-                            </div>
-
-                            <div class="three columns">
-                                <label class="">Телефон:</label>
-                                <input type="text" name="userprofile_company_phone" placeholder='Контактный телефон'
-                                       value="{{ userprofile.company_phone }}"/>
-                            </div>
-
-                            <div class="four columns ">
-                                <label class="">Имя руководителя:</label>
-                                <input type="text" name="userprofile_company_boss_first_name" placeholder='Имя'
-                                       value="{{ userprofile.company_boss_first_name }}"/>
-                            </div>
-
-                            <div class="four columns ">
-                                <label class="">Отчество руководителя:</label>
-                                <input type="text" name="userprofile_company_boss_second_name"
-                                       placeholder='Отчество'
-                                       value="{{ userprofile.company_boss_second_name }}"/>
-                            </div>
-
-                            <div class="four columns">
-                                <label class="">Фамилия руководителя:</label>
-                                <input type="text" name="userprofile_company_boss_last_name" placeholder="Фамилия"
-                                       value="{{ userprofile.company_boss_last_name }}"/>
-                            </div>
-
-                            <div class="twelve columns">
-                                <label class="">Юридический организации:</label>
-                                <input type="text" name="userprofile_company_address"
-                                       value="{{ userprofile.company_address }}"
-                                       placeholder="Юридический адрес организации для документов"/>
-                            </div>
-
-
-                            <div class="three columns ">
-                                <label class="">ИНН:</label>
-                                <input type="text" placeholder='ИНН' name="userprofile_company_inn"
-                                       value="{{ userprofile.company_inn }}"/>
-                            </div>
-
-
-                            <div class="three columns">
-                                <label class="">ОГРН:</label>
-                                <input type="text" placeholder="ОГРН" name="userprofile_company_ogrn"
-                                       value="{{ userprofile.company_ogrn }}"/>
-                            </div>
-
-
-                            <div class="three columns">
-                                <label class="">ОКПО:</label>
-                                <input type="text" placeholder="ОКПО" name="userprofile_company_okpo"
-                                       value="{{ userprofile.company_okpo }}"/>
-                            </div>
-
-                            <div class="three columns">
-                                <label class="">ОКАТО:</label>
-                                <input type="text" placeholder="ОКАТО" name="userprofile_company_okato"
-                                       value="{{ userprofile.company_okato }}"/>
-
-                            </div>
-
-                            <div class="four columns">
-                                <label class="">Расчетный счет:</label>
-                                <input type="text" placeholder="Расчетный счёт" name="userprofile_user_bank_account"
-                                       value="{{ userprofile.user_bank_account }}"/>
-                            </div>
-
-                            <div class="eight columns">
-                                <label>Банк в котором открыт расчетный счёт: </label>
-                                <select name="userprofile_user_bank" class="selecter" action="#">
-                                    {% for bank in banks %}
-                                        {% if bank.bank_name == userprofile.user_bank.bank_name %}
-                                            <option selected>{{ bank.bank_name }}</option>
-                                        {% else %}
-                                            <option>{{ bank.bank_name }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                        </div>
-
-                        <div class="four columns">
-                            <input class="button" type="submit" id="save-btn" value="Сохранить изменения">
-                        </div>
-
+{% block dashboard %}
+    <body>
+    <div id="dashboard" class="easyui-layout" fit='true'>
+        <div data-options="region:'north'" style="height:50px;">
+            {% block header %}
+            {% endblock header %}
+        </div>
+        <div title="Информационная консоль" data-options="region:'south',split:true,collapsed:false,
+                    hideCollapsedContent:false,iconCls:'icon-tip',
+                    tools: [{iconCls:'icon-clear',handler:function(){alert('clear')}}]" style="height:300px;">
+            {% block console %}
+                <div id="console">
+                    ! 16-10-2017 Запущено приложение
+                </div>
+            {% endblock console %}
+        </div>
+        <div title="Меню" data-options="region:'west',split:true" style="width:300px;">
+            {% block menu %}
+                <div class="easyui-accordion" data-options="fit:true,border:false">
+                    <div title="Title1" style="padding:10px;">
+                        content1
+                    </div>
+                    <div title="Title2" data-options="selected:true" style="padding:10px;">
+                        content2
+                    </div>
+                    <div title="Title3" style="padding:10px">
+                        content3
                     </div>
                 </div>
-            </form>
-        {% endblock banner %}
+            {% endblock menu %}
+        </div>
+        <div title="Справочники" data-options="region:'east',split:true,collapsed:true" style="width:200px;">
+            {% block property %}
+            {% endblock property %}
+        </div>
+        <div data-options="region:'center'">
+            {% block mainview %}
+            {% endblock mainview %}
+        </div>
     </div>
-{% endblock header %}
+    </body>
+{% endblock dashboard %}
+
+{% block popup-menu %}
+{% endblock popup-menu %}
+
+{% block scripts %}
+    <script type="text/javascript"></script>
+{% endblock scripts %}
+</html>

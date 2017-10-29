@@ -108,9 +108,9 @@ class ConsignmentTable(models.Model):
     number = models.IntegerField(verbose_name=u'номер в накладной')
     item = models.ForeignKey(Product, verbose_name=u'продукт')
     country = models.ForeignKey(Country, verbose_name=u'страна происхождения', default=None, null=True)
-    quantity = models.FloatField(verbose_name=u'количество')
+    quantity = models.FloatField(verbose_name=u'количество', default=0.00)
     measure = models.ForeignKey(Measure, verbose_name=u'единица измерения', default=1)
-    cost = models.FloatField(verbose_name=u'стоимость единицы продукта без налогов', default=0.0, null=True)
+    cost = models.FloatField(verbose_name=u'стоимость единицы продукта без налогов', default=0.00, null=True)
     tax = models.ForeignKey(Tax, verbose_name=u'налоговая ставка', default=None, null=True)
 
     def __str__(self):

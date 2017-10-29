@@ -1,0 +1,53 @@
+{% block document-table-popup-menu %}
+    <div id="doc-table-popup-menu" class="easyui-menu" style="width:120px;">
+        <div data-options="iconCls:'icon-add'" onclick="popupMenuDispatcher('add');">Добавить</div>
+        <div data-options="iconCls:'icon-edit'" onclick="popupMenuDispatcher('edit');">Изменить</div>
+        <div data-options="iconCls:'icon-remove'" onclick="popupMenuDispatcher('remove');">Удалить</div>
+        <div class="menu-sep"></div>
+        <div data-options="iconCls:'icon-copy'" onclick="popupMenuDispatcher('copy');">Копировать</div>
+        <div data-options="iconCls:'icon-paste'" onclick="popupMenuDispatcher('paste');">Вставить</div>
+        <div data-options="iconCls:'icon-paste'" onclick="popupMenuDispatcher('dublicate');">Дублировать</div>
+        <div class="menu-sep"></div>
+        <div data-options="iconCls:'icon-reload'" onclick="popupMenuDispatcher('reload')">Обновить</div>
+        <div class="menu-sep"></div>
+        <div data-options="disabled:'True'">
+            <span>Экспорт</span>
+
+            <div style="width:150px;">
+                <div><b>Word</b></div>
+                <div>Excel</div>
+                <div>PowerPoint</div>
+                <div>
+                    <span>M1</span>
+
+                    <div style="width:120px;">
+                        <div>sub1</div>
+                        <div>sub2</div>
+                        <div>
+                            <span>Sub</span>
+
+                            <div style="width:80px;">
+                                <div onclick="javascript:alert('sub21')">sub21</div>
+                                <div>sub22</div>
+                                <div>sub23</div>
+                            </div>
+                        </div>
+                        <div>sub3</div>
+                    </div>
+                </div>
+                <div>
+                    <span>Window Demos</span>
+
+                    <div style="width:120px;">
+                        <div data-options="href:'window.html'">Window</div>
+                        <div data-options="href:'dialog.html'">Dialog</div>
+                        <div><a href="http://www.jeasyui.com" target="_blank">EasyUI</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-options="iconCls:'icon-print'" onclick="popupMenuDispatcher('print')">Печать</div>
+        <div class="menu-sep"></div>
+        <div>Выход</div>
+    </div>
+{% endblock document-table-popup-menu %}

@@ -98,14 +98,15 @@
 
 // Tab functions
 function addTab(title, url) {
-    if ($('#doc-tab').tabs('exists', title)) {
-        $('#doc-tab').tabs('select', title);
+    var doctabs = $('#doc-tabs');
+    if (doctabs.tabs('exists', title)) {
+        doctabs.tabs('select', title);
     } else {
         $.ajax({
             url: url,
             cache: true,
             success: function (html) {
-                $('#doc-tab').tabs('add', {
+                doctabs.tabs('add', {
                     //id: doc_id.substring(1),
                     title: title,
                     content: html,
@@ -117,7 +118,7 @@ function addTab(title, url) {
 }
 
 function renameTab(number, date) {
-    var jqtab = $('#doc-tab');
+    var jqtab = $('#doc-tabs');
     var t = jqtab.tabs('getSelected');
     var titleParts = t.panel('options').title.split(" ", 5);
 
@@ -146,13 +147,56 @@ function renameTab(number, date) {
 
 // Смена наименования панели
 // Возможно устрело --- СДЕЛАТЬ смена даты на панели журнала накладных
-function renameDocTab() {
-    $('#common-tab').title()
+function docTabFilter() {
+    //alert($('#doc-maintab').title());
 }
+
+
 
 // Document functions
 // Активация cell-editing функции, а также запуск дополнительных возможностей datagrid
-function enableDoc(doc_id) {
+function enablePopupMenu(doc_id, menu_id) {
+    $(doc_id).datagrid({
+        onRowContextMenu: function (e, index, row) {
+            e.preventDefault();
+            // Включаем контекстное меню для редактирования таблицы документов
+            $(menu_id).menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
+        }
+    })
+}
+
+function enableDateFilter(table_id, datefrom_id, dateto_id) {
+    var table = $(table_id);
+    var dateFrom = $(datefrom_id);
+    var dateTo = $(dateto_id);
+
+    dateFrom.datetimebox({
+        onChange: function (newValue, oldValue) {
+            table.datagrid({
+                queryParams: {
+                    dateFrom: newValue,
+                    dateTo: dateTo.datetimebox('getValue')
+                }
+            })
+        }
+    });
+
+    dateTo.datetimebox({
+        onChange: function (newValue, oldValue) {
+            table.datagrid({
+                queryParams: {
+                    dateTo: newValue,
+                    dateFrom: dateFrom.datetimebox('getValue')
+                }
+            })
+        }
+    });
+}
+
+function enableDoc(doc_id, popupmenu_id) {
     $(doc_id).datagrid({
         clickToEdit: false,
         dblclickToEdit: true
@@ -193,38 +237,26 @@ function enableDoc(doc_id) {
                     });
                 }
             }
-        },
-        onRowContextMenu: function (e, index, row) {
-            e.preventDefault();
-            $('#mm').menu('show', {
-                left: e.pageX,
-                top: e.pageY
-            });
-            if (index >= 0) {
-                //($(this).datagrid('cell'));
-                //console.log(index);
-            } else {
-                alert(row.toSource());
-            }
         }
-
     });
+    if (popupmenu_id) {
+        enablePopupMenu(doc_id, popupmenu_id);
+    }
 }
 
-
 function newDoc(date) {
-    addTab('Новая накладная от ' + date, '../consignment/new/');
+    addTab('Новая накладная от ' + date, '/document/consignment/new/');
 }
 
 function editDoc() {
-    var row = $('#common-tab').datagrid('getSelected');
+    var row = $('#docs').datagrid('getSelected');
     if (row) {
         addTab(row.name, '/document/consignment/' + row.id + '/edit/');
     }
 }
 
 function closeDoc() {
-    var jqtab = $('#doc-tab');
+    var jqtab = $('#doc-tabs');
     var t = jqtab.tabs('getSelected');
     var index = jqtab.tabs('getTabIndex', t);
     // Общий журнал не закрывается
@@ -239,14 +271,15 @@ function printDoc(doc_id) {
 }
 
 function destroyDoc() {
-    var row = $('#common-tab').datagrid('getSelected');
+    var maintab = $('#docs');
+    var row = maintab.datagrid('getSelected');
     if (row) {
         $.ajax({
             method: 'POST',
             url: '/document/consignment/' + row.id + '/delete/',
             cache: false,
             success: function () {
-                $('#common-tab').datagrid('reload');
+                maintab.datagrid('reload');
             }
         });
     }
@@ -366,11 +399,12 @@ function editItem(doc_id, param) {
 
 function addItem(doc_id) {
     var doc = $(doc_id);
-    var rowIndex = doc.datagrid('getRows').length;
+    var rowIndex = doc.datagrid('getRows').length + 1;
     doc.datagrid('insertRow', {
             index: rowIndex,
             row: {
-                itemId: 'ITM-' + rowIndex + 1,
+                id: rowIndex,
+                itemId: 'ITM-' + rowIndex,
                 itemName: 'Не выбран',
                 measure: '-',   //Переделать
                 country: '-',
@@ -461,46 +495,41 @@ function deleteItem(doc_id) {
 
 // Activate pop-up context menu in documents
 function popupMenuDispatcher(action) {
-    // Сделать чтоб idшник сам находился #item-table-consignment-
-    var tab = $('#doc-tab');
+    // находим общий журнал документов
+    var tab = $('#doc-tabs');
+    // выбираем соответствующую tab панель
     var selected = tab.tabs('getSelected');
+    // узнаем его индекс  панели в таблице
     var tabIndex = tab.tabs('getTabIndex', selected);
     //alert(tabIndex);
     if (tabIndex) {
         // Действия в документе
+        var table_id = '#document-item-table-' + $("<div/>",
+            {"html": selected.panel('options').content}).find('#doc-id').html();
         switch (action) {
             case 'add':
-                addItem($("<div/>",
-                    {"html": selected.panel('options').content}).find('#doc-id').html());
+                addItem(table_id);
                 break;
             case 'edit':
-                editItem('#item-table-consignment-' + $("<div/>",
-                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                editItem(table_id);
                 break;
             case 'remove':
-                deleteItem('#item-table-consignment-' + $("<div/>",
-                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                deleteItem(table_id);
                 break;
             case 'copy':
-                copyItem('#item-table-consignment-' + $("<div/>",
-                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                copyItem(table_id);
                 break;
             case 'paste':
-                pasteItem('#item-table-consignment-' + $("<div/>",
-                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                pasteItem(table_id);
                 break;
             case 'dublicate':
-                dublicateItem('#item-table-consignment-' + $("<div/>",
-                        {"html": selected.panel('options').content}).find('#doc-id').html());
+                dublicateItem(table_id);
                 break;
             case 'reload':
-                var doc_id = $("<div/>",
-                    {"html": selected.panel('options').content}).find('#doc-id').html();
-                $(doc_id).datagrid('reload');    // reload the data table
+                $(table_id).datagrid('reload');    // reload the data table
                 break;
             case 'save':
-                saveDoc($("<div/>",
-                    {"html": selected.panel('options').content}).find('#doc-id').html());
+                saveDoc(table_id);
                 break;
             default:
                 break;
@@ -508,7 +537,11 @@ function popupMenuDispatcher(action) {
     } else {
         switch (action) {
             case 'add':
-                newDoc();
+                var date = new Date();
+                var y = date.getFullYear();
+                var m = date.getMonth() + 1;
+                var d = date.getDate();
+                newDoc(d + '/' + m + '/' + y);
                 break;
             case 'edit':
                 editDoc();
@@ -517,7 +550,7 @@ function popupMenuDispatcher(action) {
                 destroyDoc();
                 break;
             case 'reload':
-                $('#common-tab').datagrid('reload');
+                $('#docs').datagrid('reload');
                 break;
             default:
                 break;
@@ -544,30 +577,42 @@ $.extend(
             })
         }
     },
-    $.fn.tabs.methods, {
-        updateTitle: function (jq, param) {
-            return jq.each(function () {
-                var t = $(param.tab);
-                var opts = t.panel('options');
-                opts.title = param.title;
-                opts.tab.find('.tabs-title').html(param.title);
-            })
-        }
-    },
     // Методы для управления выводом datebox
     $.fn.datebox.defaults.parser = function (s) {
-        var dateParts = s.split("/", 3);
-        if (dateParts[0] != s) {
-            return new Date(dateParts[2], (dateParts[1] - 1), dateParts[0]);
-        } else {
+        if ($.trim(s) == '') {
             return new Date();
         }
+        var dt = s.split(' ');
+        var ss = dt[0].split('/');
+        var d = parseInt(ss[0], 10);
+        var m = parseInt(ss[1], 10) - 1;
+        var y = parseInt(ss[2], 10);
+        if (dt.length >= 2) {
+            var tt = dt[1].split(':');
+            var hour = parseInt(tt[0], 10) || 0;
+            var minute = parseInt(tt[1], 10) || 0;
+            var second = parseInt(tt[2], 10) || 0;
+        } else {
+            var hour = 0;
+            var minute = 0;
+            var second = 0;
+        }
+        return new Date(y, m, d, hour, minute, second);
     },
     $.fn.datebox.defaults.formatter = function (date) {
         var y = date.getFullYear();
         var m = date.getMonth() + 1;
         var d = date.getDate();
-        return d + '/' + m + '/' + y;
+        var h = date.getHours();
+        var M = date.getMinutes();
+        var s = date.getSeconds();
+
+        function formatNumber(value) {
+            return (value < 10 ? '0' : '') + value;
+        }
+
+        return formatNumber(d) + '/' + formatNumber(m) + '/' + y;
+        //+ ' '+formatNumber(h)+':'+formatNumber(M)+':'+formatNumber(s);
     }
 );
 
@@ -576,6 +621,6 @@ $(document).ready(function () {
         alert('Включите cookie для комфортной работы с этим сайтом');
     }
 });
-;
+
 
 

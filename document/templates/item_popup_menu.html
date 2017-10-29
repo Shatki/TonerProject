@@ -1,7 +1,5 @@
-{% load staticfiles %}
-
-{% block popup-menu %}
-    <div id="mm" class="easyui-menu" style="width:120px;">
+{% block item-table-popup-menu %}
+    <div id="item-table-popup-menu" class="easyui-menu" style="width:120px;">
         <div data-options="iconCls:'icon-add'" onclick="popupMenuDispatcher('add');">Добавить</div>
         <div data-options="iconCls:'icon-edit'" onclick="popupMenuDispatcher('edit');">Изменить</div>
         <div data-options="iconCls:'icon-remove'" onclick="popupMenuDispatcher('remove');">Удалить</div>
@@ -54,4 +52,4 @@
         <div class="menu-sep"></div>
         <div>Выход</div>
     </div>
-{% endblock popup-menu %}
+{% endblock item-table-popup-menu %}

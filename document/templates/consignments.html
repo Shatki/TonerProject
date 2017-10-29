@@ -1,121 +1,82 @@
+{% extends 'dashboard.html' %}
 {% load staticfiles %}
-<!DOCTYPE html>
-<html>
-{% block head %}
-    <head>
-        <meta charset="UTF-8">
-        <title>Журнал накладных</title>
-
-        {% block theme %}
-            <link rel="stylesheet" type="text/css" href="{% static "css/themes/metro-blue/easyui.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static "css/themes/icon.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static "css/themes/color.css" %}">
-            <link rel="stylesheet" type="text/css" href="{% static "css/themes/demo.css" %}">
-        {% endblock theme %}
-
-        <script type='text/javascript' src="{% static 'js/jquery.min.js' %}"></script>
-        <script type="text/javascript" src="{% static 'js/easyui/jquery.easyui.min.js' %}"></script>
-        <script type='text/javascript' src="{% static 'js/easyui/locale/easyui-lang-ru.js' %}"></script>
-        <script type='text/javascript' src="{% static 'js/ajax.js' %}"></script>
-        <script type='text/javascript' src="{% static 'js/cookies.js' %}"></script>
-        <script type='text/javascript' src="{% static 'js/datagrid-cellediting.js' %}"></script>
-        <script type='text/javascript' src="{% static 'js/document.js' %}"></script>
-    </head>
-{% endblock head %}
 
 {% block mainview %}
-    <body style="height:100%" class="easyui-layout">
-    <div id="doc-tab" class="easyui-tabs" style="width:100%; height:100%;"
-         data-options="region:'north',title:'Основное',split:true,collapsible:false,border:false,fit:true,plain:true">
-
-        {% block maintab %}
-            <div id="docs" title="Журнал накладных">
-
-                {% block docdate %}
-                    <div style="margin: 5px 20px 5px 20px">
-                        От: <input class="easyui-datebox" name="date" required="required" style="width: 285px"
-                                   data-options="panelWidth:285,onChange:function(date){renameDocTab(0,date)}">
-                        До: <input class="easyui-datebox" name="date" required="required" style="width: 285px"
-                                   data-options="panelWidth:285,onChange:function(date){renameDocTab(0,date)}">
-                    </div>
-                {% endblock docdate %}
-
-                {% block doctable %}
-                    <table id="common-tab" title="Журнал накладных за 31/10/1985 - 26/01/2017" class="easyui-datagrid"
-                           url="/document/consignment/all/json/"
-                           toolbar="#toolbar" pagination="true"
-                           rownumbers="true" fitColumns="true" singleSelect="true">
-                        <thead>
-                        <tr>
-                            <th field="ck" checkbox="true"></th>
-                            <th field="name" width="30%" align="left">Вид, номер, дата документа</th>
-                            <th field="seller" width="29%" align="left">Организация отпускающая продукцию</th>
-                            <th field="buyer" width="29%" align="left">Организация принимающая продукцию</th>
-                            <th field="total" width="5%" align="center">Сумма</th>
-                            <th field="enable" width="5%" align="center"
-                                editor="{type:'checkbox',options:{on:'True',off:'False'}}">Активный
-                            </th>
-                        </tr>
-                        </thead>
-                    </table>
-
-                    {% block doctable-menu %}
-                        <div id="toolbar">
-                            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
-                               onclick="newDoc('{{ system_date }}')">Создать</a>
-                            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
-                               onclick="editDoc()">Редактировать</a>
-                            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
-                               onclick="destroyDoc()">Удалить</a>
-                        </div>
-                    {% endblock doctable-menu %}
-
-                {% endblock doctable %}
+    <div id="doc-tabs" class="easyui-tabs" data-options="fit:true,border:false,plain:true">
+        {% block tab %}
+            <div id="doc-maintab" title="Журнал документов">
+                <table id="docs"
+                       class="easyui-datagrid"
+                       data-options="
+                                fit:true,
+                                fitColumns:true,
+                                method:'post',
+                                url:'/document/consignment/all/json/',
+                                idField:'id',
+                                toolbar:'#doc-toolbar',
+                                rownumbers:true,
+                                autoRowHeight:false,
+                                singleSelect:true
+                                ">
+                    <thead>
+                    <tr>
+                        <th field="id" width="3">id</th>
+                        <th field="ck" width="3" checkbox="true"></th>
+                        <th field="name" width="30" align="left">Вид, номер, дата документа</th>
+                        <th field="seller" width="20" align="left">Организация отпускающая продукцию</th>
+                        <th field="buyer" width="20" align="left">Организация принимающая продукцию</th>
+                        <th field="total" width="5" align="center">Сумма</th>
+                        <th field="enable" width="3" align="center"
+                            editor="{type:'checkbox',options:{on:'True',off:'False'}}">Активный
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
             </div>
-        {% endblock maintab %}
 
+        {% endblock tab %}
     </div>
-    {% block console %}
-        <div data-options="region:'south',title:'Консоль',split:true" style="height:100px;"></div>
 
-    {% endblock console %}
-    {% block buttons %}
-        <div id="dlg-buttons">
-            <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveDoc()"
-               style="width:90px">Save</a>
-            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
-               onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Cancel</a>
-        </div>
-    {% endblock buttons %}
-    </body>
+    {% block doctable-menu %}
+        <div id="doc-toolbar" style="padding: 5px">
+            <div id="docs-date-filter" style="padding: 5px">
+                <input class="easyui-datetimebox" id="docs-date-from" required="required" title="From"
+                       data-options="width:200,labelWidth:30,
+                           label:'От:',labelPosition:'before',labelAlign:'right',
+                           onSelect:function(date){docTabFilter(date,0)}">
+                <input class="easyui-datetimebox" id="docs-date-to" required="required" title="To"
+                       data-options="width:200,labelWidth:30,
+                           label:'До:',labelPosition:'before',labelAlign:'right',
+                           onSelect:function(date){docTabFilter(0,date)}">
+            </div>
 
-    {% block dialog %}
-        <div id="dlg" class="easyui-dialog" style="width:1024px;height:280px;padding:10px 20px"
-             closed="true" buttons="#dlg-buttons">
-            <div class="ftitle">Редактирование накладной</div>
-            <form id="fm" method="post" novalidate>
-                <div class="fitem"><label>Номер документа:</label>
-                    <input name="number" id="number" class="easyui-textbox" required="true"
-                           value={{ consignment.str_number }}
-                                   placeholder="0000000001">
-                </div>
-                <div class="fitem"><label>Дата документа:</label>
-                    <input name="date" id="date" class="easyui-datebox" required="true"
-                           value="{{ consignment.date }}" placeholder="31.10.1985" type="text">
-                </div>
-            </form>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+               onclick="newDoc('{{ system_date }}')">Создать</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
+               onclick="editDoc()">Редактировать</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+               onclick="destroyDoc()">Удалить</a>
         </div>
-    {% endblock dialog %}
+    {% endblock doctable-menu %}
 {% endblock mainview %}
 
-</html>
-
 {% block popup-menu %}
-    {% include "popup_menu.html" %}
+    {% include "item_popup_menu.html" %}
+    {% include "document_popup_menu.html" %}
 {% endblock popup-menu %}
+
+
+{% block property %}
+    <ul class="easyui-tree" data-options="url:'/catalog/product/json/',animate:true,dnd:true">
+    </ul>
+{% endblock property %}
 
 {% block scripts %}
     <script type="text/javascript">
+        $(function () {
+            enablePopupMenu('#docs', '#doc-table-popup-menu');
+            enableDateFilter('#docs', '#docs-date-from', '#docs-date-to');
+        });
     </script>
 {% endblock scripts %}
 

@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^auth/', include('authentication.urls')),
     url(r'^catalog/', include('system.urls')),
-    url(r'^dashboard/', dashboard.views.dashboard),
+    url(r'^dashboard/', include('dashboard.urls')),
     url(r'^document/', include('document.urls')),
     url(r'^form/', include('forms.urls')),
     url(r'^stock/', include('stock.urls')),

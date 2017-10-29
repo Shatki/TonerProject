@@ -11,7 +11,7 @@ from system.models import Product, Measure
 from .models import Consignment, ConsignmentTable
 from stock.views import item_add, item_edit, item_delete
 from system.datetime import SystemDateTime
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from RUSystem.RUClient import send_data
 
@@ -40,8 +40,21 @@ def consignments(request):
 @login_required
 def consignments_json(request):
     try:
+        docs_datetime_to = request.POST.get('dateTo')
+        docs_datetime_from = request.POST.get('dateFrom')
+
+        if not docs_datetime_to:
+            docs_datetime_to = datetime.today()
+        else:
+            docs_datetime_to = datetime.strptime(docs_datetime_to, "%d/%m/%Y %H:%M:%S")
+
+        if not docs_datetime_from:
+            docs_datetime_from = docs_datetime_to - timedelta(90)  # 90 дней
+        else:
+            docs_datetime_from = datetime.strptime(docs_datetime_from, "%d/%m/%Y %H:%M:%S")
+
         # Показывает только не удаленные
-        data = Consignment.objects.filter(delete=False)
+        data = Consignment.objects.filter(delete=False, date__range=[docs_datetime_from, docs_datetime_to])
     except Consignment.DoesNotExist:
         return HttpResponse(u'consignments_json: DB Error', content_type='text/html')
     # Serialize
@@ -59,6 +72,8 @@ def consignments_json(request):
     # final preparing
     response = dict(
         total=str(data.count()),
+        date_from=docs_datetime_from,
+        docs_date_to=docs_datetime_to,
         rows=rows,
     )
     return JsonResponse(response, safe=False)
@@ -113,16 +128,24 @@ def consignment_delete(request, consignment_id):
 @login_required
 def consignment_edit(request, consignment_id):
     # добавить проверку на пользователя
-    args = {'user_profile': request.user,
-            'consignment': Consignment.objects.get(id=consignment_id),
-            'contractors': Contractor.objects.all(),
-            # 'items': Consignment.objects.get(id=consignment_id).items.all(),
-            'measures': Measure.objects.all(),
-            }
-    args.update(csrf(request))
-    # просмотр полного списка накладных
-    return render_to_response('consignment.html', args)
-
+    if request.user:
+        try:
+            consignment = Consignment.objects.get(id=consignment_id)
+        except Consignment.DoesNotExist:
+            consignment = dict(
+                id='0'
+            )
+        args = {'user_profile': request.user,
+                'consignment': consignment,
+                'contractors': Contractor.objects.all(),
+                # 'items': Consignment.objects.get(id=consignment_id).items.all(),
+                'measures': Measure.objects.all(),
+                }
+        args.update(csrf(request))
+        # просмотр полного списка накладных
+        return render_to_response('consignment.html', args)
+    else:
+        return HttpResponse(u'consignment_edit:  please, login first', content_type='text/html')
 
 # Тестовая версия создания накладной
 @csrf_protect

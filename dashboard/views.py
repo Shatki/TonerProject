@@ -20,9 +20,9 @@ def dashboard(request):
         # Тут код личного профиля
         args = {}
         args['userprofile'] = request.user
-        args['banks'] = Contractor.objects.filter(type='Банк')
+        # args['banks'] = Contractor.objects.filter(type='Банк')
         args.update(csrf(request))
-        return render_to_response('dashboard.html', args)
+        return render_to_response("dashboard.html", args)
     else:
         # отправляем на аутентификацию и проверяем пользователя
         return login(request)
