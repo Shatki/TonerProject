@@ -10,8 +10,6 @@
                        data-options="
                                 fit:true,
                                 fitColumns:true,
-                                method:'post',
-                                url:'/document/consignment/all/json/',
                                 idField:'id',
                                 toolbar:'#doc-toolbar',
                                 rownumbers:true,
@@ -42,12 +40,10 @@
             <div id="docs-date-filter" style="padding: 5px">
                 <input class="easyui-datetimebox" id="docs-date-from" required="required" title="From"
                        data-options="width:200,labelWidth:30,
-                           label:'От:',labelPosition:'before',labelAlign:'right',
-                           onSelect:function(date){docTabFilter(date,0)}">
+                           label:'От:',labelPosition:'before',labelAlign:'right'">
                 <input class="easyui-datetimebox" id="docs-date-to" required="required" title="To"
                        data-options="width:200,labelWidth:30,
-                           label:'До:',labelPosition:'before',labelAlign:'right',
-                           onSelect:function(date){docTabFilter(0,date)}">
+                           label:'До:',labelPosition:'before',labelAlign:'right'">
             </div>
 
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
@@ -75,7 +71,7 @@
     <script type="text/javascript">
         $(function () {
             enablePopupMenu('#docs', '#doc-table-popup-menu');
-            enableDateFilter('#docs', '#docs-date-from', '#docs-date-to');
+            enableDocTabLoader('/document/consignment/all/json/', '#docs', '#docs-date-from', '#docs-date-to');
         });
     </script>
 {% endblock scripts %}

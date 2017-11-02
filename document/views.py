@@ -39,21 +39,29 @@ def consignments(request):
 @csrf_protect
 @login_required
 def consignments_json(request):
+    # Нужно ограничить количество запросов в секунду
+    # if request.
+
     try:
         docs_datetime_to = request.POST.get('dateTo')
         docs_datetime_from = request.POST.get('dateFrom')
 
+        # Если еще не предоставлена дата
         if not docs_datetime_to:
-            docs_datetime_to = datetime.today()
+            docs_datetime_to = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
         else:
+            # Дата получена из запроса - преобразуем ее из JS формата в Python
             docs_datetime_to = datetime.strptime(docs_datetime_to, "%d/%m/%Y %H:%M:%S")
 
         if not docs_datetime_from:
-            docs_datetime_from = docs_datetime_to - timedelta(90)  # 90 дней
+            # Если не указана дата берем диапазон 90 дней
+            docs_datetime_from = docs_datetime_to - timedelta(days=90, hours=0, minutes=0, seconds=0, microseconds=0)
         else:
+            # Дата получена из запроса - преобразуем ее из JS формата в Python
             docs_datetime_from = datetime.strptime(docs_datetime_from, "%d/%m/%Y %H:%M:%S")
 
         # Показывает только не удаленные
+
         data = Consignment.objects.filter(delete=False, date__range=[docs_datetime_from, docs_datetime_to])
     except Consignment.DoesNotExist:
         return HttpResponse(u'consignments_json: DB Error', content_type='text/html')
@@ -72,8 +80,9 @@ def consignments_json(request):
     # final preparing
     response = dict(
         total=str(data.count()),
-        date_from=docs_datetime_from,
-        docs_date_to=docs_datetime_to,
+        date_from=docs_datetime_from.strftime("%d/%m/%Y %H:%M:%S"),
+        date_to=docs_datetime_to.strftime("%d/%m/%Y %H:%M:%S"),
+        date_request=datetime.today().strftime("%d/%m/%Y %H:%M:%S"),
         rows=rows,
     )
     return JsonResponse(response, safe=False)

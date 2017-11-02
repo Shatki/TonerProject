@@ -147,11 +147,17 @@ function renameTab(number, date) {
 
 // Смена наименования панели
 // Возможно устрело --- СДЕЛАТЬ смена даты на панели журнала накладных
-function docTabFilter() {
-    //alert($('#doc-maintab').title());
+function docTabFilter(table_id, datefrom_id, dateto_id) {
+    var dateFrom = $(datefrom_id);
+    var dateTo = $(dateto_id);
+    $(table_id).datagrid({
+        loadFilter: function (data) {
+            dateFrom.datetimebox('setValue', data.date_from);
+            dateTo.datetimebox('setValue', data.date_to);
+            return data;
+        }
+    });
 }
-
-
 
 // Document functions
 // Активация cell-editing функции, а также запуск дополнительных возможностей datagrid
@@ -168,32 +174,45 @@ function enablePopupMenu(doc_id, menu_id) {
     })
 }
 
-function enableDateFilter(table_id, datefrom_id, dateto_id) {
+function enableDocTabLoader(url, table_id, datefrom_id, dateto_id) {
     var table = $(table_id);
     var dateFrom = $(datefrom_id);
     var dateTo = $(dateto_id);
 
+    table.datagrid({
+        loadFilter: function (data) {
+            //alert(data.date_from);
+            dateFrom.datetimebox('setValue', data.date_from);
+            dateTo.datetimebox('setValue', data.date_to);
+            return data;
+        }
+    });
     dateFrom.datetimebox({
         onChange: function (newValue, oldValue) {
-            table.datagrid({
-                queryParams: {
-                    dateFrom: newValue,
-                    dateTo: dateTo.datetimebox('getValue')
-                }
-            })
+            if (newValue !== oldValue) {
+                table.datagrid({
+                    queryParams: {
+                        dateFrom: newValue,
+                        dateTo: dateTo.datetimebox('getValue')
+                    }
+                })
+            }
+
         }
     });
-
     dateTo.datetimebox({
         onChange: function (newValue, oldValue) {
-            table.datagrid({
-                queryParams: {
-                    dateTo: newValue,
-                    dateFrom: dateFrom.datetimebox('getValue')
-                }
-            })
+            if (newValue !== oldValue) {
+                table.datagrid({
+                    queryParams: {
+                        dateTo: newValue,
+                        dateFrom: dateFrom.datetimebox('getValue')
+                    }
+                })
+            }
         }
     });
+    table.datagrid({url: url, method: 'post'});
 }
 
 function enableDoc(doc_id, popupmenu_id) {
