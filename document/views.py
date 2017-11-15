@@ -40,7 +40,6 @@ def consignments(request):
 @login_required
 def consignments_json(request):
     # Нужно ограничить количество запросов в секунду
-    # if request.
 
     try:
         docs_datetime_to = request.POST.get('dateTo')

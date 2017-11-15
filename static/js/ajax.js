@@ -8,6 +8,7 @@
 /*	AJAX Setup
  ------------------------------------------------------*/
 $.ajaxSetup({
+    timeout: 1000,
     beforeSend: function (xhr, settings) {
         function getCookie(name) {
             var cookieValue = null;

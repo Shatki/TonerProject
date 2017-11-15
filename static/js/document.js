@@ -94,8 +94,6 @@
     };
 })(jQuery);
 
-
-
 // Tab functions
 function addTab(title, url) {
     var doctabs = $('#doc-tabs');
