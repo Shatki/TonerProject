@@ -1,7 +1,21 @@
 // В стадии разработки для созданияя плагина 'document'
 (function ($) {
-    var methods = {
-        'add': function (doc_id) {
+    $.fn.document = function (options, param) {
+        if (typeof options == 'string') {
+            return $.fn.document.methods[options](this, param);
+        }
+        options = options || {};
+
+
+    };
+
+    $.fn.document.methods = {
+        init: function (doc_id) {
+            //return this.each(function(){
+            //$(window).bind('resize.tooltip', methods.reposition);
+            //});
+        },
+        add: function (doc_id) {
             var doc = $(doc_id);
             var rowIndex = doc.datagrid('getRows').length;
             doc.datagrid('insertRow', {
@@ -24,7 +38,7 @@
                 doc.datagrid('gotoCell', param).datagrid('editCell', param);
             }
         },
-        'edit': function (doc_id, param) {
+        edit: function (doc_id, param) {
             //alert(doc_id);
             var doc = $(doc_id);
             if (!param) {
@@ -34,13 +48,13 @@
                 }
             }
         },
-        'copy': function (doc_id) {
+        copy: function (doc_id) {
             var doc = $(doc_id);
             var rowIndex = doc.datagrid('cell').index;
             //var row = doc.datagrid('getRows')[rowIndex];
             setCookie('bufferItem', rowIndex);
         },
-        'paste': function (doc_id) {
+        paste: function (doc_id) {
             var doc = $(doc_id);
             //Вставляем в конец списка
             var rowIndex = doc.datagrid('getRows').length;
@@ -70,7 +84,7 @@
             //    }
             //});
         },
-        'dublicate': function (doc_id) {
+        dublicate: function (doc_id) {
             var doc = $(doc_id);
             var rowIndex = doc.datagrid('cell').index;
             var row = doc.datagrid('getRows')[rowIndex];
@@ -89,10 +103,11 @@
         } else if (typeof method === 'object' || !method) {
             return methods.init.apply(this, arguments);
         } else {
-            $.error('Метод с именем ' + method + ' не существует для jQuery.tooltip');
+            $.error('Метод с именем ' + method + ' не существует для jQuery.document');
         }
     };
 })(jQuery);
+
 
 // Tab functions
 function addTab(title, url) {
@@ -401,7 +416,6 @@ function formatRouble(value) {
         return '';
     }
 }
-
 
 function editItem(doc_id, param) {
     //alert(doc_id);
