@@ -85,7 +85,8 @@ class Category(models.Model):
     path = models.CharField(verbose_name=u'наименование для адресной строки', max_length=30,
                             validators=[validator_path],
                             help_text=u"категории товара в адресной строке в латинских символах")
-    parent = models.ForeignKey("self", verbose_name=u'Родительскиая категория', null=True, blank=True, default=None)
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, verbose_name=u'Родительскиая категория', null=True,
+                               blank=True, default=None)
 
     def __str__(self):
         return self.name
@@ -144,8 +145,8 @@ class Features(models.Model):
         db_table = 'features'
         ordering = ('group',)
 
-    feature = models.ForeignKey(Feature, verbose_name=u'наименование характеристики')
-    group = models.ForeignKey(Type, verbose_name=u'группа характеристик товара',
+    feature = models.ForeignKey(Feature, on_delete=models.CASCADE, verbose_name=u'наименование характеристики')
+    group = models.ForeignKey(Type, on_delete=models.CASCADE, verbose_name=u'группа характеристик товара',
                               help_text=u"группа принадлежности характеристики")
     name = models.CharField(verbose_name=u'Модель или количество', max_length=70,
                             help_text=u"описание характеристик товара, "
@@ -167,29 +168,29 @@ class Product(models.Model):
 
     name = models.CharField(verbose_name=u'наименование продукта', max_length=30,
                             help_text=u"наименование продукта")
-    category = models.ForeignKey(Category, verbose_name=u'категория продукта')
-    developer = models.ForeignKey(Developer, verbose_name=u'производитель продукта')
-    code = models.ForeignKey(Code, verbose_name=u'коды продукта:', null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=u'категория продукта')
+    developer = models.ForeignKey(Developer, on_delete=models.CASCADE, verbose_name=u'производитель продукта')
+    code = models.ForeignKey(Code, on_delete=models.CASCADE, verbose_name=u'коды продукта:', null=True, blank=True)
     features = models.ManyToManyField(Features, verbose_name=u'характеристики продукта',
                                       related_name='features', blank=True)
     include = models.ManyToManyField('self', symmetrical=True, default=None,
                                      verbose_name=u'подходит для:', blank=True)
     # Параметры для отображения информации в наименовании
-    first_view = models.ForeignKey(Features, verbose_name=u'первая характеристика',
+    first_view = models.ForeignKey(Features, on_delete=models.CASCADE, verbose_name=u'первая характеристика',
                                    related_name='first_features_view', null=True, blank=True)
-    second_view = models.ForeignKey(Features, verbose_name=u'вторая характеристика',
+    second_view = models.ForeignKey(Features, on_delete=models.CASCADE, verbose_name=u'вторая характеристика',
                                     related_name='second_features_view', null=True, blank=True)
 
-    third_view = models.ForeignKey(Features, verbose_name=u'третья характеристика',
+    third_view = models.ForeignKey(Features, on_delete=models.CASCADE, verbose_name=u'третья характеристика',
                                    related_name='third_features_view', null=True, blank=True)
 
-    fourth_view = models.ForeignKey(Features, verbose_name=u'четвертая характеристика',
+    fourth_view = models.ForeignKey(Features, on_delete=models.CASCADE, verbose_name=u'четвертая характеристика',
                                     related_name='fourth_features_view', null=True, blank=True)
 
-    fifth_view = models.ForeignKey(Features, verbose_name=u'пятая характеристика',
+    fifth_view = models.ForeignKey(Features, on_delete=models.CASCADE, verbose_name=u'пятая характеристика',
                                    related_name='fifth_features_view', null=True, blank=True)
 
-    sixth_view = models.ForeignKey(Features, verbose_name=u'шестая характеристика',
+    sixth_view = models.ForeignKey(Features, on_delete=models.CASCADE, verbose_name=u'шестая характеристика',
                                    related_name='sixth_features_view', null=True, blank=True)
 
     def __str__(self):
@@ -246,7 +247,8 @@ class Currency(models.Model):
                                  validators=[alpha_lat])
     code_4217 = models.CharField(max_length=3, verbose_name=u'код валюты number-3 ISO 4217',
                                  validators=[numeric])
-    course = models.ForeignKey('Course', verbose_name=u'текущий курс', related_name='currency_course')
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, verbose_name=u'текущий курс',
+                               related_name='currency_course')
 
     def __str__(self):
         return self.name
@@ -258,10 +260,12 @@ class Course(models.Model):
         verbose_name_plural = 'курсы валют'
         db_table = 'course'
 
-    currency = models.ForeignKey(Currency, verbose_name=u'валюта', related_name='currency_name')
+    currency = models.ForeignKey(Currency, on_delete=models.CASCADE, verbose_name=u'валюта',
+                                 related_name='currency_name')
     value = models.FloatField(verbose_name=u'курс',
                               help_text=u'введите курс валюты используйте запятую для разделения целой и дробной части')
-    relation = models.ForeignKey(Currency, verbose_name=u'в валюте', related_name='currency_relation')
+    relation = models.ForeignKey(Currency, on_delete=models.CASCADE, verbose_name=u'в валюте',
+                                 related_name='currency_relation')
     date = models.DateField(verbose_name=u'дата изменения курса', default='01.01.1980')
 
     def __str__(self):

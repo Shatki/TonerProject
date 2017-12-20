@@ -56,10 +56,10 @@ class Contractor(models.Model):
     okato = models.CharField(verbose_name=u'ОКАТО', max_length=11, validators=[numeric], null=True, blank=True)  # ОКАТО
     address = models.CharField(verbose_name=u'адрес организации', max_length=100, null=True, blank=True)
 
-    bank = models.ForeignKey('self', verbose_name=u'банк', blank=True, null=True)
+    bank = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name=u'банк', blank=True, null=True)
     account = models.CharField(verbose_name=u'банковский счёт', max_length=20,
                                validators=[numeric], null=True, blank=True)  # счет
-    type = models.ForeignKey(Type, verbose_name=u'вид контрагента', null=True, blank=True)
+    type = models.ForeignKey(Type, on_delete=models.CASCADE, verbose_name=u'вид контрагента', null=True, blank=True)
     bik = models.CharField(verbose_name=u'БИК', unique=True, max_length=9, db_index=True,
                            validators=[numeric], blank=True, null=True)  # БИК атрибут банков
 
