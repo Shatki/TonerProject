@@ -28,9 +28,9 @@ class Cost(models.Model):
         verbose_name_plural = 'цены'
         db_table = 'cost'
 
-    product = models.ForeignKey(Product, verbose_name=u'товар', blank=False, null=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=u'товар', blank=False, null=False)
     value = models.FloatField(verbose_name=u'стоимость', default=1, blank=False, null=False)
-    currency = models.ForeignKey(Currency, verbose_name=u'валюта', blank=False, null=False)
+    currency = models.ForeignKey(Currency, on_delete=models.CASCADE, verbose_name=u'валюта', blank=False, null=False)
     date = models.DateField(verbose_name=u'дата установки цены', default=date_minimal, blank=False, null=False)
     time = models.TimeField(verbose_name=u'время установки цены', blank=False, null=False)
 

@@ -25,16 +25,16 @@ class Item(models.Model):
         db_table = 'item'
 
     # main fields
-    product = models.ForeignKey(Product, verbose_name=u'продукт', default=None)
-    country = models.ForeignKey(Country, verbose_name=u'страна производитель', default=None)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=u'продукт', default=None)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=u'страна производитель', default=None)
     warranty = models.IntegerField(default=6, verbose_name=u'гарантийный срок', validators=[validator_warranty])
-    package = models.ForeignKey(Package, verbose_name=u'тип поставки', null=True)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, verbose_name=u'тип поставки', null=True)
 
     # addition fields
     serial_number = models.CharField(max_length=30, verbose_name=u'серийный номер продукта',
                                      default=None, null=True, blank=True)
     quantity = models.FloatField(verbose_name=u'количество', default=1)
-    measure = models.ForeignKey(Measure, verbose_name=u'единица измерения', default=1)
+    measure = models.ForeignKey(Measure, on_delete=models.CASCADE, verbose_name=u'единица измерения', default=1)
 
     def __str__(self):
         return str(self.product) + ', ' + self.package.name + ' [' + self.serial_number + ']'

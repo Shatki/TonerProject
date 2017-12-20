@@ -42,15 +42,15 @@ class Order(models.Model):
     number = models.CharField(max_length=10, verbose_name=u'номер заказа', validators=[validator_numerator],
                               help_text=u"пожалуйста используйте следующий формат: AA-xxxxxxx")
     date = models.DateField(verbose_name=u'дата заказа', auto_now_add=True)
-    user = models.ForeignKey(Account, verbose_name=u'клиент')
-    work = models.ForeignKey(Work, verbose_name=u'вид работ', default=None)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=u'клиент')
+    work = models.ForeignKey(Work, on_delete=models.CASCADE, verbose_name=u'вид работ', default=None)
     cost = models.IntegerField(verbose_name=u'стоимость', editable=True, default=0)
     # Оборудованиe
-    product = models.ForeignKey(Product, verbose_name=u'устройство', default=None)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=u'устройство', default=None)
     # cartridge = models.ForeignKey(Cartridge, verbose_name=u'Картридж')
     # Вид работы
     comments = models.TextField(max_length=100, verbose_name=u'комментарий', blank=True)
-    status = models.ForeignKey(Status, verbose_name=u'статус заказа', on_delete=None)
+    status = models.ForeignKey(Status, on_delete=models.CASCADE, verbose_name=u'статус заказа')
 
     def __str__(self):
         return self.number

@@ -57,7 +57,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     photo = models.FilePathField(verbose_name=u'Аватар', blank=True, null=True,
                                  default='defaultprofileimage.jpg')
     phone = models.CharField(verbose_name=u'сотовый телефон', max_length=10, validators=[phone], null=True)
-    contractor = models.ForeignKey(Contractor, verbose_name=u'организация', blank=True, null=True,
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name=u'организация', blank=True,
+                                   null=True,
                                    related_name='account_contractor')
 
     # Атрибут суперпользователя

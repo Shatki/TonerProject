@@ -25,7 +25,7 @@ urlpatterns = [
     # Examples:
     # url(r'^$', 'toner.views.home', name='home'),
     url(r'^blog/', include('blog.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
     url(r'^auth/', include('authentication.urls')),
     url(r'^catalog/', include('system.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
