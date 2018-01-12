@@ -57,6 +57,12 @@ $.extend(
     }
 );
 
+$(document).ready(function () {
+    if (!navigator.cookieEnabled) {
+        alert('Включите cookie для комфортной работы с этим сайтом');
+    }
+});
+
 (function ($) {
     var methods = {
         init: function (options) {
@@ -72,46 +78,6 @@ $.extend(
                 datagrid({
                     clickToEdit: false,
                     dblclickToEdit: true
-                }).
-                datagrid('enableCellEditing').
-                datagrid({
-                    onEndEdit: function (rowIndex, row, changes) {
-                        // get all changes
-                        for (var name in changes) {
-                            // Изменяем текствовое поле на  c id на name
-                            var ed = $(this).datagrid('getEditor', {index: rowIndex, field: name});
-                            row.name = $(ed.target).combotreegrid('getText');
-
-                            // Автокалькуляция значений в строках
-                            if (changes.cost) {
-                                // autosumm column   total = quantity * cost
-                                $(this).datagrid('updateRow', {
-                                    index: rowIndex,
-                                    row: {
-                                        total: (row.cost * row.quantity).toFixed(2)
-                                    }
-                                });
-                            } else if (changes.quantity) {
-                                // alert(changes.quantity);
-                                // autosumm column   total = quantity * cost
-                                $(this).datagrid('updateRow', {
-                                    index: rowIndex,
-                                    row: {
-                                        total: (row.cost * row.quantity).toFixed(2)
-                                    }
-                                });
-                            } else if (changes.total) {
-                                // alert(changes.total);
-                                // autosumm column   cost = total / quantity
-                                $(this).datagrid('updateRow', {
-                                    index: rowIndex,
-                                    row: {
-                                        cost: (row.total / row.quantity).toFixed(2)
-                                    }
-                                });
-                            }
-                        }
-                    }
                 }).
                 datagrid({
                     onRowContextMenu: function (e, index, row) {

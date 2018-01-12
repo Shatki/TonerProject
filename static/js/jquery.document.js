@@ -8,6 +8,207 @@ $.extend(
         }
     }
 );
+
+(function ($) {
+    var methods = {
+        init: function (options) {
+            //alert('enable');
+            return this.each(function() {
+                var table = $(this);
+                var popupmenu = $(table.datagrid('options').popupmenu);
+                var buttonAdd = $(table.datagrid('options').toolbar).find('a.document-newdoc');
+                table.
+                datagrid({
+                    clickToEdit: false,
+                    dblclickToEdit: true
+                }).
+                datagrid('enableCellEditing').
+                datagrid({
+                    onEndEdit: function (rowIndex, row, changes) {
+                        // get all changes
+                        for (var name in changes) {
+                            // Изменяем текствовое поле на  c id на name
+                            var ed = $(this).datagrid('getEditor', {index: rowIndex, field: name});
+                            row.name = $(ed.target).combotreegrid('getText');
+
+                            // Автокалькуляция значений в строках
+                            if (changes.cost) {
+                                // autosumm column   total = quantity * cost
+                                $(this).datagrid('updateRow', {
+                                    index: rowIndex,
+                                    row: {
+                                        total: (row.cost * row.quantity).toFixed(2)
+                                    }
+                                });
+                            } else if (changes.quantity) {
+                                // alert(changes.quantity);
+                                // autosumm column   total = quantity * cost
+                                $(this).datagrid('updateRow', {
+                                    index: rowIndex,
+                                    row: {
+                                        total: (row.cost * row.quantity).toFixed(2)
+                                    }
+                                });
+                            } else if (changes.total) {
+                                // alert(changes.total);
+                                // autosumm column   cost = total / quantity
+                                $(this).datagrid('updateRow', {
+                                    index: rowIndex,
+                                    row: {
+                                        cost: (row.total / row.quantity).toFixed(2)
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }).
+                datagrid({
+                    onRowContextMenu: function (e, index, row) {
+                        e.preventDefault();
+                        // Включаем контекстное меню для редактирования таблицы документов
+                        popupmenu.menu('show', {
+                            left: e.pageX,
+                            top: e.pageY
+                        });
+                    }
+                });
+
+                buttonAdd.bind('click.doctable', methods.new);
+            });
+
+        },
+        destroy: function () {
+            return this.each(function () {
+                $(window).unbind('.doctable');
+            })
+        },
+        add: function (params) {
+            var doctabs = $('.doctable-tabs');
+            //alert(params.title);
+            if (doctabs.tabs('exists', params.title)) {
+                doctabs.tabs('select', params.title);
+            } else {
+                $.ajax({
+                    url: params.url,
+                    cache: true,
+                    success: function (html) {
+                        doctabs.tabs('add', {
+                            //id: doc_id.substring(1),
+                            title: params.title,
+                            content: html,
+                            closable: true
+                        });
+                    }
+                });
+            }
+            return false;
+        },
+        new: function () {
+            var date = table.datebox.defaults.formatter(new Date());
+            methods.add({
+                title: 'Новая накладная от ' + date,
+                url: '/document/consignment/new/'
+            });
+            return false;
+        },
+        rename: function () {
+            var doctabs = $('.doctable-tabs');
+            var t = doctabs.tabs('getSelected');
+            var titleParts = t.panel('options').title.split(" ", 5);
+            if (!number) {
+                number = titleParts[2];
+            }
+            if (titleParts[4]) {
+                // Наименование будет из 5  частей
+                if (!date) {
+                    date = titleParts[4];
+                }
+            } else {
+                // Наименование будет из 4  частей
+                if (!date) {
+                    date = titleParts[3];
+                }
+            }
+            var title = 'Накладная № ' + number + ' от ' + date;
+            doctabs.tabs('updateTitle', {
+                tab: t,
+                title: title
+            });
+        },
+        edit: function (param) {
+            //alert(doc_id);
+            var doc = $(this);
+            if (!param) {
+                param = doc.datagrid('cell');
+                if (param) {
+                    doc.datagrid('gotoCell', param).datagrid('editCell', param);
+                }
+            }
+        },
+        copy: function () {
+            var doc = $(this);
+            var rowIndex = doc.datagrid('cell').index;
+            //var row = doc.datagrid('getRows')[rowIndex];
+            setCookie('bufferItem', rowIndex);
+        },
+        paste: function () {
+            var doc = $(this);
+            //Вставляем в конец списка
+            var rowIndex = doc.datagrid('getRows').length;
+            var row = doc.datagrid('getRows')[getCookie('bufferItem')];
+            row.itemId = rowIndex;
+            doc.datagrid('insertRow', {
+                    index: rowIndex,
+                    row: row
+                }
+            );
+            //$.ajax({
+            //    url: '/document/consignment/' + doc_id + '/item/paste/',
+            //    method: 'POST',
+            //    data: {'item': getCookie('copyItem')},
+            //    cache: false,
+            //    success: function (data) {
+            //        if (data == 'Ok') {
+            //            // Пока кокой-то деревянный способ
+            //            // alert('Данные получены');
+            //            $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
+            //        } else {
+            //            alert(data);
+            //            // Данные получены кривые
+            //            // location.href = "#";
+            //            // location.reload();
+            //        }
+            //    }
+            //});
+        },
+        dublicate: function () {
+            var doc = $(this);
+            var rowIndex = doc.datagrid('cell').index;
+            var row = doc.datagrid('getRows')[rowIndex];
+            row.itemId = rowIndex;
+            doc.datagrid('insertRow', {
+                    index: rowIndex,
+                    row: row
+                }
+            );
+        }
+    };
+    $.fn.document = function (method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('Метод с именем ' + method + ' не существует для jQuery.document');
+        }
+    };
+    $.fn.document.defaults = {
+        selector: '.document',
+        url: null
+    }
+})(jQuery);
+
+
 /*
 // Tab functions
 function addTab(title, url) {
@@ -490,216 +691,4 @@ function popupMenuDispatcher(action) {
     }
 }
 
-$(document).ready(function () {
-    if (!navigator.cookieEnabled) {
-        alert('Включите cookie для комфортной работы с этим сайтом');
-    }
-});
-
 // В стадии разработки для созданияя плагина 'document'
-(function ($) {
-    var methods = {
-        enable: function (options) {
-            return this.each(function() {
-                var table = $(this);
-                table.
-                datagrid({
-                    clickToEdit: false,
-                    dblclickToEdit: true
-                }).
-                datagrid('enableCellEditing').
-                datagrid({
-                    onEndEdit: function (rowIndex, row, changes) {
-                        // get all changes
-                        for (var name in changes) {
-                            // Изменяем текствовое поле на  c id на name
-                            var ed = $(this).datagrid('getEditor', {index: rowIndex, field: name});
-                            row.name = $(ed.target).combotreegrid('getText');
-
-                            // Автокалькуляция значений в строках
-                            if (changes.cost) {
-                                // autosumm column   total = quantity * cost
-                                $(this).datagrid('updateRow', {
-                                    index: rowIndex,
-                                    row: {
-                                        total: (row.cost * row.quantity).toFixed(2)
-                                    }
-                                });
-                            } else if (changes.quantity) {
-                                //alert(changes.quantity);
-                                // autosumm column   total = quantity * cost
-                                $(this).datagrid('updateRow', {
-                                    index: rowIndex,
-                                    row: {
-                                        total: (row.cost * row.quantity).toFixed(2)
-                                    }
-                                });
-                            } else if (changes.total) {
-                                //alert(changes.total);
-                                // autosumm column   cost = total / quantity
-                                $(this).datagrid('updateRow', {
-                                    index: rowIndex,
-                                    row: {
-                                        cost: (row.total / row.quantity).toFixed(2)
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }).
-                datagrid({
-                    onRowContextMenu: function (e, index, row) {
-                        //alert(options.popupmenu);
-                        e.preventDefault();
-                        // Включаем контекстное меню для редактирования таблицы документов
-                        $(options.popupmenu).menu('show', {
-                            left: e.pageX,
-                            top: e.pageY
-                        });
-                    }
-                });
-            });
-        },
-        table: function (options) {
-
-                var table = $(this);
-                var dateFrom = $(options.dateFrom);
-                var dateTo = $(options.dateTo);
-
-                table.datagrid({
-                    loadFilter: function (data) {
-                        dateFrom.datetimebox('setValue', data.date_from);
-                        dateTo.datetimebox('setValue', data.date_to);
-                        return data;
-                    }
-                });
-                dateFrom.datetimebox({
-                    onChange: function (newValue, oldValue) {
-                        if (newValue !== oldValue) {
-                            table.datagrid({
-                                queryParams: {
-                                    dateFrom: newValue,
-                                    dateTo: dateTo.datetimebox('getValue')
-                                }
-                            })
-                        }
-
-                    }
-                });
-                dateTo.datetimebox({
-                    onChange: function (newValue, oldValue) {
-                        if (newValue !== oldValue) {
-                            table.datagrid({
-                                queryParams: {
-                                    dateTo: newValue,
-                                    dateFrom: dateFrom.datetimebox('getValue')
-                                }
-                            })
-                        }
-                    }
-                });
-                table.datagrid({url: options.url, method: 'post'});
-        },
-        destroy: function () {
-            return this.each(function () {
-                $(window).unbind('.document');
-            })
-        },
-        add: function () {
-            var doc = $(doc_id);
-            var rowIndex = doc.datagrid('getRows').length;
-            doc.datagrid('insertRow', {
-                    index: rowIndex,
-                    row: {
-                        itemId: 'ITM-' + rowIndex + 1,
-                        itemName: 'Не выбран',
-                        measure: '-',   //Переделать
-                        country: '-',
-                        cost: '0.00',
-                        quantity: '0.00',
-                        tax: '0.00',
-                        total: '0.00'
-                    }
-                }
-            );
-            // autoedit 'item' field added's row
-            param = doc.datagrid('cell');
-            if (param) {
-                doc.datagrid('gotoCell', param).datagrid('editCell', param);
-            }
-        },
-        edit: function (param) {
-            //alert(doc_id);
-            var doc = $(doc_id);
-            if (!param) {
-                param = doc.datagrid('cell');
-                if (param) {
-                    doc.datagrid('gotoCell', param).datagrid('editCell', param);
-                }
-            }
-        },
-        copy: function () {
-            var doc = $(doc_id);
-            var rowIndex = doc.datagrid('cell').index;
-            //var row = doc.datagrid('getRows')[rowIndex];
-            setCookie('bufferItem', rowIndex);
-        },
-        paste: function () {
-            var doc = $(doc_id);
-            //Вставляем в конец списка
-            var rowIndex = doc.datagrid('getRows').length;
-            var row = doc.datagrid('getRows')[getCookie('bufferItem')];
-            row.itemId = rowIndex;
-            doc.datagrid('insertRow', {
-                    index: rowIndex,
-                    row: row
-                }
-            );
-            //$.ajax({
-            //    url: '/document/consignment/' + doc_id + '/item/paste/',
-            //    method: 'POST',
-            //    data: {'item': getCookie('copyItem')},
-            //    cache: false,
-            //    success: function (data) {
-            //        if (data == 'Ok') {
-            //            // Пока кокой-то деревянный способ
-            //            // alert('Данные получены');
-            //            $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
-            //        } else {
-            //            alert(data);
-            //            // Данные получены кривые
-            //            // location.href = "#";
-            //            // location.reload();
-            //        }
-            //    }
-            //});
-        },
-        dublicate: function () {
-            var doc = $(doc_id);
-            var rowIndex = doc.datagrid('cell').index;
-            var row = doc.datagrid('getRows')[rowIndex];
-            row.itemId = rowIndex;
-            doc.datagrid('insertRow', {
-                    index: rowIndex,
-                    row: row
-                }
-            );
-        }
-    };
-
-    $.fn.document = function (method) {
-        if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof method === 'object' || !method) {
-            return methods.init.apply(this, arguments);
-        } else {
-            $.error('Метод с именем ' + method + ' не существует для jQuery.document');
-        }
-    };
-
-    $.fn.document.defaults = {
-        url: null
-    }
-
-
-})(jQuery);
