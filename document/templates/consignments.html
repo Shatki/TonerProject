@@ -2,20 +2,27 @@
 {% load staticfiles %}
 
 {% block mainview %}
-    <div id="doc-tabs" class="easyui-tabs" data-options="fit:true,border:false,plain:true">
+    <div id="doc-tabs"
+         class="easyui-tabs doctable-tabs"
+         data-options="
+                    fit:true,
+                    border:false,
+                    plain:true">
         {% block tab %}
             <div id="doc-maintab" title="Журнал документов">
                 <table id="docs"
-                       class="easyui-datagrid"
+                       class="easyui-datagrid doctable"
                        data-options="
+                                url:'/document/consignment/all/json/',
+                                method: 'post',
                                 fit:true,
                                 fitColumns:true,
                                 idField:'id',
-                                toolbar:'#doc-toolbar',
+                                toolbar:'#docs-toolbar',
+                                popupmenu:'#doctable-popupmenu',
                                 rownumbers:true,
                                 autoRowHeight:false,
-                                singleSelect:true
-                                ">
+                                singleSelect:true">
                     <thead>
                     <tr>
                         <th field="id" width="3">id</th>
@@ -36,18 +43,20 @@
     </div>
 
     {% block doctable-menu %}
-        <div id="doc-toolbar" style="padding: 5px">
-            <div id="docs-date-filter" style="padding: 5px">
-                <input class="easyui-datetimebox" id="docs-date-from" required="required" title="From"
+        <div id="docs-toolbar" class="doctable-toolbar" style="padding: 5px">
+            <div id="docs-datefilter" style="padding: 5px">
+                <input class="easyui-datetimebox doctable-datefrom"
+                       id="doctable-datefrom" required="required" title="From"
                        data-options="width:200,labelWidth:30,
                            label:'От:',labelPosition:'before',labelAlign:'right'">
-                <input class="easyui-datetimebox" id="docs-date-to" required="required" title="To"
+                <input class="easyui-datetimebox doctable-dateto"
+                       id="doctable-dateto" required="required" title="To"
                        data-options="width:200,labelWidth:30,
                            label:'До:',labelPosition:'before',labelAlign:'right'">
             </div>
 
-            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
-               onclick="newDoc('{{ system_date }}')">Создать</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton doctable-newdoc"
+               iconCls="icon-add" plain="true">Создать</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
                onclick="editDoc()">Редактировать</a>
             <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
@@ -68,12 +77,6 @@
 {% endblock property %}
 
 {% block scripts %}
-    <script type="text/javascript">
-        $(function () {
-            enablePopupMenu('#docs', '#doc-table-popup-menu');
-            enableDocTabLoader('/document/consignment/all/json/', '#docs', '#docs-date-from', '#docs-date-to');
-        });
-    </script>
 {% endblock scripts %}
 
 

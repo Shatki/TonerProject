@@ -11,17 +11,17 @@
  * linkbutton - EasyUI for jQuery
  * 
  */
-(function ($) {
-	function setSize(target, param) {
+(function($){
+	function setSize(target, param){
 		var opts = $.data(target, 'linkbutton').options;
-		if (param) {
+		if (param){
 			$.extend(opts, param);
 		}
-		if (opts.width || opts.height || opts.fit) {
+		if (opts.width || opts.height || opts.fit){
 			var btn = $(target);
 			var parent = btn.parent();
 			var isVisible = btn.is(':visible');
-			if (!isVisible) {
+			if (!isVisible){
 				var spacer = $('<div style="display:none"></div>').insertBefore(target);
 				var style = {
 					position: btn.css('position'),
@@ -38,54 +38,50 @@
 			btn._size(opts, parent);
 			var left = btn.find('.l-btn-left');
 			left.css('margin-top', 0);
-			left.css('margin-top', parseInt((btn.height() - left.height()) / 2) + 'px');
-			if (!isVisible) {
+			left.css('margin-top', parseInt((btn.height()-left.height())/2)+'px');
+			if (!isVisible){
 				btn.insertAfter(spacer);
 				btn.css(style);
 				spacer.remove();
 			}
 		}
 	}
-
+	
 	function createButton(target) {
 		var opts = $.data(target, 'linkbutton').options;
 		var t = $(target).empty();
-
+		
 		t.addClass('l-btn').removeClass('l-btn-plain l-btn-selected l-btn-plain-selected l-btn-outline');
-		t.removeClass('l-btn-small l-btn-medium l-btn-large').addClass('l-btn-' + opts.size);
-		if (opts.plain) {
-			t.addClass('l-btn-plain')
-		}
-		if (opts.outline) {
-			t.addClass('l-btn-outline')
-		}
-		if (opts.selected) {
+		t.removeClass('l-btn-small l-btn-medium l-btn-large').addClass('l-btn-'+opts.size);
+		if (opts.plain){t.addClass('l-btn-plain')}
+		if (opts.outline){t.addClass('l-btn-outline')}
+		if (opts.selected){
 			t.addClass(opts.plain ? 'l-btn-selected l-btn-plain-selected' : 'l-btn-selected');
 		}
 		t.attr('group', opts.group || '');
 		t.attr('id', opts.id || '');
-
+		
 		var inner = $('<span class="l-btn-left"></span>').appendTo(t);
-		if (opts.text) {
+		if (opts.text){
 			$('<span class="l-btn-text"></span>').html(opts.text).appendTo(inner);
 		} else {
 			$('<span class="l-btn-text l-btn-empty">&nbsp;</span>').appendTo(inner);
 		}
-		if (opts.iconCls) {
+		if (opts.iconCls){
 			$('<span class="l-btn-icon">&nbsp;</span>').addClass(opts.iconCls).appendTo(inner);
-			inner.addClass('l-btn-icon-' + opts.iconAlign);
+			inner.addClass('l-btn-icon-'+opts.iconAlign);
 		}
-
-		t.unbind('.linkbutton').bind('focus.linkbutton', function () {
-			if (!opts.disabled) {
+		
+		t.unbind('.linkbutton').bind('focus.linkbutton',function(){
+			if (!opts.disabled){
 				$(this).addClass('l-btn-focus');
 			}
-		}).bind('blur.linkbutton', function () {
+		}).bind('blur.linkbutton',function(){
 			$(this).removeClass('l-btn-focus');
-		}).bind('click.linkbutton', function () {
-			if (!opts.disabled) {
-				if (opts.toggle) {
-					if (opts.selected) {
+		}).bind('click.linkbutton',function(){
+			if (!opts.disabled){
+				if (opts.toggle){
+					if (opts.selected){
 						$(this).linkbutton('unselect');
 					} else {
 						$(this).linkbutton('select');
@@ -104,18 +100,18 @@
 //				}
 //			});
 //		}
-
+		
 		setSelected(target, opts.selected)
 		setDisabled(target, opts.disabled);
 	}
-
-	function setSelected(target, selected) {
+	
+	function setSelected(target, selected){
 		var opts = $.data(target, 'linkbutton').options;
-		if (selected) {
-			if (opts.group) {
-				$('a.l-btn[group="' + opts.group + '"]').each(function () {
+		if (selected){
+			if (opts.group){
+				$('a.l-btn[group="'+opts.group+'"]').each(function(){
 					var o = $(this).linkbutton('options');
-					if (o.toggle) {
+					if (o.toggle){
 						$(this).removeClass('l-btn-selected l-btn-plain-selected');
 						o.selected = false;
 					}
@@ -124,25 +120,25 @@
 			$(target).addClass(opts.plain ? 'l-btn-selected l-btn-plain-selected' : 'l-btn-selected');
 			opts.selected = true;
 		} else {
-			if (!opts.group) {
+			if (!opts.group){
 				$(target).removeClass('l-btn-selected l-btn-plain-selected');
 				opts.selected = false;
 			}
 		}
 	}
-
-	function setDisabled(target, disabled) {
+	
+	function setDisabled(target, disabled){
 		var state = $.data(target, 'linkbutton');
 		var opts = state.options;
 		$(target).removeClass('l-btn-disabled l-btn-plain-disabled');
-		if (disabled) {
+		if (disabled){
 			opts.disabled = true;
 			var href = $(target).attr('href');
-			if (href) {
+			if (href){
 				state.href = href;
 				$(target).attr('href', 'javascript:;');
 			}
-			if (target.onclick) {
+			if (target.onclick){
 				state.onclick = target.onclick;
 				target.onclick = null;
 			}
@@ -157,82 +153,77 @@
 			}
 		}
 	}
-
-	$.fn.linkbutton = function (options, param) {
-		if (typeof options == 'string') {
+	
+	$.fn.linkbutton = function(options, param){
+		if (typeof options == 'string'){
 			return $.fn.linkbutton.methods[options](this, param);
 		}
-
+		
 		options = options || {};
-		return this.each(function () {
+		return this.each(function(){
 			var state = $.data(this, 'linkbutton');
-			if (state) {
+			if (state){
 				$.extend(state.options, options);
 			} else {
 				$.data(this, 'linkbutton', {
 					options: $.extend({}, $.fn.linkbutton.defaults, $.fn.linkbutton.parseOptions(this), options)
 				});
 				$(this).removeAttr('disabled');
-				$(this).bind('_resize', function (e, force) {
-					if ($(this).hasClass('easyui-fluid') || force) {
+				$(this).bind('_resize', function(e, force){
+					if ($(this).hasClass('easyui-fluid') || force){
 						setSize(this);
 					}
 					return false;
 				});
 			}
-
+			
 			createButton(this);
 			setSize(this);
 		});
 	};
-
+	
 	$.fn.linkbutton.methods = {
-		options: function (jq) {
+		options: function(jq){
 			return $.data(jq[0], 'linkbutton').options;
 		},
-		resize: function (jq, param) {
-			return jq.each(function () {
+		resize: function(jq, param){
+			return jq.each(function(){
 				setSize(this, param);
 			});
 		},
-		enable: function (jq) {
-			return jq.each(function () {
+		enable: function(jq){
+			return jq.each(function(){
 				setDisabled(this, false);
 			});
 		},
-		disable: function (jq) {
-			return jq.each(function () {
+		disable: function(jq){
+			return jq.each(function(){
 				setDisabled(this, true);
 			});
 		},
-		select: function (jq) {
-			return jq.each(function () {
+		select: function(jq){
+			return jq.each(function(){
 				setSelected(this, true);
 			});
 		},
-		unselect: function (jq) {
-			return jq.each(function () {
+		unselect: function(jq){
+			return jq.each(function(){
 				setSelected(this, false);
 			});
 		}
 	};
-
-	$.fn.linkbutton.parseOptions = function (target) {
+	
+	$.fn.linkbutton.parseOptions = function(target){
 		var t = $(target);
-		return $.extend({}, $.parser.parseOptions(target,
-			['id', 'iconCls', 'iconAlign', 'group', 'size', 'text', {
-				plain: 'boolean',
-				toggle: 'boolean',
-				selected: 'boolean',
-				outline: 'boolean'
-			}]
+		return $.extend({}, $.parser.parseOptions(target, 
+			['id','iconCls','iconAlign','group','size','text',{plain:'boolean',toggle:'boolean',selected:'boolean',outline:'boolean'}]
 		), {
 			disabled: (t.attr('disabled') ? true : undefined),
 			text: ($.trim(t.html()) || undefined),
 			iconCls: (t.attr('icon') || t.attr('iconCls'))
 		});
 	};
-
+	
 	$.fn.linkbutton.defaults = {
 		id: null,
 		disabled: false,
@@ -245,8 +236,7 @@
 		iconCls: null,
 		iconAlign: 'left',
 		size: 'small',	// small,large
-		onClick: function () {
-		}
+		onClick: function(){}
 	};
 	
 })(jQuery);
