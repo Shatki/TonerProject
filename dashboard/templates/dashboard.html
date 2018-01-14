@@ -21,7 +21,8 @@
         <script type='text/javascript' src="{% static 'js/datagrid-cellediting.js' %}"></script>
         <script type='text/javascript' src="{% static 'js/datagrid-scrollview.js' %}"></script>
 
-        <script type='text/javascript' src="{% static 'js/jquery.doctable.js' %}"></script>
+        <script type='text/javascript' src="{% static 'js/jquery.journal.js' %}"></script>
+        <script type='text/javascript' src="{% static 'js/jquery.document.js' %}"></script>
 
         <script type='text/javascript' src="{% static 'js/ajax.js' %}"></script>
         <script type='text/javascript' src="{% static 'js/cookies.js' %}"></script>
@@ -65,8 +66,8 @@
             {% endblock property %}
         </div>
         <div data-options="region:'center'">
-            {% block mainview %}
-            {% endblock mainview %}
+            {% block documents %}
+            {% endblock documents %}
         </div>
     </div>
     </body>

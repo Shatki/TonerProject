@@ -29,10 +29,10 @@ def consignments(request):
                 'system_date': SystemDateTime.today(),
                 }
     except:
-        return HttpResponse(u"consignments: DB Error", content_type='text/html')
+        return HttpResponse(u"journal: DB Error", content_type='text/html')
     args.update(csrf(request))
     # просмотр полного списка накладных
-    return render_to_response('consignments.html', args)
+    return render_to_response('journal.html', args)
 
 
 # JSON запрос элементов для отображения журнала накладных
@@ -151,7 +151,7 @@ def consignment_edit(request, consignment_id):
                 }
         args.update(csrf(request))
         # просмотр полного списка накладных
-        return render_to_response('consignment.html', args)
+        return render_to_response('document.html', args)
     else:
         return HttpResponse(u'consignment_edit:  please, login first', content_type='text/html')
 
@@ -180,8 +180,8 @@ def consignment_new(request):
         args["contractor"] = Contractor.objects.get(id=request.user.contractor_id)
     args.update(csrf(request))
 
-    # Добавление новой накладной
-    return render_to_response("consignment.html", args)
+    # Добавление нового документа
+    return render_to_response("document.html", args)
 
 
 # JSON обработка отображение позиций товара

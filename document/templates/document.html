@@ -1,22 +1,22 @@
-{% block docview %}
+{% block document %}
     {% block tab %}
         <table id="document-item-table-{{ consignment.id }}"
-               class="easyui-datagrid"
+               class="easyui-datagrid easydocui-document"
                 {% if consignment.id %}
                url="/document/consignment/{{ consignment.id }}/items/json/"
                 {% endif %}
                data-options="
-                                url:
-                                fit:true,
-                                fitColumns:true,
-                                toolbar:'#toolbar-document-{{ consignment.id }}',
-                                idField:'id',
-                                textField:'name',
-                                rownumbers:true,
-                                autoRowHeight:true,
-                                singleSelect:true,
-                                showFooter:true
-                                ">
+                            idDoc:'{{ consignment.id }}',
+                            fit:true,
+                            fitColumns:true,
+                            toolbar:'#toolbar-document-{{ consignment.id }}',
+                            popupmenu:'#item-table-popup-menu',
+                            idField:'id',
+                            textField:'name',
+                            rownumbers:true,
+                            autoRowHeight:true,
+                            singleSelect:true,
+                            showFooter:true">
             <thead>
             <tr>
                 <th field="ck" checkbox="true" width="5"></th>
@@ -91,7 +91,7 @@
             </thead>
         </table>
     {% endblock tab %}
-{% endblock docview %}
+{% endblock document %}
 
 {% block toolbar %}
     <div id='toolbar-document-{{ consignment.id }}'>
@@ -169,9 +169,4 @@
 
 
 {% block scripts %}
-    <script type="text/javascript">
-        $(function () {
-            enableDoc('#document-item-table-' + '{{ consignment.id }}', '#item-table-popup-menu');
-        });
-    </script>
 {% endblock scripts %}
