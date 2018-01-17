@@ -210,6 +210,18 @@ function formatRouble(value) {
             return this;
         },
         remove: function () {
+            var table = $('.easydocui-journal');
+            var row = table.datagrid('getSelected');
+            if (row) {
+                $.ajax({
+                    method: 'POST',
+                    url: '/document/consignment/' + row.id + '/delete/',
+                    cache: false,
+                    success: function () {
+                        table.datagrid('reload');
+                    }
+                });
+            }
             return this;
         },
         copy: function () {

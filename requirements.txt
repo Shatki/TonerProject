@@ -2,5 +2,6 @@ django
 openpyxl
 reportlab
 simplejson
+django-debug-toolbar
 
 
