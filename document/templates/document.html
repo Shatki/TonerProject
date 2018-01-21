@@ -6,7 +6,6 @@
                url="/document/consignment/{{ consignment.id }}/items/json/"
                 {% endif %}
                data-options="
-                            idDoc:'{{ consignment.id }}',
                             fit:true,
                             fitColumns:true,
                             toolbar:'#toolbar-document-{{ consignment.id }}',
@@ -91,13 +90,14 @@
             </thead>
         </table>
     {% endblock tab %}
+    {% block index %}
+        <div id="doc-id" hidden="hidden">{{ consignment.id }}</div>
+    {% endblock index %}
 {% endblock document %}
 
 {% block toolbar %}
     <div id='toolbar-document-{{ consignment.id }}'>
-        {% block index %}
-            <div id="doc-id" hidden="hidden">{{ consignment.id }}</div>
-        {% endblock index %}
+
         {% include 'menu.html' %}
         {% block toolbar-reqvisites %}
             <form id="document-req-form-{{ consignment.id }}">

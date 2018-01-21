@@ -66,10 +66,8 @@
 {% endblock documents %}
 
 {% block popup-menu %}
-    {% include "item_popup_menu.html" %}
-    {% include "document_popup_menu.html" %}
+    <div id="journal-popupmenu" class="easyui-menu easydocui-popupmenu"></div>
 {% endblock popup-menu %}
-
 
 {% block property %}
     <ul class="easyui-tree" data-options="url:'/catalog/product/json/',animate:true,dnd:true">
