@@ -396,6 +396,7 @@ $.extend(
             return false;
         },
         new: function () {
+            alert('Создание документа');
             return false;
         },
         edit: function (param) {
@@ -454,6 +455,11 @@ $.extend(
                     row: row
                 }
             );
+        },
+        print: function () {
+            //
+            alert('Печать из документа');
+            return this;
         }
     };
     $.fn.document = function (method) {

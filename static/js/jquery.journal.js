@@ -89,16 +89,15 @@ function formatRouble(value) {
     }
 }
 
-function popupMenuDispatcher(item) {
-    $(this).document(item.name);
-}
+
 
 (function ($) {
-
-
     function popupmenu(menuid, index, row) {
         var menu = $(menuid).empty();
-        //menu.menu('options').onClick='popupMenuDispatcher';
+        menu.menu('options').onClick = function (item) {
+            //alert(item.name);
+            $(this).journal(item.name);
+        };
         menu.menu('appendItem', {
             text: 'Создать',
             name: 'new',
@@ -121,7 +120,6 @@ function popupMenuDispatcher(item) {
                 var menuid = $(table.datagrid('options').popupmenu);
                 var dateFrom = $(table.datagrid('options').toolbar).find('input.journal-datefrom');
                 var dateTo = $(table.datagrid('options').toolbar).find('input.journal-dateto');
-
 
                 var buttonAdd = $(table.datagrid('options').toolbar).find('a.easydocui-adddoc');
                 var buttonEdit = $(table.datagrid('options').toolbar).find('a.easydocui-editdoc');
@@ -219,6 +217,7 @@ function popupMenuDispatcher(item) {
             return this;
         },
         new: function () {
+            alert('new');
             var table = $('.easydocui-journal');
             //var row = table.datagrid('getSelected');
             //alert(row);
@@ -372,6 +371,11 @@ function popupMenuDispatcher(item) {
                         break;
                 }
             }
+        },
+        print: function () {
+            //
+            alert('Печать из журнала');
+            return this;
         }
     };
     $.fn.journal = function (method) {
