@@ -94,99 +94,140 @@ function formatRouble(value) {
 (function ($) {
     function popupmenu(menuid, index, row) {
         var menu = $(menuid).empty();
-        menu.menu('options').onClick = function (item) {
-            //alert(item.name);
-            $(this).journal(item.name);
-        };
-        menu.menu('appendItem', {
+        menu.
+        menu('appendItem', {
             text: 'Создать',
             name: 'new',
-            iconCls: 'icon-add'
-        }).menu('appendItem', {
-                separator: true
-            }
-        ).menu('appendItem', {
+            iconCls: 'icon-add'}).
+        menu('appendItem', {
+            text: 'Редактировать',
+            name: 'edit',
+            iconCls: 'icon-edit'}).
+        menu('appendItem', {
+            text: 'Удалить',
+            name: 'remove',
+            iconCls: 'icon-remove'}).
+        menu('appendItem', {
+                separator: true}).
+        menu('appendItem', {
+            text: 'Копировать',
+            name: 'copy',
+            iconCls: 'icon-copy'}).
+        menu('appendItem', {
+            text: 'Вставить',
+            name: 'edit',
+            iconCls: 'icon-paste'}).
+        menu('appendItem', {
+            text: 'Дублировать',
+            name: 'remove',
+            iconCls: 'icon-paste'}).
+        menu('appendItem', {
+                separator: true}).
+        menu('appendItem', {
+            text: 'Обновить',
+            name: 'reload',
+            iconCls: 'icon-reload'}).
+        menu('appendItem', {
             text: 'Печать',
             name: 'print',
             iconCls: 'icon-print'
-        });
+        }).
+        menu('options').onClick = function (item) {
+            $(this).journal(item.name)};
         return menu;
     }
 
     var methods = {
         init: function (options) {
+            // Создаем настройки из дефолтных
+            // актуальные настройки, будут индивидуальными при каждом запуске
+            options = options || {};
+            var opts = $.extend({}, $.fn.journal.defaults, options);
+
             return this.each(function() {
-                var table = $(this);
-                var menuid = $(table.datagrid('options').popupmenu);
-                var dateFrom = $(table.datagrid('options').toolbar).find('input.journal-datefrom');
-                var dateTo = $(table.datagrid('options').toolbar).find('input.journal-dateto');
+                //var data = journal.data('journal');
+                var state = $(this).data('journal');
+                if (state) {
+                    return this;
+                } else {
+                    var journal = $(this);
+                    var menuid = journal.datagrid('options').popupmenu;
+                    var toolbar = $(journal.datagrid('options').toolbar);
+                    var dateFrom = toolbar.find('input.journal-datefrom');
+                    var dateTo = toolbar.find('input.journal-dateto');
 
-                var buttonAdd = $(table.datagrid('options').toolbar).find('a.easydocui-adddoc');
-                var buttonEdit = $(table.datagrid('options').toolbar).find('a.easydocui-editdoc');
-                var buttonRemove = $(table.datagrid('options').toolbar).find('a.easydocui-removedoc');
+                    var buttonAdd = toolbar.find('a.easydocui-adddoc');
+                    var buttonEdit = toolbar.find('a.easydocui-editdoc');
+                    var buttonRemove = toolbar.find('a.easydocui-removedoc');
 
-                table.
-                datagrid({
-                    clickToEdit: false,
-                    dblclickToEdit: true
-                }).
-                datagrid({
-                    onRowContextMenu: function (e, index, row) {
-                        e.preventDefault();
-                        // Включаем контекстное меню для редактирования таблицы документов
-                        popupmenu(menuid, index, row).menu('show', {
-                            left: e.pageX,
-                            top: e.pageY
-                        });
-                    }
-                }).
-                datagrid({
-                    loadFilter: function (data) {
-                        dateFrom.datetimebox('setValue', data.date_from);
-                        dateTo.datetimebox('setValue', data.date_to);
-                        return data;
-                    }
-                });
+                    buttonAdd.unbind().bind('click.journal', methods.new);
+                    buttonEdit.unbind().bind('click.journal', methods.edit);
+                    buttonRemove.unbind().bind('click.journal', methods.remove);
 
-                dateTo.datetimebox({
-                    onChange: function (newValue, oldValue) {
-                        if (newValue !== oldValue) {
-                            table.datagrid({
-                                queryParams: {
-                                    dateTo: newValue,
-                                    dateFrom: dateFrom.datetimebox('getValue')
-                                }
-                            })
+
+
+                    journal.
+                    datagrid({
+                        clickToEdit: false,
+                        dblclickToEdit: true
+                    }).
+                    datagrid({
+                        onRowContextMenu: function (e, index, row) {
+                            e.preventDefault();
+                            // Включаем контекстное меню для редактирования таблицы документов
+                            popupmenu(menuid, index, row).menu('show', {
+                                left: e.pageX,
+                                top: e.pageY
+                            });
                         }
-                    }
-                });
-                dateFrom.datetimebox({
-                    onChange: function (newValue, oldValue) {
-                        if (newValue !== oldValue) {
-                            table.datagrid({
-                                queryParams: {
-                                    dateFrom: newValue,
-                                    dateTo: dateTo.datetimebox('getValue')
-                                }
-                            })
+                    }).
+                    datagrid({
+                        loadFilter: function (data) {
+                            dateFrom.datetimebox('setValue', data.date_from);
+                            dateTo.datetimebox('setValue', data.date_to);
+                            return data;
                         }
-                    }
-                });
+                    });
 
-                buttonAdd.unbind().bind('click.journal', methods.new);
-                buttonEdit.unbind().bind('click.journal', methods.edit);
-                buttonRemove.unbind().bind('click.journal', methods.remove);
+                    dateTo.datetimebox({
+                        onChange: function (newValue, oldValue) {
+                            if (newValue !== oldValue) {
+                                journal.datagrid({
+                                    queryParams: {
+                                        dateTo: newValue,
+                                        dateFrom: dateFrom.datetimebox('getValue')
+                                    }
+                                })
+                            }
+                        }
+                    });
+                    dateFrom.datetimebox({
+                        onChange: function (newValue, oldValue) {
+                            if (newValue !== oldValue) {
+                                journal.datagrid({
+                                    queryParams: {
+                                        dateFrom: newValue,
+                                        dateTo: dateTo.datetimebox('getValue')
+                                    }
+                                })
+                            }
+                        }
+                    });
+
+                    // Устанавливаем флаг проинициализированности
+                    $(this).data('journal', this);
+                }
 
             });
 
         },
         destroy: function () {
-            return this.each(function () {
+            return $(this).each(function () {
                 $(window).unbind('.journal');
             })
         },
-        add: function (params) {
-            var doctabs = $('.journal-tabs');
+        add: function (jq, params) {
+            var doctabs = $(this);
             //alert(params.title);
             if (doctabs.tabs('exists', params.title)) {
                 doctabs.tabs('select', params.title);
@@ -216,9 +257,8 @@ function formatRouble(value) {
             }
             return this;
         },
-        new: function () {
-            alert('new');
-            var table = $('.easydocui-journal');
+        new: function (target) {
+            var table = $(this);
             //var row = table.datagrid('getSelected');
             //alert(row);
             var date = table.datebox.defaults.formatter(new Date());
@@ -228,9 +268,12 @@ function formatRouble(value) {
             });
             return this
         },
-        edit: function () {
-            var table = $('.easydocui-journal');    ////  this ????????????
-            var row = table.datagrid('getSelected');
+        edit: function (target) {
+            var journal = $(this).data('journal');
+            //alert(journal.toSource());
+            //var journal = $(this).data('journal');
+            //alert(journal.html().toSource());
+            var row = journal.datagrid('getSelected');
             if (row) {
                 methods.add({
                     title: row.name,
@@ -256,7 +299,7 @@ function formatRouble(value) {
             return this;
         },
         copy: function () {
-            var doc = $(this);
+            var doc = this;
             var rowIndex = doc.datagrid('cell').index;
             //var row = doc.datagrid('getRows')[rowIndex];
             setCookie('bufferItem', rowIndex);
@@ -380,10 +423,16 @@ function formatRouble(value) {
     };
     $.fn.journal = function (method) {
         if (methods[method]) {
+            // если запрашиваемый метод существует, мы его вызываем
+            // все параметры, кроме имени метода прийдут в метод
+            // this так же перекочует в метод
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === 'object' || !method) {
+            // если первым параметром идет объект, либо совсем пусто
+            // выполняем метод init
             return methods.init.apply(this, arguments);
         } else {
+            // если ничего не получилось
             $.error('Метод с именем ' + method + ' не существует для jQuery.journal');
         }
     };
@@ -395,7 +444,8 @@ function formatRouble(value) {
 
 $(document).ready(function () {
     $(function () {
-        $('.easydocui-journal').journal();
+        $('table.easydocui-journal').journal();
+
     });
 
     if (!navigator.cookieEnabled) {
