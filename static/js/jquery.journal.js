@@ -160,7 +160,8 @@ function formatRouble(value) {
                     var buttonEdit = toolbar.find('a.easydocui-editdoc');
                     var buttonRemove = toolbar.find('a.easydocui-removedoc');
 
-                    buttonAdd.unbind().bind('click.journal', methods.new);
+                    buttonAdd.click(methods.new.bind(this));
+                    //buttonAdd.unbind().bind('click.journal', methods.new.bind(this));
                     buttonEdit.unbind().bind('click.journal', methods.edit);
                     buttonRemove.unbind().bind('click.journal', methods.remove);
 
@@ -226,8 +227,8 @@ function formatRouble(value) {
                 $(window).unbind('.journal');
             })
         },
-        add: function (jq, params) {
-            var doctabs = $(this);
+        add: function (params) {
+            var doctabs = $('#doc-tabs');
             //alert(params.title);
             if (doctabs.tabs('exists', params.title)) {
                 doctabs.tabs('select', params.title);
@@ -257,10 +258,10 @@ function formatRouble(value) {
             }
             return this;
         },
-        new: function (target) {
+        new: function () {
             var table = $(this);
-            //var row = table.datagrid('getSelected');
-            //alert(row);
+            var row = table.datagrid('getSelected');
+            alert(row);
             var date = table.datebox.defaults.formatter(new Date());
             methods.add({
                 title: 'Новая накладная от ' + date,
