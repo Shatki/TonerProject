@@ -137,6 +137,11 @@ function formatRouble(value) {
         return menu;
     }
 
+    function activate(table) {
+
+
+    }
+
     var methods = {
         init: function (options) {
             // Создаем настройки из дефолтных
@@ -150,6 +155,7 @@ function formatRouble(value) {
                 if (state) {
                     return this;
                 } else {
+
                     var journal = $(this);
                     var menuid = journal.datagrid('options').popupmenu;
                     var toolbar = $(journal.datagrid('options').toolbar);
