@@ -1,3 +1,4 @@
+
 /**
  * EasyDocUI for jQuery
  *
@@ -167,11 +168,11 @@ function formatRouble(value) {
                     var buttonRemove = toolbar.find('a.easydocui-removedoc');
 
                     buttonAdd.click(methods.new.bind(this));
+                    buttonEdit.click(methods.edit.bind(this));
+                    buttonRemove.click(methods.remove.bind(this));
                     //buttonAdd.unbind().bind('click.journal', methods.new.bind(this));
-                    buttonEdit.unbind().bind('click.journal', methods.edit);
-                    buttonRemove.unbind().bind('click.journal', methods.remove);
-
-
+                    //buttonEdit.unbind().bind('click.journal', methods.edit);
+                    //buttonRemove.unbind().bind('click.journal', methods.remove);
 
                     journal.
                     datagrid({
@@ -195,7 +196,6 @@ function formatRouble(value) {
                             return data;
                         }
                     });
-
                     dateTo.datetimebox({
                         onChange: function (newValue, oldValue) {
                             if (newValue !== oldValue) {
@@ -220,13 +220,10 @@ function formatRouble(value) {
                             }
                         }
                     });
-
                     // Устанавливаем флаг проинициализированности
                     $(this).data('journal', this);
                 }
-
             });
-
         },
         destroy: function () {
             return $(this).each(function () {
@@ -275,9 +272,9 @@ function formatRouble(value) {
             });
             return this
         },
-        edit: function (target) {
-            var journal = $(this).data('journal');
-            //alert(journal.toSource());
+        edit: function () {
+            var journal = $(this);
+            alert(journal.toSource());
             //var journal = $(this).data('journal');
             //alert(journal.html().toSource());
             var row = journal.datagrid('getSelected');
