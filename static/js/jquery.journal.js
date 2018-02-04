@@ -1,4 +1,3 @@
-
 /**
  * EasyDocUI for jQuery
  *
@@ -152,12 +151,11 @@ function formatRouble(value) {
 
             return this.each(function() {
                 //var data = journal.data('journal');
-                var state = $(this).data('journal');
+                var journal = $(this);
+                var state = journal.data('journal');
                 if (state) {
                     return this;
                 } else {
-
-                    var journal = $(this);
                     var menuid = journal.datagrid('options').popupmenu;
                     var toolbar = $(journal.datagrid('options').toolbar);
                     var dateFrom = toolbar.find('input.journal-datefrom');
@@ -167,12 +165,10 @@ function formatRouble(value) {
                     var buttonEdit = toolbar.find('a.easydocui-editdoc');
                     var buttonRemove = toolbar.find('a.easydocui-removedoc');
 
-                    buttonAdd.click(methods.new.bind(this));
-                    buttonEdit.click(methods.edit.bind(this));
-                    buttonRemove.click(methods.remove.bind(this));
-                    //buttonAdd.unbind().bind('click.journal', methods.new.bind(this));
-                    //buttonEdit.unbind().bind('click.journal', methods.edit);
-                    //buttonRemove.unbind().bind('click.journal', methods.remove);
+                    buttonAdd.on( "click", $.proxy(methods.new.bind(this)));
+                    buttonEdit.on( "click", $.proxy(methods.edit.bind(this)));
+                    buttonRemove.on( "click", $.proxy(methods.remove.bind(this)));
+
 
                     journal.
                     datagrid({
@@ -231,8 +227,8 @@ function formatRouble(value) {
             })
         },
         add: function (params) {
-            var doctabs = $('#doc-tabs');
-            //alert(params.title);
+            var doctabs = $('.journal-tabs');
+            //alert(this.html().toSource());
             if (doctabs.tabs('exists', params.title)) {
                 doctabs.tabs('select', params.title);
             } else {
@@ -249,7 +245,7 @@ function formatRouble(value) {
                             content: html,
                             closable: true
                         });
-                        // Активируем все документы
+                        // Инициализируем все документы
                         $('.easydocui-document').document();
                         //var tabs = document.datagrid('options').idDoc;
                         //alert(idDoc);
@@ -263,8 +259,9 @@ function formatRouble(value) {
         },
         new: function () {
             var table = $(this);
-            var row = table.datagrid('getSelected');
-            alert(row);
+            //alert($(".journal-tabs").html().toSource());
+            //var row = table.datagrid('getSelected');
+            //alert(row);
             var date = table.datebox.defaults.formatter(new Date());
             methods.add({
                 title: 'Новая накладная от ' + date,
@@ -274,7 +271,7 @@ function formatRouble(value) {
         },
         edit: function () {
             var journal = $(this);
-            alert(journal.toSource());
+            //alert(journal.toSource());
             //var journal = $(this).data('journal');
             //alert(journal.html().toSource());
             var row = journal.datagrid('getSelected');
