@@ -10,7 +10,8 @@
                     plain:true">
         {% block tab %}
             <div id="doc-maintab" title="Журнал документов">
-                <table class="easyui-datagrid"
+                <table id="journal-table"
+                        class="easyui-datagrid"
                        data-options="
                                 url:'/document/consignment/all/json/',
                                 method: 'post',

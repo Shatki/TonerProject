@@ -51,7 +51,7 @@ $.extend(
             + ' ' +formatNumber(h)+':'+formatNumber(M)+':'+formatNumber(s);
     },
     $.fn.datetimebox.defaults.parser = function (s) {
-        if ($.trim(s) == '') {
+        if ($.trim(s) === '') {
             return new Date();
         }
         var dt = s.split(' ');
@@ -89,11 +89,12 @@ function formatRouble(value) {
     }
 }
 
-
-
 (function ($) {
-    function popupmenu(menuid, index, row) {
-        var menu = $(menuid).empty();
+    /**
+     * Динамическое создание меню для journal
+     */
+    function popupmenu(target, index, row) {
+        var menu = $(target).empty();
         menu.
         menu('appendItem', {
             text: 'Создать',
@@ -108,7 +109,7 @@ function formatRouble(value) {
             name: 'remove',
             iconCls: 'icon-remove'}).
         menu('appendItem', {
-                separator: true}).
+            separator: true}).
         menu('appendItem', {
             text: 'Копировать',
             name: 'copy',
@@ -122,7 +123,7 @@ function formatRouble(value) {
             name: 'remove',
             iconCls: 'icon-paste'}).
         menu('appendItem', {
-                separator: true}).
+            separator: true}).
         menu('appendItem', {
             text: 'Обновить',
             name: 'reload',
@@ -137,305 +138,373 @@ function formatRouble(value) {
         return menu;
     }
 
-    function activate(table) {
+    function showMenu(target, action) {
+        // УСТАРЕВШАЯ
+        // находим общий журнал документов
+        var tab = $('.easydocui-journal');
+        // выбираем соответствующую tab панель
+        var selected = tab.tabs('getSelected');
+        // узнаем его индекс  панели в таблице
+        var tabIndex = tab.tabs('getTabIndex', selected);
+        //alert(tabIndex);
+        alert(selected.panel('options').idDoc);
 
+        if (tabIndex) {
+            // Действия в документе
+            //var doc_id = '#document-item-table-' + $("<div/>",
+            //    {"html": selected.panel('options').content}).find('#doc-id').html();
 
+            alert(selected.panel('options').content);
+            $(this).document(action);
+
+        } else {
+            switch (action) {
+                case 'add':
+                    var date = new Date();
+                    var y = date.getFullYear();
+                    var m = date.getMonth() + 1;
+                    var d = date.getDate();
+                    newDoc(d + '/' + m + '/' + y);
+                    break;
+                case 'edit':
+                    editDoc();
+                    break;
+                case 'remove':
+                    destroyDoc();
+                    break;
+                case 'reload':
+                    $('#docs').datagrid('reload');
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
-    var methods = {
-        init: function (options) {
-            // Создаем настройки из дефолтных
-            // актуальные настройки, будут индивидуальными при каждом запуске
-            options = options || {};
-            var opts = $.extend({}, $.fn.journal.defaults, options);
+    /**
+     * Функция создания и открытия документа из journal datagrid в новой tab вкладки для редактирования
+     */
+    function addDoc(target, params) {
+        var doctabs = $('.journal-tabs');
+        //alert(this.html().toSource());
+        if (doctabs.tabs('exists', params.title)) {
+            doctabs.tabs('select', params.title);
+        } else {
+            $.ajax({
+                url: params.url,
+                cache: true,
+                success: function (html) {
+                    //Найдем в полученом HTML id документа и добавим его в data-options к tabs
+                    var idDoc = $("<div/>", {"html": html}).find('#doc-id').html();
 
-            return this.each(function() {
-                //var data = journal.data('journal');
-                var journal = $(this);
-                var state = journal.data('journal');
-                if (state) {
-                    return this;
-                } else {
-                    var menuid = journal.datagrid('options').popupmenu;
-                    var toolbar = $(journal.datagrid('options').toolbar);
-                    var dateFrom = toolbar.find('input.journal-datefrom');
-                    var dateTo = toolbar.find('input.journal-dateto');
-
-                    var buttonAdd = toolbar.find('a.easydocui-adddoc');
-                    var buttonEdit = toolbar.find('a.easydocui-editdoc');
-                    var buttonRemove = toolbar.find('a.easydocui-removedoc');
-
-                    buttonAdd.on( "click", $.proxy(methods.new.bind(this)));
-                    buttonEdit.on( "click", $.proxy(methods.edit.bind(this)));
-                    buttonRemove.on( "click", $.proxy(methods.remove.bind(this)));
-
-                    journal.
-                    datagrid({
-                        clickToEdit: false,
-                        dblclickToEdit: true
-                    }).
-                    datagrid({
-                        onRowContextMenu: function (e, index, row) {
-                            e.preventDefault();
-                            // Включаем контекстное меню для редактирования таблицы документов
-                            popupmenu(menuid, index, row).menu('show', {
-                                left: e.pageX,
-                                top: e.pageY
-                            });
-                        }
-                    }).
-                    datagrid({
-                        loadFilter: function (data) {
-                            dateFrom.datetimebox('setValue', data.date_from);
-                            dateTo.datetimebox('setValue', data.date_to);
-                            return data;
-                        }
+                    doctabs.tabs('add', {
+                        idDoc: idDoc,
+                        title: params.title,
+                        content: html,
+                        closable: true
                     });
-                    dateTo.datetimebox({
-                        onChange: function (newValue, oldValue) {
-                            if (newValue !== oldValue) {
-                                journal.datagrid({
-                                    queryParams: {
-                                        dateTo: newValue,
-                                        dateFrom: dateFrom.datetimebox('getValue')
-                                    }
-                                })
-                            }
-                        }
-                    });
-                    dateFrom.datetimebox({
-                        onChange: function (newValue, oldValue) {
-                            if (newValue !== oldValue) {
-                                journal.datagrid({
-                                    queryParams: {
-                                        dateFrom: newValue,
-                                        dateTo: dateTo.datetimebox('getValue')
-                                    }
-                                })
-                            }
-                        }
-                    });
-                    // Устанавливаем флаг проинициализированности
-                    $(this).data('journal', this);
+                    // Инициализируем все документы
+                    $('.easydocui-document').document();
+                    //var tabs = document.datagrid('options').idDoc;
+                    //alert(idDoc);
+                    //document.document();
+                    //$(html).document();
+                    // enableDoc('#document-item-table-' + '{{ consignment.id }}', '#item-table-popup-menu');
                 }
             });
+        }
+    }
+
+    /**
+     * Редактирование документа, выделенного в journal datagrid
+     */
+    function editDoc(target) {
+        var table = $.data(target, 'journal').table;
+        //alert(journal.toSource());
+        //var journal = $(this).data('journal');
+        //alert(journal.html().toSource());
+        var row = journal.datagrid('getSelected');
+        if (row) {
+            methods.add({
+                title: row.name,
+                url: '/document/consignment/' + row.id + '/edit/',
+                idDoc: row.id
+            });
+        }
+        return this;
+    }
+
+    /**
+     * "Мягкое" удаление документа, выделенного в journal datagrid
+     */
+    function removeDoc(target) {
+        var table = $('.easydocui-journal');
+        var row = table.datagrid('getSelected');
+        if (row) {
+            $.ajax({
+                method: 'POST',
+                url: '/document/consignment/' + row.id + '/delete/',
+                cache: false,
+                success: function () {
+                    table.datagrid('reload');
+                }
+            });
+        }
+        return this;
+    }
+
+    /**
+     * Копирование документа, выделенного в journal datagrid в буфер cookie
+     */
+    function copyDoc(target) {
+        var doc = $(this);
+        var rowIndex = doc.datagrid('cell').index;
+        //var row = doc.datagrid('getRows')[rowIndex];
+        alert(rowIndex);
+        setCookie('bufferItem', rowIndex);
+    }
+
+    /**
+     * Добавление документа, в journal datagrid из буфера cookie
+     */
+    function pasteDoc(target) {
+        var doc = $(this);
+        //Вставляем в конец списка
+        var rowIndex = doc.datagrid('getRows').length;
+        var row = doc.datagrid('getRows')[getCookie('bufferItem')];
+        row.itemId = rowIndex;
+        doc.datagrid('insertRow', {
+                index: rowIndex,
+                row: row
+            }
+        );
+        //$.ajax({
+        //    url: '/document/consignment/' + doc_id + '/item/paste/',
+        //    method: 'POST',
+        //    data: {'item': getCookie('copyItem')},
+        //    cache: false,
+        //    success: function (data) {
+        //        if (data == 'Ok') {
+        //            // Пока кокой-то деревянный способ
+        //            // alert('Данные получены');
+        //            $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
+        //        } else {
+        //            alert(data);
+        //            // Данные получены кривые
+        //            // location.href = "#";
+        //            // location.reload();
+        //        }
+        //    }
+        //});
+    }
+
+    /**
+     * Создание дубликата документа, в journal datagrid
+     */
+    function dublicateDoc(target) {
+        var doc = $(this);
+        var rowIndex = doc.datagrid('cell').index;
+        var row = doc.datagrid('getRows')[rowIndex];
+        row.itemId = rowIndex;
+        doc.datagrid('insertRow', {
+                index: rowIndex,
+                row: row
+            }
+        );
+    }
+
+    /**
+     * Переименование панели документа, в journal tabs
+     * */
+    function renameDoc(target) {
+        var doctabs = $('.journal-tabs');
+        var t = doctabs.tabs('getSelected');
+        var titleParts = t.panel('options').title.split(" ", 5);
+        if (!number) {
+            number = titleParts[2];
+        }
+        if (titleParts[4]) {
+            // Наименование будет из 5  частей
+            if (!date) {
+                date = titleParts[4];
+            }
+        } else {
+            // Наименование будет из 4  частей
+            if (!date) {
+                date = titleParts[3];
+            }
+        }
+        var title = 'Накладная № ' + number + ' от ' + date;
+        doctabs.tabs('updateTitle', {
+            tab: t,
+            title: title
+        });
+        return false;
+    }
+
+    /**
+     * Активация плагина journal на таблице datagrid
+     */
+    function init(target, options) {
+        var tab = $(target);
+        var journal = tab.$('table');
+
+        alert(journal.html().toSource());
+        var menuid = journal.datagrid('options').popupmenu;
+        var toolbar = $(journal.datagrid('options').toolbar);
+        var dateFrom = toolbar.find('input.journal-datefrom');
+        var dateTo = toolbar.find('input.journal-dateto');
+
+        var buttonAdd = toolbar.find('a.easydocui-adddoc');
+        var buttonEdit = toolbar.find('a.easydocui-editdoc');
+        var buttonRemove = toolbar.find('a.easydocui-removedoc');
+
+        //buttonAdd.on( "click", $.proxy(methods.new.bind(this)));
+        //buttonEdit.on( "click", $.proxy(methods.edit.bind(this)));
+        //buttonRemove.on( "click", $.proxy(methods.remove.bind(this)));
+
+        journal.
+        datagrid({
+            clickToEdit: false,
+            dblclickToEdit: true
+        }).
+        datagrid({
+            onRowContextMenu: function (e, index, row) {
+                e.preventDefault();
+                // Включаем контекстное меню для редактирования таблицы документов
+                popupmenu(menuid, index, row).menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                });
+            }
+        }).
+        datagrid({
+            loadFilter: function (data) {
+                dateFrom.datetimebox('setValue', data.date_from);
+                dateTo.datetimebox('setValue', data.date_to);
+                return data;
+            }
+        });
+        dateTo.datetimebox({
+            onChange: function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    journal.datagrid({
+                        queryParams: {
+                            dateTo: newValue,
+                            dateFrom: dateFrom.datetimebox('getValue')
+                        }
+                    })
+                }
+            }
+        });
+        dateFrom.datetimebox({
+            onChange: function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    journal.datagrid({
+                        queryParams: {
+                            dateFrom: newValue,
+                            dateTo: dateTo.datetimebox('getValue')
+                        }
+                    })
+                }
+            }
+        });
+        return {
+            options: options,
+            table: journal,
+            tab: tab
+        };
+    }
+
+    /**
+     * Деакцивация плагина
+     */
+    function destroy(target) {
+        var journal = $.data(target, 'journal').table;
+        $(target).remove();
+    }
+
+    $.fn.journal = function (options, param) {
+        if (typeof options === 'string') {
+            alert('Строка');
+            return this.journal.methods[options](this, param);
+        }
+        options = options || {};
+        return this.each(function () {
+            // Делаем инициализацию
+            alert('Here');
+            var state = $.data(this, 'journal');
+            alert(state.toSource());
+            if (state) {
+                $.extend(state.options, options);
+
+            } else {
+                var r = init(this);
+                alert(r.toSource());
+                $.data(this, 'journal', {
+                    //$.extend({}, $.fn.journal.defaults, options);
+                    //options: $.extend({}, $.fn.journal.defaults, parseOptions(this), options),
+                    table: r.table,
+                    tab: r.tab
+                });
+                $(this).removeAttr('disabled');
+            }
+            //$('input.combo-text', state.combo).attr('readonly', !state.options.editable);
+            //setDisabled(this, state.options.disabled);
+            //setSize(this);
+            //bindEvents(this);
+            //validate(this);
+        });
+    };
+
+    $.fn.journal.methods = {
+        options: function (jq) {
+            return $.data(jq[0], 'journal').options;
         },
-        destroy: function () {
-            return $(this).each(function () {
-                $(window).unbind(this);
+        table: function (jq) {
+            return $.data(jq[0], 'journal').table;
+        },
+        tab: function (jq) {
+            return $.data(jq[0], 'journal').tab;
+        },
+        destroy: function (jq) {
+            return jq.each(function () {
+                // Пока не работает
+                destroy(this);
+            });
+        },
+        add: function (jq, params) {
+            return jq.each(function () {
+                addDoc(this, params);
             })
         },
-        add: function (params) {
-            var doctabs = $('.journal-tabs');
-            //alert(this.html().toSource());
-            if (doctabs.tabs('exists', params.title)) {
-                doctabs.tabs('select', params.title);
-            } else {
-                $.ajax({
-                    url: params.url,
-                    cache: true,
-                    success: function (html) {
-                        //Найдем в полученом HTML id документа и добавим его в data-options к tabs
-                        var idDoc = $("<div/>", {"html": html}).find('#doc-id').html();
-
-                        doctabs.tabs('add', {
-                            idDoc: idDoc,
-                            title: params.title,
-                            content: html,
-                            closable: true
-                        });
-                        // Инициализируем все документы
-                        $('.easydocui-document').document();
-                        //var tabs = document.datagrid('options').idDoc;
-                        //alert(idDoc);
-                        //document.document();
-                        //$(html).document();
-                        // enableDoc('#document-item-table-' + '{{ consignment.id }}', '#item-table-popup-menu');
-                    }
+        new: function (jq) {
+            return jq.each(function () {
+                var date = this.datebox.defaults.formatter(new Date());
+                addDoc(this, {
+                    title: 'Новая накладная от ' + date,
+                    url: '/document/consignment/new/'
                 });
-            }
-            return this;
+            })
         },
-        new: function () {
-            var table = $(this);
-            //alert($(".journal-tabs").html().toSource());
-            //var row = table.datagrid('getSelected');
-            //alert(row);
-            var date = table.datebox.defaults.formatter(new Date());
-            methods.add({
-                title: 'Новая накладная от ' + date,
-                url: '/document/consignment/new/'
-            });
-            return this
+        edit: function (jq) {
         },
-        edit: function () {
-            var journal = $(this);
-            //alert(journal.toSource());
-            //var journal = $(this).data('journal');
-            //alert(journal.html().toSource());
-            var row = journal.datagrid('getSelected');
-            if (row) {
-                methods.add({
-                    title: row.name,
-                    url: '/document/consignment/' + row.id + '/edit/',
-                    idDoc: row.id
-                });
-            }
-            return this;
+        remove: function (jq) {
         },
-        remove: function () {
-            var table = $('.easydocui-journal');
-            var row = table.datagrid('getSelected');
-            if (row) {
-                $.ajax({
-                    method: 'POST',
-                    url: '/document/consignment/' + row.id + '/delete/',
-                    cache: false,
-                    success: function () {
-                        table.datagrid('reload');
-                    }
-                });
-            }
-            return this;
+        copy: function (jq) {
         },
-        copy: function () {
-            var doc = this;
-            var rowIndex = doc.datagrid('cell').index;
-            //var row = doc.datagrid('getRows')[rowIndex];
-            setCookie('bufferItem', rowIndex);
+        paste: function (jq) {
         },
-        paste: function () {
-            var doc = $(this);
-            //Вставляем в конец списка
-            var rowIndex = doc.datagrid('getRows').length;
-            var row = doc.datagrid('getRows')[getCookie('bufferItem')];
-            row.itemId = rowIndex;
-            doc.datagrid('insertRow', {
-                    index: rowIndex,
-                    row: row
-                }
-            );
-            //$.ajax({
-            //    url: '/document/consignment/' + doc_id + '/item/paste/',
-            //    method: 'POST',
-            //    data: {'item': getCookie('copyItem')},
-            //    cache: false,
-            //    success: function (data) {
-            //        if (data == 'Ok') {
-            //            // Пока кокой-то деревянный способ
-            //            // alert('Данные получены');
-            //            $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
-            //        } else {
-            //            alert(data);
-            //            // Данные получены кривые
-            //            // location.href = "#";
-            //            // location.reload();
-            //        }
-            //    }
-            //});
-        },
-        dublicate: function () {
-            var doc = $(this);
-            var rowIndex = doc.datagrid('cell').index;
-            var row = doc.datagrid('getRows')[rowIndex];
-            row.itemId = rowIndex;
-            doc.datagrid('insertRow', {
-                    index: rowIndex,
-                    row: row
-                }
-            );
-        },
-        rename: function () {
-            var doctabs = $('.journal-tabs');
-            var t = doctabs.tabs('getSelected');
-            var titleParts = t.panel('options').title.split(" ", 5);
-            if (!number) {
-                number = titleParts[2];
-            }
-            if (titleParts[4]) {
-                // Наименование будет из 5  частей
-                if (!date) {
-                    date = titleParts[4];
-                }
-            } else {
-                // Наименование будет из 4  частей
-                if (!date) {
-                    date = titleParts[3];
-                }
-            }
-            var title = 'Накладная № ' + number + ' от ' + date;
-            doctabs.tabs('updateTitle', {
-                tab: t,
-                title: title
-            });
-            return false;
-        },
-        reload: function () {
-            //tab
-            return this;
-        },
-        popupmenu: function (action) {
-            // находим общий журнал документов
-            var tab = $('.easydocui-journal');
-            // выбираем соответствующую tab панель
-            var selected = tab.tabs('getSelected');
-            // узнаем его индекс  панели в таблице
-            var tabIndex = tab.tabs('getTabIndex', selected);
-            //alert(tabIndex);
-            alert(selected.panel('options').idDoc);
+        dublicate: function (jq) {
 
-            if (tabIndex) {
-                // Действия в документе
-                //var doc_id = '#document-item-table-' + $("<div/>",
-                //    {"html": selected.panel('options').content}).find('#doc-id').html();
-
-                alert(selected.panel('options').content);
-                $(this).document(action);
-
-            } else {
-                switch (action) {
-                    case 'add':
-                        var date = new Date();
-                        var y = date.getFullYear();
-                        var m = date.getMonth() + 1;
-                        var d = date.getDate();
-                        newDoc(d + '/' + m + '/' + y);
-                        break;
-                    case 'edit':
-                        editDoc();
-                        break;
-                    case 'remove':
-                        destroyDoc();
-                        break;
-                    case 'reload':
-                        $('#docs').datagrid('reload');
-                        break;
-                    default:
-                        break;
-                }
-            }
         },
-        print: function () {
-            //
-            alert('Печать из журнала');
-            return this;
+        reload: function (jq) {
+        },
+        print: function (jq) {},
+        rename: function (jq) {
         }
     };
-    $.fn.journal = function (method) {
-        if (methods[method]) {
-            // если запрашиваемый метод существует, мы его вызываем
-            // все параметры, кроме имени метода прийдут в метод
-            // this так же перекочует в метод
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof method === 'object' || !method) {
-            // если первым параметром идет объект, либо совсем пусто
-            // выполняем метод init
-            return methods.init.apply(this, arguments);
-        } else {
-            // если ничего не получилось
-            $.error('Метод с именем ' + method + ' не существует для jQuery.journal');
-        }
-    };
+
     $.fn.journal.defaults = {
         selector: '.easydocui-journal',
         url: '/document/'
@@ -444,7 +513,7 @@ function formatRouble(value) {
 
 $(document).ready(function () {
     $(function () {
-        $('table.easydocui-journal').journal();
+        $('div.easydocui-journal').journal('init');
 
     });
 

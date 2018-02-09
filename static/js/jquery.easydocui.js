@@ -349,7 +349,7 @@ function formatRouble(value) {
      */
     function init(target, options) {
         var tab = $(target);
-        var journal = tab.find('table');
+        var journal = tab.find(options.table);
 
         alert(journal.html().toSource());
         var menuid = journal.datagrid('options').popupmenu;
@@ -365,10 +365,12 @@ function formatRouble(value) {
         //buttonEdit.on( "click", $.proxy(methods.edit.bind(this)));
         //buttonRemove.on( "click", $.proxy(methods.remove.bind(this)));
 
-        journal.datagrid({
+        journal.
+        datagrid({
             clickToEdit: false,
             dblclickToEdit: true
-        }).datagrid({
+        }).
+        datagrid({
             onRowContextMenu: function (e, index, row) {
                 e.preventDefault();
                 // Включаем контекстное меню для редактирования таблицы документов
@@ -377,7 +379,8 @@ function formatRouble(value) {
                     top: e.pageY
                 });
             }
-        }).datagrid({
+        }).
+        datagrid({
             loadFilter: function (data) {
                 dateFrom.datetimebox('setValue', data.date_from);
                 dateTo.datetimebox('setValue', data.date_to);
@@ -442,7 +445,7 @@ function formatRouble(value) {
             if (state) {
                 $.extend(state.options, options);
             } else {
-                var r = init(this);
+                var r = init(this, options);
                 //alert(r.toSource());
                 $.data(this, 'journal', {
                     //$.extend({}, $.fn.journal.defaults, options);
@@ -519,7 +522,8 @@ $(document).ready(function () {
     $(function () {
         $('.easydocui-journal').journal({
             type: 'consignment',
-            name: 'Журнал накладных'
+            name: 'Журнал накладных',
+            table: '#journal-table'
         });
 
     });
