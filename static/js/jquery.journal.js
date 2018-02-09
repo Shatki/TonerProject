@@ -169,7 +169,6 @@ function formatRouble(value) {
                     buttonEdit.on( "click", $.proxy(methods.edit.bind(this)));
                     buttonRemove.on( "click", $.proxy(methods.remove.bind(this)));
 
-
                     journal.
                     datagrid({
                         clickToEdit: false,
@@ -223,7 +222,7 @@ function formatRouble(value) {
         },
         destroy: function () {
             return $(this).each(function () {
-                $(window).unbind('.journal');
+                $(window).unbind(this);
             })
         },
         add: function (params) {

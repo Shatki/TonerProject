@@ -3,15 +3,14 @@
 
 {% block documents %}
     <div id="doc-tabs"
-         class="easyui-tabs journal-tabs"
+         class="easyui-tabs easydocui-journal"
          data-options="
                     fit:true,
                     border:false,
                     plain:true">
         {% block tab %}
             <div id="doc-maintab" title="Журнал документов">
-                <table id="easydocui-journal"
-                       class="easyui-datagrid easydocui-journal"
+                <table class="easyui-datagrid"
                        data-options="
                                 url:'/document/consignment/all/json/',
                                 method: 'post',
