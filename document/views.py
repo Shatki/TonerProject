@@ -19,7 +19,7 @@ from RUSystem.RUClient import send_data
 # Представление общего журнала накладных
 @csrf_protect
 @login_required
-def consignments(request):
+def documents(request, document):
     # добавить проверку на пользователя
     try:
         args = {'user_profile': request.user,
@@ -29,7 +29,7 @@ def consignments(request):
                 'system_date': SystemDateTime.today(),
                 }
     except:
-        return HttpResponse(u"journal: DB Error", content_type='text/html')
+        return HttpResponse(u'journal: DB Error', content_type='text/html')
     args.update(csrf(request))
     # просмотр полного списка накладных
     return render_to_response('journal.html', args)
@@ -38,9 +38,8 @@ def consignments(request):
 # JSON запрос элементов для отображения журнала накладных
 @csrf_protect
 @login_required
-def consignments_json(request):
+def documents_json(request, document):
     # Нужно ограничить количество запросов в секунду
-
     try:
         docs_datetime_to = request.POST.get('dateTo')
         docs_datetime_from = request.POST.get('dateFrom')
@@ -63,7 +62,7 @@ def consignments_json(request):
 
         data = Consignment.objects.filter(delete=False, date__range=[docs_datetime_from, docs_datetime_to])
     except Consignment.DoesNotExist:
-        return HttpResponse(u'consignments_json: DB Error', content_type='text/html')
+        return HttpResponse(u'documents_json: DB Error', content_type='text/html')
     # Serialize
     rows = []
     for get_one in data:
@@ -90,7 +89,7 @@ def consignments_json(request):
 # Сохранение накладной  через POST
 @csrf_protect
 @login_required
-def consignment_save(request, consignment_id):
+def document_save(request, document, document_id):
     try:
         consignment = Consignment.objects.get(id=consignment_id)
         # Предобработка данных
@@ -115,7 +114,7 @@ def consignment_save(request, consignment_id):
 # Удаление накладной  через POST
 @csrf_protect
 @login_required
-def consignment_delete(request, consignment_id):
+def document_delete(request, document, document_id):
     try:
         # Мягкое удаление
         doc = Consignment.objects.get(id=consignment_id)
@@ -134,11 +133,11 @@ def consignment_delete(request, consignment_id):
 # Отображение представления одной накладной
 @csrf_protect
 @login_required
-def consignment_edit(request, consignment_id):
+def document_edit(request, document, document_id):
     # добавить проверку на пользователя
     if request.user:
         try:
-            consignment = Consignment.objects.get(id=consignment_id)
+            consignment = Consignment.objects.get(id=document_id)
         except Consignment.DoesNotExist:
             consignment = dict(
                 id='0'
@@ -153,12 +152,12 @@ def consignment_edit(request, consignment_id):
         # просмотр полного списка накладных
         return render_to_response('document.html', args)
     else:
-        return HttpResponse(u'consignment_edit:  please, login first', content_type='text/html')
+        return HttpResponse(u'document_edit:  please, login first', content_type='text/html')
 
 # Тестовая версия создания накладной
 @csrf_protect
 @login_required
-def consignment_new(request):
+def document_new(request, document):
     # добавить проверку на пользователя
     try:
         new_consignment = Consignment.objects.create(
@@ -183,13 +182,43 @@ def consignment_new(request):
     # Добавление нового документа
     return render_to_response("document.html", args)
 
+# Создание документа по образу и подобию заданного
+@csrf_protect
+@login_required
+def document_copy_json(request, document, document_id):
+    # добавить проверку на пользователя
+    try:
+        items = ConsignmentTable.objects.filter(consignment_id=document_id).all()
+        new_document = Consignment.objects.create(
+            date=SystemDateTime.db_today(),
+            creator=request.user,
+            modificator=request.user,
+            items=items,
+        )
+        args = {'user_profile': request.user,
+                'consignment': new_document,
+                'creator': request.user,
+                'modificator': request.user,
+                'contractors': Contractor.objects.all(),
+                'products': Product.objects.all(),
+                'measures': Measure.objects.all(),
+                }
+    except:
+        return HttpResponse(u'consignment_new:  DB error', content_type='text/html')
+    if request.user.contractor_id is not None:
+        args["contractor"] = Contractor.objects.get(id=request.user.contractor_id)
+    args.update(csrf(request))
+
+    # Добавление нового документа
+    return render_to_response("document.html", args)
+
 
 # JSON обработка отображение позиций товара
 @csrf_protect
 @login_required
-def consignment_items_json(request, consignment_id):
+def document_items_json(request, document, document_id):
     try:
-        items = ConsignmentTable.objects.filter(consignment_id=consignment_id).all()
+        items = ConsignmentTable.objects.filter(consignment_id=document_id).all()
         # rows = ConsignmentTable.objects.
     except ConsignmentTable.DoesNotExist:
         return HttpResponse(u'items_json: Error DB', content_type='text/html')
@@ -221,8 +250,8 @@ def consignment_items_json(request, consignment_id):
 # Создание нового товара и добавление его в накладную
 @csrf_protect
 @login_required
-def consignment_item_add(request, consignment_id):
-    if request.POST and consignment_id and request.POST.get('product'):
+def document_item_add(request, document, document_id):
+    if request.POST and document_id and request.POST.get('product'):
         # Нужно добавить больше валидаций данных
         if request.POST.get('product')[0] != 'p':
             return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
@@ -233,7 +262,7 @@ def consignment_item_add(request, consignment_id):
             if new_item:
                 Consignment.items.create(  # ????
                                            item=new_item,
-                                           consignment_id=consignment_id,
+                                           consignment_id=document_id,
                                            )
             else:
                 return HttpResponse("item_add: DB error", content_type='text/html')
@@ -245,14 +274,14 @@ def consignment_item_add(request, consignment_id):
         return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
 
 
-# Дублирование товара из сохраненного в куках и добавление его в накладную
+# Дублирование товара из сохраненного в буффере и добавление его в накладную
 @csrf_protect
 @login_required
-def consignment_item_paste(request, consignment_id):
-    if request.POST and consignment_id and request.POST.get('item'):
+def document_item_paste(request, document, document_id):
+    if request.POST and document_id and request.POST.get('item'):
         # Возможно нужно перенести часть функции в stock.view.item_add
         try:
-            consignment_id = Consignment.objects.get(id=consignment_id).id
+            consignment_id = Consignment.objects.get(id=document_id).id
 
             if consignment_id:
                 Consignment.items.create(
@@ -271,8 +300,8 @@ def consignment_item_paste(request, consignment_id):
 
 @csrf_protect
 @login_required
-def consignment_item_edit(request, consignment_id, item_id):
-    if request.POST and consignment_id and item_id and request.POST.get('product'):
+def document_item_edit(request, document, document_id, item_id):
+    if request.POST and document_id and item_id and request.POST.get('product'):
         # Нужно добавить больше валидаций данных
         if request.POST.get('product')[0] != 'p':
             return HttpResponse("consignment_item_edit: AJAX data error", content_type='text/html')
@@ -284,17 +313,17 @@ def consignment_item_edit(request, consignment_id, item_id):
 # Пробная версия
 @csrf_protect
 @login_required
-def consignment_item_delete(request, consignment_id, item_id):
-    if consignment_id and item_id:
+def document_item_delete(request, document, document_id, item_id):
+    if document_id and item_id:
         try:
             # Удаляем запись о товаре в накладной из базы
-            Consignment.items.get(item_id=item_id, consignment_id=consignment_id).delete()
+            Consignment.items.get(item_id=item_id, consignment_id=document_id).delete()
 
             # тут основной функционал, многое надо допилить
             # Удаляем товар!! очень аккуратно
             if not item_delete(item_id):
                 return HttpResponse("item_delete: Can't delete Item", content_type='text/html')
         except Consignment.DoesNotExist:
-            return HttpResponse("consignment_item_delete: ConsignmentTable.DoesNotExist", content_type='text/html')
+            return HttpResponse("document_item_delete: ConsignmentTable.DoesNotExist", content_type='text/html')
         return HttpResponse("Ok", content_type='text/html')
-    return HttpResponse("consignment_item_delete: AJAX data error", content_type='text/html')
+    return HttpResponse("document_item_delete: AJAX data error", content_type='text/html')

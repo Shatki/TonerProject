@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from datetime import datetime
 from document.models import Consignment
-from document.views import consignment_items_json
+from document.views import document_items_json
 
 # forms
 from forms.forms import Form

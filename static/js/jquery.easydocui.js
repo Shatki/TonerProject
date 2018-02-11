@@ -121,7 +121,7 @@ function formatRouble(value) {
             iconCls: 'icon-copy'}).
         menu('appendItem', {
             text: 'Вставить',
-            name: 'edit',
+            name: 'paste',
             iconCls: 'icon-paste'}).
         menu('appendItem', {
             text: 'Дублировать',
@@ -260,45 +260,50 @@ function formatRouble(value) {
      * Копирование документа, выделенного в journal datagrid в буфер cookie
      */
     function copyDoc(target) {
-        var doc = $(this);
-        var rowIndex = doc.datagrid('cell').index;
-        //var row = doc.datagrid('getRows')[rowIndex];
-        alert(rowIndex);
-        setCookie('bufferItem', rowIndex);
+        var table = $.data(target, 'journal').table;
+        var row = table.datagrid('getSelected');
+        if(row){
+            //alert(row.toString());
+            $.data(target, 'copiedDoc', row);
+            //setCookie('copiedDoc', JSON.stringify(row));
+        }
     }
 
     /**
      * Добавление документа, в journal datagrid из буфера cookie
      */
     function pasteDoc(target) {
-        var doc = $(this);
+        var table = $.data(target, 'journal').table;
         //Вставляем в конец списка
-        var rowIndex = doc.datagrid('getRows').length;
-        var row = doc.datagrid('getRows')[getCookie('bufferItem')];
+        var rowIndex = table.datagrid('getRows').length;
+        var row = $.data(target, 'copiedDoc');
         row.itemId = rowIndex;
-        doc.datagrid('insertRow', {
+        /*
+        table.datagrid('insertRow', {
                 index: rowIndex,
                 row: row
             }
         );
-        //$.ajax({
-        //    url: '/document/consignment/' + doc_id + '/item/paste/',
-        //    method: 'POST',
-        //    data: {'item': getCookie('copyItem')},
-        //    cache: false,
-        //    success: function (data) {
-        //        if (data == 'Ok') {
-        //            // Пока кокой-то деревянный способ
-        //            // alert('Данные получены');
-        //            $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
-        //        } else {
-        //            alert(data);
-        //            // Данные получены кривые
-        //            // location.href = "#";
-        //            // location.reload();
-        //        }
-        //    }
-        //});
+        */
+        $.ajax({
+            url: '/document/consignment/' + row.id + '/item/paste/',
+            method: 'POST',
+            data: {'item':row},
+            cache: false,
+            success: function (data) {
+                if (data === 'Ok') {
+                    // Пока кокой-то деревянный способ
+                    alert('Данные получены');
+                    $('#item-table-consignment-' + doc_id).datagrid('reload');    // reload the data table
+                } else {
+                    alert(data);
+                    // Данные получены кривые
+                    // location.href = "#";
+                    // location.reload();
+                }
+            }
+        });
+
     }
 
     /**
@@ -502,8 +507,8 @@ function formatRouble(value) {
         table: function (jq) {
             return $.data(jq[0], 'journal').table;
         },
-        tab: function (jq) {
-            return $.data(jq[0], 'journal').tab;
+        journal: function (jq) {
+            return $.data(jq[0], 'journal').journal;
         },
         destroy: function (jq) {
             return jq.each(function () {
@@ -531,10 +536,19 @@ function formatRouble(value) {
             })
         },
         remove: function (jq) {
+            return jq.each(function () {
+                removeDoc(this);
+            })
         },
         copy: function (jq) {
+            return jq.each(function () {
+                copyDoc(this);
+            })
         },
         paste: function (jq) {
+            return jq.each(function () {
+                pasteDoc(this);
+            })
         },
         dublicate: function (jq) {
 
