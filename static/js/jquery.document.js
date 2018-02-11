@@ -322,7 +322,7 @@ $.extend(
 
     var methods = {
         init: function (options) {
-            alert('enable');
+            alert('enableDoc');
             return this.each(function() {
                 var table = $(this);
                 var popupmenu = $(table.datagrid('options').popupmenu);
