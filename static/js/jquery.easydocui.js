@@ -270,7 +270,7 @@ function formatRouble(value) {
     }
 
     /**
-     * Добавление документа, в journal datagrid из буфера cookie
+     * Добавление документа, в journal datagrid из буфера
      */
     function pasteDoc(target) {
         var table = $.data(target, 'journal').table;

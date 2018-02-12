@@ -46,8 +46,20 @@ class Contract(models.Model):
     def __str__(self):
         return 'Контракт № ' + self.number + ' от ' + str(self.date_begin)
 
+# DocType
+class DocType(models.Model):
+    class Meta:
+        verbose_name = 'тип документа'
+        verbose_name_plural = 'типы документов'
+        db_table = 'document_type'
+    name = models.CharField(max_length=30, verbose_name=u'Название документа')
+    type = models.CharField(max_length=30, verbose_name=u'Тип документа (лат)')
 
-# Consignment
+    def __str__(self):
+        return self.name
+
+
+# Document
 # Накладная - это документ, используемый при передаче товарно-материальных ценностей от одного лица другому
 # Накладная - это документ бухгалтерского учета, создание которого позволяет оформить операции
 #               по отпуску и приему товарно-материальных ценностей (ТМЦ).
@@ -57,6 +69,8 @@ class Consignment(models.Model):
         verbose_name_plural = 'реализации'
         db_table = 'consignment'
 
+    type = models.ForeignKey(DocType, verbose_name=u'перемещаемый товар',
+                             related_name='consignment_items', on_delete=models.CASCADE)
     number = models.CharField(max_length=10, verbose_name=u'номер накладной')
     date = models.DateField(verbose_name=u'дата документа')
     emitter = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name=u'организация отпускающая груз',

@@ -1,6 +1,9 @@
 from django.contrib import admin
-from .models import Consignment, Contract, ConsignmentTable
+from .models import DocType, Consignment, Contract, ConsignmentTable
 
+class DocTypeAdmin(admin.ModelAdmin):
+    list_display = ('name',
+                    'type')
 
 class ConsignmentTableInline(admin.TabularInline):
     model = ConsignmentTable
@@ -44,5 +47,6 @@ class ContractAdmin(admin.ModelAdmin):
 
 
 # Register your models here.
+admin.site.register(DocType)
 admin.site.register(Consignment, ConsignmentAdmin)
 admin.site.register(Contract, ContractAdmin)
