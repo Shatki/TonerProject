@@ -52,8 +52,10 @@ class DocType(models.Model):
         verbose_name = 'тип документа'
         verbose_name_plural = 'типы документов'
         db_table = 'document_type'
-    name = models.CharField(max_length=30, verbose_name=u'Название документа')
-    type = models.CharField(max_length=30, verbose_name=u'Тип документа (лат)')
+
+    name = models.CharField(max_length=30, verbose_name=u'Название документа (например, Накладная)')
+    action = models.CharField(max_length=30, verbose_name=u'Название документа (например, Реализация)')
+    type = models.CharField(max_length=30, verbose_name=u'Тип документа (например, Consignment)')
 
     def __str__(self):
         return self.name
@@ -63,47 +65,47 @@ class DocType(models.Model):
 # Накладная - это документ, используемый при передаче товарно-материальных ценностей от одного лица другому
 # Накладная - это документ бухгалтерского учета, создание которого позволяет оформить операции
 #               по отпуску и приему товарно-материальных ценностей (ТМЦ).
-class Consignment(models.Model):
+class Document(models.Model):
     class Meta:
-        verbose_name = 'реализация'
-        verbose_name_plural = 'реализации'
-        db_table = 'consignment'
+        verbose_name = 'документ'
+        verbose_name_plural = 'документы'
+        db_table = 'document'
 
-    type = models.ForeignKey(DocType, verbose_name=u'перемещаемый товар',
-                             related_name='consignment_items', on_delete=models.CASCADE)
-    number = models.CharField(max_length=10, verbose_name=u'номер накладной')
+    type = models.ForeignKey(DocType, verbose_name=u'продукция',
+                             related_name='document_items', on_delete=models.CASCADE)
+    number = models.CharField(max_length=10, verbose_name=u'номер документа')
     date = models.DateField(verbose_name=u'дата документа')
-    emitter = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name=u'организация отпускающая груз',
-                                related_name='consignment_emitter', default=None, null=True)
-    receiver = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name=u'организация принимающая груз',
-                                 related_name='consignment_receiver', default=None, null=True)
+    emitter = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name=u'организация эмитент',
+                                related_name='document_emitter', default=None, null=True)
+    receiver = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name=u'организация контрагент',
+                                 related_name='document_receiver', default=None, null=True)
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, verbose_name=u'контракт',
-                                 related_name='consignment_contract', default=None, null=True)
+                                 related_name='document_contract', default=None, null=True)
 
-    items = models.ManyToManyField(Product, verbose_name=u'перемещаемый товар',
-                                   through='ConsignmentTable',
-                                   through_fields=('consignment', 'item'),
-                                   related_name='consignment_items'
+    items = models.ManyToManyField(Product, verbose_name=u'продукция в документе',
+                                   through='DocumentTable',
+                                   through_fields=('document', 'item'),
+                                   related_name='document_items'
                                    )
     # Общие для всех документов поля
     delete = models.BooleanField(verbose_name=u'Черновик/Подлежит удалению', default=True)
     enable = models.BooleanField(verbose_name=u'действующий документ', default=False)
     created = models.DateTimeField(verbose_name=u'время/дата создания документа')
     creator = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=u'автор документа',
-                                related_name='consignment_creator')
+                                related_name='document_creator')
     modified = models.DateTimeField(verbose_name=u'время/дата изменения документа')
     modificator = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=u'изменил документ',
-                                    related_name='consignment_modificator')
+                                    related_name='document_modificator')
 
     def save(self, *args, **kwargs):
         # On save, update timestamps
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
-        return super(Consignment, self).save(*args, **kwargs)
+        return super(Document, self).save(*args, **kwargs)
 
     def __str__(self):
-        return 'Накладная № ' + self.str_number() + ' от ' + self.str_date()
+        return '%s № %s от %s' % (self.type.name, self.str_number(), self.str_date())
 
     def str_date(self):
         return str(self.date.day) + '/' + str(self.date.month) + '/' + str(self.date.year)
@@ -113,17 +115,17 @@ class Consignment(models.Model):
         if self.number:
             return ('000000000' + str(int(self.number)))[-10:]
         else:
-            return 'Новая'
+            return 'Новый документ'
 
 
-class ConsignmentTable(models.Model):
+class DocumentTable(models.Model):
     class Meta:
-        verbose_name = 'продукт в накладной'
-        verbose_name_plural = 'продукты в накладной'
-        db_table = 'consignment_items'
+        verbose_name = 'продукт в документе'
+        verbose_name_plural = 'продукция в документе'
+        db_table = 'document_items'
 
-    consignment = models.ForeignKey(Consignment, on_delete=models.CASCADE, verbose_name=u'накладная')
-    number = models.IntegerField(verbose_name=u'номер в накладной')
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, verbose_name=u'накладная')
+    number = models.IntegerField(verbose_name=u'номер в документк')
     item = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=u'продукт')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=u'страна происхождения', default=None,
                                 null=True)

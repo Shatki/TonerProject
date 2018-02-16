@@ -1,15 +1,17 @@
 from django.contrib import admin
-from .models import DocType, Consignment, Contract, ConsignmentTable
+from .models import DocType, Document, Contract, DocumentTable
 
 class DocTypeAdmin(admin.ModelAdmin):
     list_display = ('name',
                     'type')
 
-class ConsignmentTableInline(admin.TabularInline):
-    model = ConsignmentTable
+
+class DocumentTableInline(admin.TabularInline):
+    model = DocumentTable
     extra = 1
 
-class ConsignmentAdmin(admin.ModelAdmin):
+
+class DocumentAdmin(admin.ModelAdmin):
     list_display = ('__str__',
                     'emitter',
                     'receiver',
@@ -23,11 +25,11 @@ class ConsignmentAdmin(admin.ModelAdmin):
 
     search_fields = ('number', 'date', 'creator')
     ordering = ('id',)
-    inlines = (ConsignmentTableInline,)
+    inlines = (DocumentTableInline,)
 
 
-class ConsignmentTableAdmin(admin.ModelAdmin):
-    inlines = (ConsignmentTableInline,)
+class DocumentTableAdmin(admin.ModelAdmin):
+    inlines = (DocumentTableInline,)
 
 
 class ContractAdmin(admin.ModelAdmin):
@@ -48,5 +50,5 @@ class ContractAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(DocType)
-admin.site.register(Consignment, ConsignmentAdmin)
+admin.site.register(Document, DocumentAdmin)
 admin.site.register(Contract, ContractAdmin)

@@ -8,7 +8,7 @@ from django.http import JsonResponse
 
 from contractor.models import Contractor
 from system.models import Product, Measure
-from .models import Consignment, ConsignmentTable
+from .models import Document, DocumentTable
 from stock.views import item_add, item_edit, item_delete
 from system.datetime import SystemDateTime
 from datetime import datetime, timedelta
@@ -23,7 +23,7 @@ def documents(request, document):
     # добавить проверку на пользователя
     try:
         args = {'user_profile': request.user,
-                # 'consignments': Consignment.objects.filter(delete=False),
+                # 'Documents': Docugnment.objects.filter(delete=False),
                 'contractors': Contractor.objects.all(),
                 'measures': Measure.objects.all(),
                 'system_date': SystemDateTime.today(),
@@ -60,8 +60,8 @@ def documents_json(request, document):
 
         # Показывает только не удаленные
 
-        data = Consignment.objects.filter(delete=False, date__range=[docs_datetime_from, docs_datetime_to])
-    except Consignment.DoesNotExist:
+        data = Document.objects.filter(delete=False, date__range=[docs_datetime_from, docs_datetime_to])
+    except Document.DoesNotExist:
         return HttpResponse(u'documents_json: DB Error', content_type='text/html')
     # Serialize
     rows = []
@@ -91,21 +91,21 @@ def documents_json(request, document):
 @login_required
 def document_save(request, document, document_id):
     try:
-        consignment = Consignment.objects.get(id=consignment_id)
+        document = Document.objects.get(id=document_id)
         # Предобработка данных
         if not request.POST.get('date'):
-            return HttpResponse("consignment_save: Error received data", content_type='text/html')
+            return HttpResponse("Document_save: Error received data", content_type='text/html')
         # Обработка даты
-        consignment.date = SystemDateTime.decode(request.POST.get('date'))
-        consignment.number = request.POST.get('number')
-        consignment.emitter_id = Contractor.objects.get(name=request.POST.get('emitter')).id
-        consignment.receiver_id = Contractor.objects.get(name=request.POST.get('receiver')).id
-        consignment.modified = datetime.today()
-        consignment.modificator = request.user
-        consignment.delete = False
-        consignment.save()
+        Document.date = SystemDateTime.decode(request.POST.get('date'))
+        Document.number = request.POST.get('number')
+        Document.emitter_id = Contractor.objects.get(name=request.POST.get('emitter')).id
+        Document.receiver_id = Contractor.objects.get(name=request.POST.get('receiver')).id
+        Document.modified = datetime.today()
+        Document.modificator = request.user
+        Document.delete = False
+        Document.save()
     except:
-        return HttpResponse(u"consignment_save: DB error", content_type='text/html')
+        return HttpResponse(u"Document_save: DB error", content_type='text/html')
     # args.update(csrf(request))
     # просмотр полного списка накладных
     return HttpResponse("Ok", content_type='text/html')
@@ -117,14 +117,14 @@ def document_save(request, document, document_id):
 def document_delete(request, document, document_id):
     try:
         # Мягкое удаление
-        doc = Consignment.objects.get(id=consignment_id)
+        doc = Document.objects.get(id=document_id)
         doc.delete = True
         doc.save()
         # Жесткое удаление
-        # Consignment.objects.filter(id=consignment_id).delete()
+        # Document.objects.filter(id=Document_id).delete()
         # Предобработка данных
-    except Consignment.DoesNotExist:
-        return HttpResponse(u"consignment_delete: DB error", content_type='text/html')
+    except Document.DoesNotExist:
+        return HttpResponse(u"Document_delete: DB error", content_type='text/html')
     # args.update(csrf(request))
     # просмотр полного списка накладных
     return HttpResponse("Ok", content_type='text/html')
@@ -137,15 +137,15 @@ def document_edit(request, document, document_id):
     # добавить проверку на пользователя
     if request.user:
         try:
-            consignment = Consignment.objects.get(id=document_id)
-        except Consignment.DoesNotExist:
-            consignment = dict(
+            document = Document.objects.get(id=document_id)
+        except Document.DoesNotExist:
+            Document = dict(
                 id='0'
             )
         args = {'user_profile': request.user,
-                'consignment': consignment,
+                'Document': document,
                 'contractors': Contractor.objects.all(),
-                # 'items': Consignment.objects.get(id=consignment_id).items.all(),
+                # 'items': Document.objects.get(id=Document_id).items.all(),
                 'measures': Measure.objects.all(),
                 }
         args.update(csrf(request))
@@ -160,13 +160,13 @@ def document_edit(request, document, document_id):
 def document_new(request, document):
     # добавить проверку на пользователя
     try:
-        new_consignment = Consignment.objects.create(
+        new_Document = Document.objects.create(
             date=SystemDateTime.db_today(),
             creator=request.user,
             modificator=request.user,
         )
         args = {'user_profile': request.user,
-                'consignment': new_consignment,
+                'Document': new_Document,
                 'creator': request.user,
                 'modificator': request.user,
                 'contractors': Contractor.objects.all(),
@@ -174,7 +174,7 @@ def document_new(request, document):
                 'measures': Measure.objects.all(),
                 }
     except:
-        return HttpResponse(u'consignment_new:  DB error', content_type='text/html')
+        return HttpResponse(u'Document_new:  DB error', content_type='text/html')
     if request.user.contractor_id is not None:
         args["contractor"] = Contractor.objects.get(id=request.user.contractor_id)
     args.update(csrf(request))
@@ -188,15 +188,15 @@ def document_new(request, document):
 def document_copy_json(request, document, document_id):
     # добавить проверку на пользователя
     try:
-        items = ConsignmentTable.objects.filter(consignment_id=document_id).all()
-        new_document = Consignment.objects.create(
+        items = DocumentTable.objects.filter(Document_id=document_id).all()
+        new_document = Document.objects.create(
             date=SystemDateTime.db_today(),
             creator=request.user,
             modificator=request.user,
             items=items,
         )
         args = {'user_profile': request.user,
-                'consignment': new_document,
+                'Document': new_document,
                 'creator': request.user,
                 'modificator': request.user,
                 'contractors': Contractor.objects.all(),
@@ -204,7 +204,7 @@ def document_copy_json(request, document, document_id):
                 'measures': Measure.objects.all(),
                 }
     except:
-        return HttpResponse(u'consignment_new:  DB error', content_type='text/html')
+        return HttpResponse(u'Document_new:  DB error', content_type='text/html')
     if request.user.contractor_id is not None:
         args["contractor"] = Contractor.objects.get(id=request.user.contractor_id)
     args.update(csrf(request))
@@ -218,9 +218,9 @@ def document_copy_json(request, document, document_id):
 @login_required
 def document_items_json(request, document, document_id):
     try:
-        items = ConsignmentTable.objects.filter(consignment_id=document_id).all()
-        # rows = ConsignmentTable.objects.
-    except ConsignmentTable.DoesNotExist:
+        items = DocumentTable.objects.filter(Document_id=document_id).all()
+        # rows = DocumentTable.objects.
+    except DocumentTable.DoesNotExist:
         return HttpResponse(u'items_json: Error DB', content_type='text/html')
     # Serialize
     rows = []
@@ -254,24 +254,24 @@ def document_item_add(request, document, document_id):
     if request.POST and document_id and request.POST.get('product'):
         # Нужно добавить больше валидаций данных
         if request.POST.get('product')[0] != 'p':
-            return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
+            return HttpResponse("Document_item_add: AJAX data error", content_type='text/html')
         product_id = request.POST.get('product')[1:]
         # Возможно нужно перенести часть функции в stock.view.item_add
         try:
             new_item = item_add(request, product_id)
             if new_item:
-                Consignment.items.create(  # ????
+                document.items.create(  # ????
                                            item=new_item,
-                                           consignment_id=document_id,
+                    Document_id=document_id,
                                            )
             else:
                 return HttpResponse("item_add: DB error", content_type='text/html')
         except:
-            return HttpResponse("consignment_item_add: DB error", content_type='text/html')
+            return HttpResponse("Document_item_add: DB error", content_type='text/html')
         # response.update(csrf(request))
         return HttpResponse("Ok", content_type='text/html')
     else:
-        return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
+        return HttpResponse("Document_item_add: AJAX data error", content_type='text/html')
 
 
 # Дублирование товара из сохраненного в буффере и добавление его в накладную
@@ -281,21 +281,21 @@ def document_item_paste(request, document, document_id):
     if request.POST and document_id and request.POST.get('item'):
         # Возможно нужно перенести часть функции в stock.view.item_add
         try:
-            consignment_id = Consignment.objects.get(id=document_id).id
+            document_id = Document.objects.get(id=document_id).id
 
-            if consignment_id:
-                Consignment.items.create(
+            if document_id:
+                document.items.create(
                     item=get_item,  # Недоделал еще
-                    consignment_id=consignment_id,
+                    Document_id=document_id,
                 )
             else:
                 return HttpResponse("item_add: DB error", content_type='text/html')
         except:
-            return HttpResponse("consignment_item_add: DB error", content_type='text/html')
+            return HttpResponse("Document_item_add: DB error", content_type='text/html')
         # response.update(csrf(request))
         return HttpResponse("Ok", content_type='text/html')
     else:
-        return HttpResponse("consignment_item_add: AJAX data error", content_type='text/html')
+        return HttpResponse("Document_item_add: AJAX data error", content_type='text/html')
 
 
 @csrf_protect
@@ -304,7 +304,7 @@ def document_item_edit(request, document, document_id, item_id):
     if request.POST and document_id and item_id and request.POST.get('product'):
         # Нужно добавить больше валидаций данных
         if request.POST.get('product')[0] != 'p':
-            return HttpResponse("consignment_item_edit: AJAX data error", content_type='text/html')
+            return HttpResponse("Document_item_edit: AJAX data error", content_type='text/html')
         # Возможно нужно перенести часть функции в stock.view.item_edit
         return item_edit(request, item_id)
 
@@ -317,13 +317,13 @@ def document_item_delete(request, document, document_id, item_id):
     if document_id and item_id:
         try:
             # Удаляем запись о товаре в накладной из базы
-            Consignment.items.get(item_id=item_id, consignment_id=document_id).delete()
+            Document.items.get(item_id=item_id, Document_id=document_id).delete()
 
             # тут основной функционал, многое надо допилить
             # Удаляем товар!! очень аккуратно
             if not item_delete(item_id):
                 return HttpResponse("item_delete: Can't delete Item", content_type='text/html')
-        except Consignment.DoesNotExist:
-            return HttpResponse("document_item_delete: ConsignmentTable.DoesNotExist", content_type='text/html')
+        except Document.DoesNotExist:
+            return HttpResponse("document_item_delete: DocumentTable.DoesNotExist", content_type='text/html')
         return HttpResponse("Ok", content_type='text/html')
     return HttpResponse("document_item_delete: AJAX data error", content_type='text/html')

@@ -3,14 +3,13 @@
 import os
 from TonerProject.settings import BASE_DIR, STATIC_URL, DOCUMENT_DIR
 from io import StringIO
-from document.models import Consignment
 import cProfile
 
 # общие
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from datetime import datetime
-from document.models import Consignment
+from document.models import Document
 from document.views import document_items_json
 
 # forms
@@ -25,9 +24,9 @@ def invoice(request, invoice_id):
 def torg12(request, consignment_id):
     """ Читаем накладную из БД """
     try:
-        consignment = Consignment.objects.get(id=consignment_id)
-        items = Consignment.objects.get(id=consignment_id).items.all()
-    except Consignment.DoesNotExist:
+        consignment = Document.objects.get(id=consignment_id)
+        items = Document.objects.get(id=consignment_id).items.all()
+    except Document.DoesNotExist:
         return False
     # Подготавливаем данные в шаблон
     # Serialize
