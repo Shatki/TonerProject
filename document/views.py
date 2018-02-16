@@ -19,7 +19,7 @@ from RUSystem.RUClient import send_data
 # Представление общего журнала накладных
 @csrf_protect
 @login_required
-def documents(request, document):
+def documents(request, doctype):
     # добавить проверку на пользователя
     try:
         args = {'user_profile': request.user,
@@ -38,7 +38,7 @@ def documents(request, document):
 # JSON запрос элементов для отображения журнала накладных
 @csrf_protect
 @login_required
-def documents_json(request, document):
+def documents_json(request, doctype):
     # Нужно ограничить количество запросов в секунду
     try:
         docs_datetime_to = request.POST.get('dateTo')
@@ -89,7 +89,7 @@ def documents_json(request, document):
 # Сохранение накладной  через POST
 @csrf_protect
 @login_required
-def document_save(request, document, document_id):
+def document_save(request, doctype, document_id):
     try:
         document = Document.objects.get(id=document_id)
         # Предобработка данных
@@ -114,7 +114,7 @@ def document_save(request, document, document_id):
 # Удаление накладной  через POST
 @csrf_protect
 @login_required
-def document_delete(request, document, document_id):
+def document_delete(request, doctype, document_id):
     try:
         # Мягкое удаление
         doc = Document.objects.get(id=document_id)
@@ -133,13 +133,13 @@ def document_delete(request, document, document_id):
 # Отображение представления одной накладной
 @csrf_protect
 @login_required
-def document_edit(request, document, document_id):
+def document_edit(request, doctype, document_id):
     # добавить проверку на пользователя
     if request.user:
         try:
             document = Document.objects.get(id=document_id)
         except Document.DoesNotExist:
-            Document = dict(
+            document = dict(
                 id='0'
             )
         args = {'user_profile': request.user,
@@ -157,16 +157,16 @@ def document_edit(request, document, document_id):
 # Тестовая версия создания накладной
 @csrf_protect
 @login_required
-def document_new(request, document):
+def document_new(request, doctype):
     # добавить проверку на пользователя
     try:
-        new_Document = Document.objects.create(
+        new_document = Document.objects.create(
             date=SystemDateTime.db_today(),
             creator=request.user,
             modificator=request.user,
         )
         args = {'user_profile': request.user,
-                'Document': new_Document,
+                'Document': new_document,
                 'creator': request.user,
                 'modificator': request.user,
                 'contractors': Contractor.objects.all(),
@@ -185,10 +185,10 @@ def document_new(request, document):
 # Создание документа по образу и подобию заданного
 @csrf_protect
 @login_required
-def document_copy_json(request, document, document_id):
+def document_copy_json(request, doctype, document_id):
     # добавить проверку на пользователя
     try:
-        items = DocumentTable.objects.filter(Document_id=document_id).all()
+        items = DocumentTable.objects.filter(document_id=document_id).all()
         new_document = Document.objects.create(
             date=SystemDateTime.db_today(),
             creator=request.user,
@@ -216,9 +216,9 @@ def document_copy_json(request, document, document_id):
 # JSON обработка отображение позиций товара
 @csrf_protect
 @login_required
-def document_items_json(request, document, document_id):
+def document_items_json(request, doctype, document_id):
     try:
-        items = DocumentTable.objects.filter(Document_id=document_id).all()
+        items = DocumentTable.objects.filter(document_id=document_id).all()
         # rows = DocumentTable.objects.
     except DocumentTable.DoesNotExist:
         return HttpResponse(u'items_json: Error DB', content_type='text/html')
@@ -250,7 +250,7 @@ def document_items_json(request, document, document_id):
 # Создание нового товара и добавление его в накладную
 @csrf_protect
 @login_required
-def document_item_add(request, document, document_id):
+def document_item_add(request, doctype, document_id):
     if request.POST and document_id and request.POST.get('product'):
         # Нужно добавить больше валидаций данных
         if request.POST.get('product')[0] != 'p':
@@ -261,8 +261,8 @@ def document_item_add(request, document, document_id):
             new_item = item_add(request, product_id)
             if new_item:
                 document.items.create(  # ????
-                                           item=new_item,
-                    Document_id=document_id,
+                    item=new_item,
+                    document_id=document_id,
                                            )
             else:
                 return HttpResponse("item_add: DB error", content_type='text/html')
@@ -277,7 +277,7 @@ def document_item_add(request, document, document_id):
 # Дублирование товара из сохраненного в буффере и добавление его в накладную
 @csrf_protect
 @login_required
-def document_item_paste(request, document, document_id):
+def document_item_paste(request, doctype, document_id):
     if request.POST and document_id and request.POST.get('item'):
         # Возможно нужно перенести часть функции в stock.view.item_add
         try:
@@ -286,7 +286,7 @@ def document_item_paste(request, document, document_id):
             if document_id:
                 document.items.create(
                     item=get_item,  # Недоделал еще
-                    Document_id=document_id,
+                    document_id=document_id,
                 )
             else:
                 return HttpResponse("item_add: DB error", content_type='text/html')
@@ -300,7 +300,7 @@ def document_item_paste(request, document, document_id):
 
 @csrf_protect
 @login_required
-def document_item_edit(request, document, document_id, item_id):
+def document_item_edit(request, doctype, document_id, item_id):
     if request.POST and document_id and item_id and request.POST.get('product'):
         # Нужно добавить больше валидаций данных
         if request.POST.get('product')[0] != 'p':
@@ -313,11 +313,11 @@ def document_item_edit(request, document, document_id, item_id):
 # Пробная версия
 @csrf_protect
 @login_required
-def document_item_delete(request, document, document_id, item_id):
+def document_item_delete(request, doctype, document_id, item_id):
     if document_id and item_id:
         try:
             # Удаляем запись о товаре в накладной из базы
-            Document.items.get(item_id=item_id, Document_id=document_id).delete()
+            Document.items.get(item_id=item_id, document_id=document_id).delete()
 
             # тут основной функционал, многое надо допилить
             # Удаляем товар!! очень аккуратно

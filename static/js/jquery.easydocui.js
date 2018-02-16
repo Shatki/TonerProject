@@ -144,49 +144,6 @@ function formatRouble(value) {
         return menu;
     }
 
-    function showMenu(target, action) {
-        // УСТАРЕВШАЯ
-        // находим общий журнал документов
-        var tab = $('.easydocui-journal');
-        // выбираем соответствующую tab панель
-        var selected = tab.tabs('getSelected');
-        // узнаем его индекс  панели в таблице
-        var tabIndex = tab.tabs('getTabIndex', selected);
-        //alert(tabIndex);
-        alert(selected.panel('options').idDoc);
-
-        if (tabIndex) {
-            // Действия в документе
-            //var doc_id = '#document-item-table-' + $("<div/>",
-            //    {"html": selected.panel('options').content}).find('#doc-id').html();
-
-            alert(selected.panel('options').content);
-            $(this).document(action);
-
-        } else {
-            switch (action) {
-                case 'add':
-                    var date = new Date();
-                    var y = date.getFullYear();
-                    var m = date.getMonth() + 1;
-                    var d = date.getDate();
-                    newDoc(d + '/' + m + '/' + y);
-                    break;
-                case 'edit':
-                    editDoc();
-                    break;
-                case 'remove':
-                    destroyDoc();
-                    break;
-                case 'reload':
-                    $('#docs').datagrid('reload');
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
     /**
      * Функция открытия документа из journal datagrid в новой tab вкладки для редактирования
      */
@@ -568,11 +525,221 @@ function formatRouble(value) {
     }
 })(jQuery);
 
+(function ($) {
+    /**
+     * Динамическое создание меню для document
+     */
+    function popupmenu(target, index, row) {
+        var menu = $.data(target, 'document').menu;
+        menu.empty().
+        menu('appendItem', {
+            text: 'Создать',
+            name: 'new',
+            iconCls: 'icon-add'}).
+        menu('appendItem', {
+            text: 'Редактировать',
+            name: 'edit',
+            iconCls: 'icon-edit'
+        }).
+        menu('appendItem', {
+            text: 'Удалить',
+            name: 'remove',
+            iconCls: 'icon-remove'}).
+        menu('appendItem', {
+            separator: true
+        }).
+        menu('appendItem', {
+            text: 'Копировать',
+            name: 'copy',
+            iconCls: 'icon-copy'}).
+        menu('appendItem', {
+            text: 'Вставить',
+            name: 'paste',
+            iconCls: 'icon-paste'}).
+        menu('appendItem', {
+            text: 'Дублировать',
+            name: 'remove',
+            iconCls: 'icon-paste'}).
+        menu('appendItem', {
+            separator: true}).
+        menu('appendItem', {
+            text: 'Обновить',
+            name: 'reload',
+            iconCls: 'icon-reload'}).
+        menu('appendItem', {
+            text: 'Печать',
+            name: 'print',
+            iconCls: 'icon-print'}).
+        menu('options').
+            onClick = function (item) {
+            $(target).journal(item.name)
+        };
+        return menu;
+    }
+
+    /**
+     * Активация плагина document на таблице datagrid
+     */
+    function init(target) {
+        var document = $(target);
+        if (document){
+            var table = document.find(options.table);
+            if (!document){
+                $.error('jQuery.document: Не могу обнаружить datagrid table');
+                return false;
+            }
+
+            ///////
+        }else {
+            $.error('jQuery.document: Не могу обнаружить easydocui-document');
+            return false;
+        }
+
+        //alert(journal.html().toSource());
+        var menu = $(table.datagrid('options').menu);
+        var toolbar = $(table.datagrid('options').toolbar);
+
+        table.
+        datagrid({
+            clickToEdit: false,
+            dblclickToEdit: true
+        }).
+        // Активация cell-editing функции, а также запуск дополнительных возможностей datagrid
+        datagrid('enableCellEditing').
+        datagrid({
+            onEndEdit: function (rowIndex, row, changes) {
+                // get all changes
+                for (var name in changes) {
+                    // Изменяем текствовое поле на  c id на name
+                    var ed = table.datagrid('getEditor', {index: rowIndex, field: name});
+                    row.name = $(ed.target).combotreegrid('getText');
+
+                    // Автокалькуляция значений в строках
+                    if (changes.cost) {
+                        // autosumm column   total = quantity * cost
+                        $(this).datagrid('updateRow', {
+                            index: rowIndex,
+                            row: {
+                                total: (row.cost * row.quantity).toFixed(2)
+                            }
+                        });
+                    } else if (changes.quantity) {
+                        // alert(changes.quantity);
+                        // autosumm column   total = quantity * cost
+                        $(this).datagrid('updateRow', {
+                            index: rowIndex,
+                            row: {
+                                total: (row.cost * row.quantity).toFixed(2)
+                            }
+                        });
+                    } else if (changes.total) {
+                        // alert(changes.total);
+                        // autosumm column   cost = total / quantity
+                        $(this).datagrid('updateRow', {
+                            index: rowIndex,
+                            row: {
+                                cost: (row.total / row.quantity).toFixed(2)
+                            }
+                        });
+                    }
+                }
+            }
+        }).
+        datagrid({
+            onRowContextMenu: function (e, index, row) {
+                e.preventDefault();
+                // Включаем контекстное меню для редактирования таблицы документов
+                popupmenu.menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                });
+            }
+        });
+
+        return {
+            options: options,
+            journal: journal,
+            table: table,
+            toolbar: toolbar,
+            menu: menu
+        };
+
+    }
+
+
+    $.fn.document = function (options, param) {
+        if (typeof options === 'string') {
+            //alert('Строка');
+            var result = $.fn.document.methods[options];
+            if (result) {
+                return result(this, param);
+            } else {
+                $.error('Метод с именем ' + options + ' не существует для jQuery.document');
+                return this;
+            }
+        }
+        options = options || {};
+        //alert($(this).html().toSource());
+        return this.each(function () {
+            // Делаем инициализацию
+            var state = $.data(this, 'document');
+            if (state) {
+                $.extend(state.options, options);
+            } else {
+                var r = init(this, options);
+                //alert(r.toSource());
+                $.data(this, 'document', {
+                    //options: $.extend({}, $.fn.journal.defaults, parseOptions(this), options),
+                    options: $.extend({}, $.fn.document.defaults, options),
+                    document: r.document,
+                    table: r.table,
+                    toolbar: r.toolbar,
+                    menu: r.menu
+                });
+                $(this).removeAttr('disabled');
+            }
+            //$('input.combo-text', state.combo).attr('readonly', !state.options.editable);
+            //setDisabled(this, state.options.disabled);
+            //setSize(this);
+            bindEvents(this);
+            //validate(this);
+        });
+    };
+
+    $.fn.document.methods = {
+        options: function (jq) {
+            return $.data(jq[0], 'document').options;
+        },
+        table: function (jq) {
+            return $.data(jq[0], 'document').table;
+        },
+        document: function(jq) {
+            return $.data(jq[0], 'document').document;
+        }
+    };
+
+    $.fn.document.defaults = {
+
+    };
+
+
+})(jQuery);
+
+
+
+
+
+
+
+
+
+
+
 $(document).ready(function () {
     $(function () {
         $('.easydocui-journal').journal({
-            type: 'consignment',
-            name: 'Журнал накладных',
+            type: 'document',
+            name: 'Журнал документов',
             table: '#journal-table'
         });
 

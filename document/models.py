@@ -27,7 +27,7 @@ class Contract(models.Model):
     date_expire = models.DateField(verbose_name=u'дата истечения контракта', default=date_maximal)
 
     # Общие для всех документов поля
-    delete = models.BooleanField(verbose_name=u'Черновик/Подлежит удалению', default=True)
+    delete = models.BooleanField(verbose_name=u'черновик/подлежит удалению', default=True)
     enable = models.BooleanField(verbose_name=u'действующий документ', default=False)
     created = models.DateTimeField(verbose_name=u'время/дата создания документа')
     creator = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=u'автор документа',
@@ -44,18 +44,18 @@ class Contract(models.Model):
         return super(Contract, self).save(*args, **kwargs)
 
     def __str__(self):
-        return 'Контракт № ' + self.number + ' от ' + str(self.date_begin)
+        return 'Контракт № %s от %s' % (self.number, str(self.date_begin))
 
 # DocType
 class DocType(models.Model):
     class Meta:
         verbose_name = 'тип документа'
         verbose_name_plural = 'типы документов'
-        db_table = 'document_type'
+        db_table = 'doctype'
 
-    name = models.CharField(max_length=30, verbose_name=u'Название документа (например, Накладная)')
-    action = models.CharField(max_length=30, verbose_name=u'Название документа (например, Реализация)')
-    type = models.CharField(max_length=30, verbose_name=u'Тип документа (например, Consignment)')
+    name = models.CharField(max_length=30, verbose_name=u'название документа (например, Накладная)')
+    action = models.CharField(max_length=30, verbose_name=u'название документа (например, Реализация)')
+    type = models.CharField(max_length=30, verbose_name=u'тип документа (например, Consignment)')
 
     def __str__(self):
         return self.name
@@ -88,7 +88,7 @@ class Document(models.Model):
                                    related_name='document_items'
                                    )
     # Общие для всех документов поля
-    delete = models.BooleanField(verbose_name=u'Черновик/Подлежит удалению', default=True)
+    delete = models.BooleanField(verbose_name=u'черновик/подлежит удалению', default=True)
     enable = models.BooleanField(verbose_name=u'действующий документ', default=False)
     created = models.DateTimeField(verbose_name=u'время/дата создания документа')
     creator = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=u'автор документа',
@@ -108,7 +108,7 @@ class Document(models.Model):
         return '%s № %s от %s' % (self.type.name, self.str_number(), self.str_date())
 
     def str_date(self):
-        return str(self.date.day) + '/' + str(self.date.month) + '/' + str(self.date.year)
+        return '%s/%s/%s' % (str(self.date.day), str(self.date.month),str(self.date.year))
 
     def str_number(self):
         # Потом доработать для случаем сложных нумераций
@@ -124,8 +124,8 @@ class DocumentTable(models.Model):
         verbose_name_plural = 'продукция в документе'
         db_table = 'document_items'
 
-    document = models.ForeignKey(Document, on_delete=models.CASCADE, verbose_name=u'накладная')
-    number = models.IntegerField(verbose_name=u'номер в документк')
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, verbose_name=u'документ')
+    number = models.IntegerField(verbose_name=u'номер в документе')
     item = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=u'продукт')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=u'страна происхождения', default=None,
                                 null=True)
