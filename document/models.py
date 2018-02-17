@@ -44,7 +44,7 @@ class Contract(models.Model):
         return super(Contract, self).save(*args, **kwargs)
 
     def __str__(self):
-        return 'Контракт № %s от %s' % (self.number, str(self.date_begin))
+        return 'Контракт № {} от {}'.format(self.number, str(self.date_begin))
 
 # DocType
 class DocType(models.Model):
@@ -105,15 +105,15 @@ class Document(models.Model):
         return super(Document, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '%s № %s от %s' % (self.type.name, self.str_number(), self.str_date())
+        return '{} № {} от {}'.format(self.type.name, self.str_number(), self.str_date())
 
     def str_date(self):
-        return '%s/%s/%s' % (str(self.date.day), str(self.date.month),str(self.date.year))
+        return '{:0>2}/{:0>2}/{:0>2}'.format(str(self.date.day), str(self.date.month), str(self.date.year))
 
     def str_number(self):
         # Потом доработать для случаем сложных нумераций
         if self.number:
-            return ('000000000' + str(int(self.number)))[-10:]
+            return '{:0>10}'.format(self.number)
         else:
             return 'Новый документ'
 
