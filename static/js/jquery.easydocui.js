@@ -588,7 +588,6 @@ function formatRouble(value) {
                 $.error('jQuery.document: Не могу обнаружить datagrid table');
                 return false;
             }
-
             ///////
         }else {
             $.error('jQuery.document: Не могу обнаружить easydocui-document');
