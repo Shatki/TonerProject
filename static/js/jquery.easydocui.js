@@ -160,13 +160,18 @@ function formatRouble(value) {
                     var idDoc = $("<div/>", {"html": html}).find('#doc-id').html();
 
                     doctabs.tabs('add', {
-                        idDoc: idDoc,
+                        index: idDoc,
+                        //   idDoc: idDoc,
                         title: params.title,
                         content: html,
                         closable: true
                     });
-                    // Инициализируем все документы
-                    $('.easydocui-document').document();
+                    // Инициализируем документ
+                    alert(idDoc.toSource());
+                    var doc = doctabs.tabs('getTab', idDoc);
+                    alert(doc.html().toSource());
+
+                    //$('.easydocui-document').document();
                     //var tabs = document.datagrid('options').idDoc;
                     //alert(idDoc);
                     //document.document();
@@ -578,9 +583,62 @@ function formatRouble(value) {
     }
 
     /**
+     * Функция создание иерархии каталога продукции на Фронтэнде
+     */
+    function productLoadFilter(rows) {
+        function exists(rows, parentId) {
+            for (var i = 0; i < rows.length; i++) {
+                if (rows[i].itemId == parentId) return true;
+            }
+            return false;
+        }
+
+        var nodes = [];
+        // get the top level nodes
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (!exists(rows, row.parentId)) {
+                nodes.push({
+                    itemId: row.itemId,
+                    itemName: row.itemName,
+                    state: row.state,
+                    parentId: row.parentId
+                    //добавить еще данные
+                });
+            }
+        }
+        var toDo = [];
+        for (var i = 0; i < nodes.length; i++) {
+            toDo.push(nodes[i]);
+        }
+        while (toDo.length) {
+            var node = toDo.shift();    // the parent node
+            // get the children nodes
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                if (row.parentId == node.itemId) {
+                    var child = {
+                        itemId: row.itemId,
+                        itemName: row.itemName,
+                        state: row.state,
+                        parentId: row.parentId
+                    };
+                    if (node.children) {
+                        node.children.push(child);
+                    } else {
+                        node.children = [child];
+                    }
+                    toDo.push(child);
+                }
+            }
+        }
+        return nodes;
+    }
+
+    /**
      * Активация плагина document на таблице datagrid
      */
-    function init(target) {
+    function init(target, options) {
         var document = $(target);
         if (document){
             var table = document.find(options.table);
@@ -654,17 +712,21 @@ function formatRouble(value) {
                 });
             }
         });
-
         return {
             options: options,
-            journal: journal,
+            document: document,
             table: table,
             toolbar: toolbar,
             menu: menu
         };
-
     }
 
+    /**
+     * Привязка событий
+     */
+    function bindEvents(target) {
+        return false
+    }
 
     $.fn.document = function (options, param) {
         if (typeof options === 'string') {
@@ -686,7 +748,7 @@ function formatRouble(value) {
                 $.extend(state.options, options);
             } else {
                 var r = init(this, options);
-                //alert(r.toSource());
+                alert(r.toSource());
                 $.data(this, 'document', {
                     //options: $.extend({}, $.fn.journal.defaults, parseOptions(this), options),
                     options: $.extend({}, $.fn.document.defaults, options),
@@ -700,6 +762,7 @@ function formatRouble(value) {
             //$('input.combo-text', state.combo).attr('readonly', !state.options.editable);
             //setDisabled(this, state.options.disabled);
             //setSize(this);
+            // Активация кнопок
             bindEvents(this);
             //validate(this);
         });
@@ -714,11 +777,15 @@ function formatRouble(value) {
         },
         document: function(jq) {
             return $.data(jq[0], 'document').document;
+        },
+        reload: function (jq) {
+            return $.data(jq[0], 'document').table.datagrid('reload');
         }
     };
 
     $.fn.document.defaults = {
-
+        selector: '.easydocui-document',
+        url: '/document/'
     };
 
 
