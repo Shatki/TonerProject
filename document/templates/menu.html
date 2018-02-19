@@ -1,36 +1,36 @@
 {% block menu %}
     {% block buttons %}
         <div style="background:#fafafa;width:100%;border:1px solid #ccc">
-            <a href="#" class="easyui-menubutton" menu="#mm-document-consignment-{{ consignment.id }}"
+            <a href="#" class="easyui-menubutton" menu="#mm-document-{{ document.id }}"
                iconCls="icon-large-smartart">Документ</a>
-            <a href="#" class="easyui-menubutton" menu="#mm-edit-consignment-{{ consignment.id }}"
+            <a href="#" class="easyui-menubutton" menu="#mm-document-edit-{{ document.id }}"
                iconCls="icon-edit">Правка</a>
-            <a href="#" class="easyui-menubutton" menu="#mm-help-consignment-{{ consignment.id }}"
+            <a href="#" class="easyui-menubutton" menu="#mm-document-help-{{ document.id }}"
                iconCls="icon-help">Помощь</a>
-            <a href="#" class="easyui-menubutton" menu="#mm-operations-consignment-{{ consignment.id }}"
+            <a href="#" class="easyui-menubutton" menu="#mm-document-operations-{{ document.id }}"
                iconCls="icon-large-chart">Операции</a>
         </div>
     {% endblock buttons %}
 
     {% block document %}
-        <div id="mm-document-consignment-{{ consignment.id }}" style="width:150px;">
-            <div data-options="iconCls:'icon-save'" onclick="saveDoc({{ consignment.id }})">Сохранить</div>
-            <div data-options="iconCls:'icon-close'" onclick="closeDoc({{ consignment.id }})">Закрыть</div>
+        <div id="mm-document-{{ document.id }}" style="width:150px;">
+            <div data-options="iconCls:'icon-save'" onclick="saveDoc({{ document.id }})">Сохранить</div>
+            <div data-options="iconCls:'icon-close'" onclick="closeDoc({{ document.id }})">Закрыть</div>
             <div class="menu-sep"></div>
-            <div data-options="iconCls:'icon-print'" onclick="printDoc({{ consignment.id }})">Печать</div>
+            <div data-options="iconCls:'icon-print'" onclick="printDoc({{ document.id }})">Печать</div>
             <div class="menu-sep"></div>
             <div>Выход</div>
         </div>
     {% endblock document %}
 
     {% block edit %}
-        <div id="mm-edit-consignment-{{ consignment.id }}" style="width:150px;">
+        <div id="mm-document-edit-{{ document.id }}" style="width:150px;">
             <div data-options="iconCls:'icon-undo'">Undo</div>
             <div data-options="iconCls:'icon-redo'">Redo</div>
             <div class="menu-sep"></div>
-            <div onclick="copyItem({{ consignment.id }})">Копировать</div>
-            <div onclick="pasteItem({{ consignment.id }})">Вставить</div>
-            <div onclick="dublicateItem({{ consignment.id }})">Дублировать</div>
+            <div onclick="copyItem({{ document.id }})">Копировать</div>
+            <div onclick="pasteItem({{ document.id }})">Вставить</div>
+            <div onclick="dublicateItem({{ document.id }})">Дублировать</div>
             <div class="menu-sep"></div>
             <div>
                 <span>Toolbar</span>
@@ -50,7 +50,7 @@
     {% endblock edit %}
 
     {% block help %}
-        <div id="mm-help-consignment-{{ consignment.id }}" style="width:100px;">
+        <div id="mm-document-help-{{ document.id }}" style="width:100px;">
             <div>Help</div>
             <div>Update</div>
             <div>About</div>
@@ -58,7 +58,7 @@
     {% endblock help %}
 
     {% block operations %}
-        <div id="mm-operations-consignment-{{ consignment.id }}" class="menu-content"
+        <div id="mm-document-operations-{{ document.id }}" class="menu-content"
              style="background:#f0f0f0;padding:10px;text-align:left">
 
             <p style="font-size:14px;color:#444;">Try jQuery EasyUI to build your modern, interactive,

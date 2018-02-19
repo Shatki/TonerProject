@@ -157,26 +157,22 @@ function formatRouble(value) {
                 cache: true,
                 success: function (html) {
                     //Найдем в полученом HTML id документа и добавим его в data-options к tabs
-                    var idDoc = $("<div/>", {"html": html}).find('#doc-id').html();
+                    var idDoc = +($("<div/>", {"html": html}).find('#doc-id').html());
 
-                    doctabs.tabs('add', {
-                        index: idDoc,
-                        //   idDoc: idDoc,
-                        title: params.title,
-                        content: html,
-                        closable: true
-                    });
-                    // Инициализируем документ
-                    alert(idDoc.toSource());
-                    var doc = doctabs.tabs('getTab', idDoc);
-                    alert(doc.html().toSource());
-
-                    //$('.easydocui-document').document();
-                    //var tabs = document.datagrid('options').idDoc;
-                    //alert(idDoc);
-                    //document.document();
-                    //$(html).document();
-                    // enableDoc('#document-item-table-' + '{{ consignment.id }}', '#item-table-popup-menu');
+                    if(idDoc >= 0){
+                        doctabs.tabs('add', {
+                            index: idDoc,
+                            //   idDoc: idDoc,
+                            title: params.title,
+                            content: html,
+                            closable: true,
+                            selected:true
+                        });//.tabs('getTab', idDoc).document();
+                        // Инициализируем документ
+                        //alert(idDoc.toSource());
+                        var doc = doctabs.tabs('getTab', idDoc);
+                        alert(doc.html().toSource());
+                    }
                 }
             });
         }

@@ -1,14 +1,15 @@
 {% block document %}
-    {% block tab %}
-        <table id="document-item-table-{{ consignment.id }}"
+    <div id="document-{{ document.id }}" class="easydocui-document">
+    {% block table %}
+        <table id="document-item-table-{{ document.id }}"
                class="easyui-datagrid easydocui-document"
-                {% if consignment.id %}
-               url="/document/consignment/{{ consignment.id }}/items/json/"
+                {% if document.id %}
+               url="/document/consignment/{{ document.id }}/items/json/"
                 {% endif %}
                data-options="
                             fit:true,
                             fitColumns:true,
-                            toolbar:'#toolbar-document-{{ consignment.id }}',
+                            toolbar:'#toolbar-document-{{ document.id }}',
                             popupmenu:'#item-table-popup-menu',
                             idField:'id',
                             textField:'name',
@@ -89,27 +90,28 @@
             </tr>
             </thead>
         </table>
-    {% endblock tab %}
+    {% endblock table %}
     {% block index %}
-        <div id="doc-id" hidden="hidden">{{ consignment.id }}</div>
+        <div id="doc-id" hidden="hidden">{{ document.id }}</div>
     {% endblock index %}
+    </div>
 {% endblock document %}
 
 {% block toolbar %}
-    <div id='toolbar-document-{{ consignment.id }}'>
+    <div id='toolbar-document-{{ document.id }}'>
 
         {% include 'menu.html' %}
         {% block toolbar-reqvisites %}
-            <form id="document-req-form-{{ consignment.id }}">
+            <form id="document-req-form-{{ document.id }}">
                 {% block document_number %}
                     <input class="easyui-textbox" name="number" required="required" style="width: 100px"
                            label="Накладная №"
                            data-options="onChange:function(number){renameTab(number,0)}"
                            labelPosition="top"
-                            {% if not consignment.number %}
+                            {% if not document.number %}
                            value="Новая"
                             {% else %}
-                           value="{{ consignment.number }}"
+                           value="{{ document.number }}"
                             {% endif %}
                            placeholder="0000000001" type="number">
                     <span>от</span>
@@ -117,18 +119,18 @@
                            data-options="panelWidth:285,currentText:'Сегодня',closeText:'Закрыть',
                        onChange:function(date){renameTab(0,date)}"
                            labelPosition="top"
-                           value="{{ consignment.str_date }}"
+                           value="{{ document.str_date }}"
                            placeholder="31/10/1985">
                 {% endblock document_number %}
 
                 {% block contractors %}
                     {% block emitter %}
-                        <select id="emitter-consignment-{{ consignment.id }}" name="emitter" label="Продавец:"
+                        <select id="emitter-document-{{ document.id }}" name="emitter" label="Продавец:"
                                 class="easyui-combobox"
                                 labelPosition="top">
 
                             {% for contractor in contractors %}
-                                {% if contractor.id == consignment.emitter.id %}
+                                {% if contractor.id == document.emitter.id %}
                                     <option selected>{{ contractor.name }}</option>
                                 {% else %}
                                     <option>{{ contractor.name }}</option>
@@ -138,12 +140,12 @@
                     {% endblock emitter %}
 
                     {% block receiver %}
-                        <select id="receiver-consignment-{{ consignment.id }}" name="receiver" label="Покупатель:"
+                        <select id="receiver-document-{{ document.id }}" name="receiver" label="Покупатель:"
                                 class="easyui-combobox"
                                 labelPosition="top">
 
                             {% for contractor in contractors %}
-                                {% if contractor.id == consignment.receiver.id %}
+                                {% if contractor.id == document.receiver.id %}
                                     <option selected>{{ contractor.name }}</option>
                                 {% else %}
                                     <option>{{ contractor.name }}</option>
@@ -155,18 +157,14 @@
             </form>
         {% endblock toolbar-reqvisites %}
         {% block toolbar-menu %}
-            <div id="item-toolbar-{{ consignment.id }}">
+            <div id="item-toolbar-{{ document.id }}">
                 <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true"
-                   onclick="addItem('#item-table-consignment-' + '{{ consignment.id }}')">Добавить</a>
+                   onclick="addItem('#item-table-document-' + '{{ document.id }}')">Добавить</a>
                 <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
-                   onclick="editItem('#item-table-consignment-' + '{{ consignment.id }}')">Редактировать</a>
+                   onclick="editItem('#item-table-document-' + '{{ document.id }}')">Редактировать</a>
                 <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
-                   onclick="deleteItem('#item-table-consignment-' + '{{ consignment.id }}')">Удалить</a>
+                   onclick="deleteItem('#item-table-document-' + '{{ document.id }}')">Удалить</a>
             </div>
         {% endblock toolbar-menu %}
     </div>
 {% endblock toolbar %}
-
-
-{% block scripts %}
-{% endblock scripts %}

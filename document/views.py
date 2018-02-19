@@ -143,9 +143,9 @@ def document_edit(request, doctype, document_id):
                 id='0'
             )
         args = {'user_profile': request.user,
-                'Document': document,
+                'document': document,
                 'contractors': Contractor.objects.all(),
-                # 'items': Document.objects.get(id=Document_id).items.all(),
+                #'items': Document.objects.get(id=document_id).items.all(),
                 'measures': Measure.objects.all(),
                 }
         args.update(csrf(request))
