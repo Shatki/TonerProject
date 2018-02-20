@@ -2,14 +2,13 @@
 {% load staticfiles %}
 
 {% block easydocui %}
-    <div id="journal-tabs"
-         class="easyui-tabs"
+    <div id="easydocui" class="easyui-tabs easydocui"
          data-options="
                     fit:true,
                     border:false,
                     plain:true">
         {% block journal %}
-            <div id="doc-maintab" class="easydocui-journal" title="Журнал документов">
+            <div id="journal" class="easydocui-journal" title="Журнал документов">
                 {% block table %}
                     <table id="journal-table"
                            class="easyui-datagrid"
@@ -68,15 +67,12 @@
 
 {% block popup-menu %}
     <div id="journal-popupmenu"
-         class="easyui-menu easydocui-popupmenu"></div>
+         class="easyui-menu easydocui-popupmenu">
+    </div>
 {% endblock popup-menu %}
 
 {% block property %}
     <ul class="easyui-tree" data-options="url:'/catalog/product/json/',animate:true,dnd:true">
     </ul>
 {% endblock property %}
-
-{% block scripts %}
-{% endblock scripts %}
-
 

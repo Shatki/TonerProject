@@ -97,7 +97,9 @@ function formatRouble(value) {
      * Динамическое создание меню для journal
      */
     function popupmenu(target, index, row) {
+        // var menu = $('<div id="journal-popupmenu" class="easyui-menu easydocui-popupmenu"></div>').appendTo(target);
         var menu = $.data(target, 'journal').menu;
+        //alert(menu.html().toSource());
         menu.empty().
         menu('appendItem', {
             text: 'Создать',
@@ -148,9 +150,10 @@ function formatRouble(value) {
      * Функция открытия документа из journal datagrid в новой tab вкладки для редактирования
      */
     function openDoc(target, params) {
-        var doctabs = $(target);
-        if (doctabs.tabs('exists', params.title)) {
-            doctabs.tabs('select', params.title);
+        var easydocui = $.data(target, 'journal').table;
+        alert(easydocui.html().toSource());
+        if (easydocui.tabs('exists', params.title)) {
+            easydocui.tabs('select', params.title);
         } else {
             $.ajax({
                 url: params.url,
@@ -787,22 +790,12 @@ function formatRouble(value) {
 
 })(jQuery);
 
-
-
-
-
-
-
-
-
-
-
 $(document).ready(function () {
     $(function () {
         $('.easydocui-journal').journal({
             type: 'document',
             name: 'Журнал документов',
-            table: '#journal-table'
+            journal: '#journal-table'
         });
 
     });
