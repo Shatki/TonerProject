@@ -65,8 +65,12 @@
             {% endblock property %}
         </div>
         <div data-options="region:'center'">
-            {% block easydocui %}
-            {% endblock easydocui %}
+            <div id="easydocui" class="easyui-tabs easydocui"
+                 data-options="
+                    fit:true,
+                    border:false,
+                    plain:true">
+            </div>
         </div>
     </div>
     </body>
@@ -76,6 +80,20 @@
 {% endblock popup-menu %}
 
 {% block scripts %}
-    <script type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $('.easydocui').easydocui({
+                    type: 'consignment',
+                    title: 'Журнал документов',
+                    journal: '#journal-table'
+                });
+            });
+
+            if (!navigator.cookieEnabled) {
+                alert('Включите cookie для комфортной работы с этим сайтом');
+            }
+        });
+    </script>
 {% endblock scripts %}
 </html>

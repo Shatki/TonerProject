@@ -786,21 +786,82 @@ function formatRouble(value) {
         selector: '.easydocui-document',
         url: '/document/'
     };
-
-
 })(jQuery);
 
-$(document).ready(function () {
-    $(function () {
-        $('.easydocui-journal').journal({
-            type: 'document',
-            name: 'Журнал документов',
-            journal: '#journal-table'
+(function ($) {
+    function init(target, options) {
+        // Находим easyui tabs и вешаем на него плагин
+        var easydocui = $(target);
+        if (!easydocui) {
+            $.error('jQuery.easydocui: Не могу обнаружить easyui-tabs или easydocui');
+            return false;
+        }
+        // Первая вкладка всегда journal с индексом 0
+        $.ajax({
+            url: '/document/journal/' + options.type + '/',
+            method: 'post',
+            cache: true,
+            success: function (html) {
+                //alert(html.toSource());
+                easydocui.tabs('add', {
+                    index: 0,
+                    title: options.title,
+                    content: html,
+                    closable: false,
+                    selected: true
+                });
+                // Инициализируем документ
+                //alert(idDoc.toSource());
+            }
         });
+        var journal = easydocui.tabs('getTab', 0);
 
-    });
-
-    if (!navigator.cookieEnabled) {
-        alert('Включите cookie для комфортной работы с этим сайтом');
+        return {
+            options: options,
+            easydocui: easydocui,
+            journal: journal
+        };
     }
-});
+
+    $.fn.easydocui = function (options, params) {
+        if (typeof options === 'string') {
+            //alert('Строка');
+            var result = $.fn.easydocui.methods[options];
+            if (result) {
+                return result(this, param);
+            } else {
+                $.error('Метод с именем ' + options + ' не существует для jQuery.easydocui');
+                return this;
+            }
+        }
+        options = options || {};
+        //alert($(this).html().toSource());
+        return this.each(function () {
+            // Делаем инициализацию
+            var state = $.data(this, 'easydocui');
+            if (state) {
+                $.extend(state.options, options);
+            } else {
+                var r = init(this, options);
+                alert(r.toSource());
+                $.data(this, 'easydocui', {
+                    //options: $.extend({}, $.fn.journal.defaults, parseOptions(this), options),
+                    options: $.extend({}, $.fn.document.defaults, options),
+                    easydocui: r.easydocui,
+                    journal: r.journal
+                });
+                $(this).removeAttr('disabled');
+            }
+            //$('input.combo-text', state.combo).attr('readonly', !state.options.editable);
+            //setDisabled(this, state.options.disabled);
+            //setSize(this);
+            // Активация кнопок
+            //bindEvents(this);
+            //validate(this);
+        });
+    };
+
+    $.fn.easydocui.methods = {};
+
+    $.fn.easydocui.defaults = {};
+})(jQuery);

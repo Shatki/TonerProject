@@ -1,18 +1,12 @@
-{% extends 'dashboard.html' %}
 {% load staticfiles %}
 
 {% block easydocui %}
-    <div id="easydocui" class="easyui-tabs easydocui"
-         data-options="
-                    fit:true,
-                    border:false,
-                    plain:true">
-        {% block journal %}
-            <div id="journal" class="easydocui-journal" title="Журнал документов">
-                {% block table %}
-                    <table id="journal-table"
-                           class="easyui-datagrid"
-                           data-options="
+    {% block journal %}
+        <div id="journal" class="easydocui-journal" title="Журнал документов">
+            {% block table %}
+                <table id="journal-table"
+                       class="easyui-datagrid"
+                       data-options="
                                 url:'/document/consignment/all/json/',
                                 method: 'post',
                                 fit:true,
@@ -23,24 +17,23 @@
                                 rownumbers:true,
                                 autoRowHeight:false,
                                 singleSelect:true">
-                        <thead>
-                        <tr>
-                            <th field="id" width="3">id</th>
-                            <th field="ck" width="3" checkbox="true"></th>
-                            <th field="name" width="30" align="left">Вид, номер, дата документа</th>
-                            <th field="seller" width="20" align="left">Организация отпускающая продукцию</th>
-                            <th field="buyer" width="20" align="left">Организация принимающая продукцию</th>
-                            <th field="total" width="5" align="center">Сумма</th>
-                            <th field="enable" width="3" align="center"
-                                editor="{type:'checkbox',options:{on:'True',off:'False'}}">Активный
-                            </th>
-                        </tr>
-                        </thead>
-                    </table>
-                {% endblock table %}
-            </div>
-        {% endblock journal %}
-    </div>
+                    <thead>
+                    <tr>
+                        <th field="id" width="3">id</th>
+                        <th field="ck" width="3" checkbox="true"></th>
+                        <th field="name" width="30" align="left">Вид, номер, дата документа</th>
+                        <th field="seller" width="20" align="left">Организация отпускающая продукцию</th>
+                        <th field="buyer" width="20" align="left">Организация принимающая продукцию</th>
+                        <th field="total" width="5" align="center">Сумма</th>
+                        <th field="enable" width="3" align="center"
+                            editor="{type:'checkbox',options:{on:'True',off:'False'}}">Активный
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+            {% endblock table %}
+        </div>
+    {% endblock journal %}
 
     {% block journal-menu %}
         <div id="journal-toolbar" class="journal-toolbar" style="padding: 5px">

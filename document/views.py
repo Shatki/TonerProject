@@ -16,23 +16,11 @@ from datetime import datetime, timedelta
 from RUSystem.RUClient import send_data
 
 
-# Представление общего журнала накладных
 @csrf_protect
 @login_required
-def documents(request, doctype):
-    # добавить проверку на пользователя
-    try:
-        args = {'user_profile': request.user,
-                # 'Documents': Docugnment.objects.filter(delete=False),
-                'contractors': Contractor.objects.all(),
-                'measures': Measure.objects.all(),
-                'system_date': SystemDateTime.today(),
-                }
-    except:
-        return HttpResponse(u'journal: DB Error', content_type='text/html')
-    args.update(csrf(request))
-    # просмотр полного списка накладных
-    return render_to_response('journal.html', args)
+def journal(request, doctype):
+    return render_to_response('journal.html')
+
 
 
 # JSON запрос элементов для отображения журнала накладных
