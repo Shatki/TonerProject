@@ -62,6 +62,8 @@
         </div>
         <div title="Справочники" data-options="region:'east',split:true,collapsed:true" style="width:200px;">
             {% block property %}
+                <ul class="easyui-tree" data-options="url:'/catalog/product/json/',animate:true,dnd:true">
+                </ul>
             {% endblock property %}
         </div>
         <div data-options="region:'center'">
@@ -83,7 +85,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $(function () {
-                $('.easydocui').easydocui({
+                $('#easydocui').easydocui({
                     type: 'consignment',
                     title: 'Журнал документов',
                     journal: '#journal-table'

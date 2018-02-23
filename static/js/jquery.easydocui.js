@@ -161,11 +161,10 @@ function formatRouble(value) {
                 success: function (html) {
                     //Найдем в полученом HTML id документа и добавим его в data-options к tabs
                     var idDoc = +($("<div/>", {"html": html}).find('#doc-id').html());
-
                     if(idDoc >= 0){
                         doctabs.tabs('add', {
-                            index: idDoc,
-                            //   idDoc: idDoc,
+                            //index: idDoc,
+                            idDoc: idDoc,
                             title: params.title,
                             content: html,
                             closable: true,
@@ -799,27 +798,40 @@ function formatRouble(value) {
         // Первая вкладка всегда journal с индексом 0
         $.ajax({
             url: '/document/journal/' + options.type + '/',
-            method: 'post',
+            method: 'POST',
             cache: true,
             success: function (html) {
-                //alert(html.toSource());
+                alert(html.toSource());
                 easydocui.tabs('add', {
                     index: 0,
                     title: options.title,
                     content: html,
                     closable: false,
-                    selected: true
+                    selected: true,
+                    onLoad: function(){
+                        var journal = easydocui.tabs('getTab',0);
+                        journal.journal(options);
+                    }
                 });
-                // Инициализируем документ
-                //alert(idDoc.toSource());
+            },
+
+            error: function (textStatus) {
+                $.error('jQuery.easydocui: ошибка в получении journal/'+ textStatus)
             }
         });
-        var journal = easydocui.tabs('getTab', 0);
+        // Инициализируем документ
+        // Добавить проверки
+        //
+
+        ////
+        //
+        //var journal = $('.easydocui-journal');
+        //journal.journal(options);
 
         return {
             options: options,
             easydocui: easydocui,
-            journal: journal
+            journal:easydocui.tabs('getTab',0)
         };
     }
 
@@ -843,7 +855,6 @@ function formatRouble(value) {
                 $.extend(state.options, options);
             } else {
                 var r = init(this, options);
-                alert(r.toSource());
                 $.data(this, 'easydocui', {
                     //options: $.extend({}, $.fn.journal.defaults, parseOptions(this), options),
                     options: $.extend({}, $.fn.document.defaults, options),
@@ -852,9 +863,7 @@ function formatRouble(value) {
                 });
                 $(this).removeAttr('disabled');
             }
-            //$('input.combo-text', state.combo).attr('readonly', !state.options.editable);
             //setDisabled(this, state.options.disabled);
-            //setSize(this);
             // Активация кнопок
             //bindEvents(this);
             //validate(this);

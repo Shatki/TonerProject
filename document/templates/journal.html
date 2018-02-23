@@ -1,8 +1,28 @@
-{% load staticfiles %}
-
 {% block easydocui %}
     {% block journal %}
-        <div id="journal" class="easydocui-journal" title="Журнал документов">
+        <div id="journal">
+            {% block menu %}
+                <div id="journal-toolbar" class="journal-toolbar" style="padding: 5px">
+                    <div id="docs-datefilter" style="padding: 5px">
+                        <input class="easyui-datetimebox journal-datefrom"
+                               id="journal-datefrom" required="required" title="From"
+                               data-options="width:200,labelWidth:30,
+                           label:'От:',labelPosition:'before',labelAlign:'right'">
+                        <input class="easyui-datetimebox journal-dateto"
+                               id="journal-dateto" required="required" title="To"
+                               data-options="width:200,labelWidth:30,
+                           label:'До:',labelPosition:'before',labelAlign:'right'">
+                    </div>
+
+                    <a href="javascript:void(0)" class="easyui-linkbutton easydocui-createdoc"
+                       iconCls="icon-add" plain="true">Создать</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton easydocui-editdoc"
+                       iconCls="icon-edit" plain="true">Редактировать</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton easydocui-removedoc"
+                       iconCls="icon-remove" plain="true">Удалить</a>
+                </div>
+            {% endblock menu %}
+
             {% block table %}
                 <table id="journal-table"
                        class="easyui-datagrid"
@@ -34,38 +54,11 @@
             {% endblock table %}
         </div>
     {% endblock journal %}
-
-    {% block journal-menu %}
-        <div id="journal-toolbar" class="journal-toolbar" style="padding: 5px">
-            <div id="docs-datefilter" style="padding: 5px">
-                <input class="easyui-datetimebox journal-datefrom"
-                       id="journal-datefrom" required="required" title="From"
-                       data-options="width:200,labelWidth:30,
-                           label:'От:',labelPosition:'before',labelAlign:'right'">
-                <input class="easyui-datetimebox journal-dateto"
-                       id="journal-dateto" required="required" title="To"
-                       data-options="width:200,labelWidth:30,
-                           label:'До:',labelPosition:'before',labelAlign:'right'">
-            </div>
-
-            <a href="javascript:void(0)" class="easyui-linkbutton easydocui-createdoc"
-               iconCls="icon-add" plain="true">Создать</a>
-            <a href="javascript:void(0)" class="easyui-linkbutton easydocui-editdoc"
-               iconCls="icon-edit" plain="true">Редактировать</a>
-            <a href="javascript:void(0)" class="easyui-linkbutton easydocui-removedoc"
-               iconCls="icon-remove" plain="true">Удалить</a>
+    {% block popup-menu %}
+        <div id="journal-popupmenu"
+             class="easyui-menu easydocui-popupmenu">
         </div>
-    {% endblock journal-menu %}
+    {% endblock popup-menu %}
+
 {% endblock easydocui %}
-
-{% block popup-menu %}
-    <div id="journal-popupmenu"
-         class="easyui-menu easydocui-popupmenu">
-    </div>
-{% endblock popup-menu %}
-
-{% block property %}
-    <ul class="easyui-tree" data-options="url:'/catalog/product/json/',animate:true,dnd:true">
-    </ul>
-{% endblock property %}
 
