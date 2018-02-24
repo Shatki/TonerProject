@@ -76,6 +76,28 @@ $.extend(
     }
 );
 
+
+(function ($) {
+    $.fn.classes = function (callback) {
+        var classes = [];
+        $.each(this, function (i, v) {
+            var splitClassName = v.className.split(/\s+/);
+            for (var j = 0; j < splitClassName.length; j++) {
+                var className = splitClassName[j];
+                if (-1 === classes.indexOf(className)) {
+                    classes.push(className);
+                }
+            }
+        });
+        if ('function' === typeof callback) {
+            for (var i in classes) {
+                callback(classes[i]);
+            }
+        }
+        return classes;
+    };
+})(jQuery);
+
 function formatDollar(value) {
     if (value) {
         return '$' + value;
@@ -151,7 +173,7 @@ function formatRouble(value) {
      */
     function openDoc(target, params) {
         var easydocui = $.data(target, 'journal').table;
-        alert(easydocui.html().toSource());
+        alert($(target).classes().toSource());
         if (easydocui.tabs('exists', params.title)) {
             easydocui.tabs('select', params.title);
         } else {
@@ -791,47 +813,42 @@ function formatRouble(value) {
     function init(target, options) {
         // Находим easyui tabs и вешаем на него плагин
         var easydocui = $(target);
-        if (!easydocui) {
+        //alert(easydocui.hasClass('easyui-tabs'));
+        if (!easydocui || !easydocui.hasClass('easyui-tabs') ) {
             $.error('jQuery.easydocui: Не могу обнаружить easyui-tabs или easydocui');
-            return false;
+            return this;
         }
-        // Первая вкладка всегда journal с индексом 0
-        $.ajax({
-            url: '/document/journal/' + options.type + '/',
-            method: 'POST',
-            cache: true,
-            success: function (html) {
-                alert(html.toSource());
-                easydocui.tabs('add', {
-                    index: 0,
-                    title: options.title,
-                    content: html,
-                    closable: false,
-                    selected: true,
-                    onLoad: function(){
-                        var journal = easydocui.tabs('getTab',0);
-                        journal.journal(options);
-                    }
-                });
-            },
-
-            error: function (textStatus) {
-                $.error('jQuery.easydocui: ошибка в получении journal/'+ textStatus)
+        // Инициализируем Tabs
+        easydocui.
+        tabs({
+            onLoad: function(panel) {
+                // Первая вкладка всегда journal с индексом 0
+                alert(panel.classes().toSource());
             }
+        }).
+        tabs('add', {
+            index: 0,
+            href: options.url,
+            title: options.title,
+            closable: false,
+            selected: true
         });
+        //var journal = easydocui.tabs('getTab',0);
+
+        //alert(journal.html().toSource());
         // Инициализируем документ
         // Добавить проверки
         //
 
         ////
         //
-        //var journal = $('.easydocui-journal');
+
         //journal.journal(options);
 
         return {
             options: options,
-            easydocui: easydocui,
-            journal:easydocui.tabs('getTab',0)
+            easydocui: easydocui
+        //    journal: journal
         };
     }
 
