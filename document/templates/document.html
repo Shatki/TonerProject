@@ -1,8 +1,8 @@
 {% block document %}
-    <div id="document-{{ document.id }}" class="easydocui-document">
+    <div id="document-{{ document.id }}">
     {% block table %}
         <table id="document-item-table-{{ document.id }}"
-               class="easyui-datagrid easydocui-document"
+               class="easyui-datagrid"
                 {% if document.id %}
                url="/document/consignment/{{ document.id }}/items/json/"
                 {% endif %}

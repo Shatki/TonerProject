@@ -338,7 +338,7 @@ function formatRouble(value) {
     function init(target, options) {
         var journal = $(target);
         if (journal){
-            var table = journal.find(options.table);
+            var table = journal.find('table');
             if (!journal){
                 $.error('jQuery.journal: Не могу обнаружить datagrid table');
                 return false;
@@ -823,7 +823,19 @@ function formatRouble(value) {
         tabs({
             onLoad: function(panel) {
                 // Первая вкладка всегда journal с индексом 0
-                alert(panel.classes().toSource());
+                var indexTab = panel.panel('options').index;
+                var tab = easydocui.tabs('getTab', indexTab);
+                //alert(tab.find('div').classes().toSource());
+                if (indexTab === 0) {
+                    tab.addClass('easydocui-journal');
+                    tab.journal(options);
+                    //alert(tab.classes().toSource());
+                }else if(indexTab > 0){
+                    tab.addClass('easydocui-document');
+                    tab.document(options);
+                }else{
+                    $.error('jQuery.easydocui: index of tab error');
+                }
             }
         }).
         tabs('add', {
@@ -834,21 +846,11 @@ function formatRouble(value) {
             selected: true
         });
         //var journal = easydocui.tabs('getTab',0);
-
-        //alert(journal.html().toSource());
-        // Инициализируем документ
-        // Добавить проверки
-        //
-
-        ////
-        //
-
-        //journal.journal(options);
-
+        //alert(journal.classes().toSource());
         return {
             options: options,
-            easydocui: easydocui
-        //    journal: journal
+            easydocui: easydocui,
+            journal: easydocui.tabs('getTab',0)
         };
     }
 
