@@ -338,11 +338,13 @@ function formatRouble(value) {
     function init(target, options) {
         var journal = $(target);
         if (journal){
-            var table = journal.find('table');
-            if (!journal){
-                $.error('jQuery.journal: Не могу обнаружить datagrid table');
-                return false;
-            }
+            var table = journal.find('.easyui-datagrid');
+                if (!table){
+                    $.error('jQuery.journal: Не могу обнаружить datagrid table');
+                    return false;
+                }else{
+                    table.addClass('easydocui-journal-table')
+                }
         }else {
             $.error('jQuery.journal: Не могу обнаружить easydocui-journal');
             return false;
@@ -841,6 +843,7 @@ function formatRouble(value) {
         tabs('add', {
             index: 0,
             href: options.url,
+            method:'POST',
             title: options.title,
             closable: false,
             selected: true
