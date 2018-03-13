@@ -172,11 +172,16 @@ function formatRouble(value) {
      * Функция открытия документа из journal datagrid в новой tab вкладки для редактирования
      */
     function openDoc(target, params) {
-        var easydocui = $.data(target, 'journal').table;
-        alert($(target).classes().toSource());
-        if (easydocui.tabs('exists', params.title)) {
-            easydocui.tabs('select', params.title);
+        var _easydocui = $(target).easydocui('journal');
+        //alert(easydocui.tabs('tabs').toSource());
+        alert(_easydocui.html().toSource());
+
+
+        if (_easydocui.tabs('exists', params.title)) {
+            // Если такой документ открыт, то переключимся на нее
+            _easydocui.tabs('select', params.title);
         } else {
+            alert(params.url);
             $.ajax({
                 url: params.url,
                 cache: true,
@@ -184,18 +189,14 @@ function formatRouble(value) {
                     //Найдем в полученом HTML id документа и добавим его в data-options к tabs
                     var idDoc = +($("<div/>", {"html": html}).find('#doc-id').html());
                     if(idDoc >= 0){
-                        doctabs.tabs('add', {
+                        _easydocui.tabs('add', {
                             //index: idDoc,
                             idDoc: idDoc,
                             title: params.title,
                             content: html,
                             closable: true,
                             selected:true
-                        });//.tabs('getTab', idDoc).document();
-                        // Инициализируем документ
-                        //alert(idDoc.toSource());
-                        var doc = doctabs.tabs('getTab', idDoc);
-                        alert(doc.html().toSource());
+                        });
                     }
                 }
             });
@@ -892,7 +893,28 @@ function formatRouble(value) {
         });
     };
 
-    $.fn.easydocui.methods = {};
+    $.fn.easydocui.methods = {
+        options: function (jq) {
+            return $.data(jq[0], 'easydocui').options;
+        },
+        tabs: function (jq) {
+            return $.data(jq[0], 'easydocui').tabs;
+        },
+        journal: function (jq) {
+            return $.data(jq[0], 'easydocui').journal;
+        },
+        close: function (jq, params) {
+            return jq.each(function () {
+                // Пока не работает
+                close(this);
+            });
+        },
+        add: function (jq, params) {
+            return jq.each(function () {
+                addTab(this, params);
+            })
+        }
+    };
 
     $.fn.easydocui.defaults = {};
 })(jQuery);
