@@ -1,7 +1,7 @@
 /**
- * EasyUI for jQuery 1.5.3
- * 
- * Copyright (c) 2009-2017 www.jeasyui.com. All rights reserved.
+ * EasyUI for jQuery 1.5.5.4
+ *
+ * Copyright (c) 2009-2018 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
  * To use it on other terms please contact us: info@jeasyui.com
@@ -1227,7 +1227,7 @@ if(_12a[0].offsetHeight&&_12a[0].clientHeight&&_12a[0].offsetHeight<=_12a[0].cli
 _12b=0;
 }
 var _12c=_12a.outerHeight(true)-_12a.outerHeight();
-var top=tr.position().top-_129-_12c;
+    var top = tr.offset().top - dc.view2.offset().top - _129 - _12c;
 if(top<0){
 _12a.scrollTop(_12a.scrollTop()+top);
 }else{
@@ -2477,7 +2477,47 @@ col.styler=col.styler1;
 col.formatter1=col.styler1=undefined;
 });
 }};
-$.fn.datagrid.defaults=$.extend({},$.fn.panel.defaults,{sharedStyleSheet:false,frozenColumns:undefined,columns:undefined,fitColumns:false,resizeHandle:"right",resizeEdge:5,autoRowHeight:true,toolbar:null,striped:false,method:"post",nowrap:true,idField:null,url:null,data:null,loadMsg:"Processing, please wait ...",emptyMsg:"",rownumbers:false,singleSelect:false,ctrlSelect:false,selectOnCheck:true,checkOnSelect:true,pagination:false,pagePosition:"bottom",pageNumber:1,pageSize:10,pageList:[10,20,30,40,50],queryParams:{},sortName:null,sortOrder:"asc",multiSort:false,remoteSort:true,showHeader:true,showFooter:false,scrollOnSelect:true,scrollbarSize:18,rownumberWidth:30,editorHeight:24,headerEvents:{mouseover:_82(true),mouseout:_82(false),click:_86,dblclick:_8d,contextmenu:_93},rowEvents:{mouseover:_96(true),mouseout:_96(false),click:_9e,dblclick:_a9,contextmenu:_ae},rowStyler:function(_253,_254){
+    $.fn.datagrid.defaults = $.extend({}, $.fn.panel.defaults, {
+        sharedStyleSheet: false,
+        frozenColumns: undefined,
+        columns: undefined,
+        fitColumns: false,
+        resizeHandle: "right",
+        resizeEdge: 5,
+        autoRowHeight: true,
+        toolbar: null,
+        striped: false,
+        method: "post",
+        nowrap: true,
+        idField: null,
+        url: null,
+        data: null,
+        loadMsg: "Processing, please wait ...",
+        emptyMsg: "",
+        rownumbers: false,
+        singleSelect: false,
+        ctrlSelect: false,
+        selectOnCheck: true,
+        checkOnSelect: true,
+        pagination: false,
+        pagePosition: "bottom",
+        pageNumber: 1,
+        pageSize: 10,
+        pageList: [10, 20, 30, 40, 50],
+        queryParams: {},
+        sortName: null,
+        sortOrder: "asc",
+        multiSort: false,
+        remoteSort: true,
+        showHeader: true,
+        showFooter: false,
+        scrollOnSelect: true,
+        scrollbarSize: 18,
+        rownumberWidth: 30,
+        editorHeight: 31,
+        headerEvents: {mouseover: _82(true), mouseout: _82(false), click: _86, dblclick: _8d, contextmenu: _93},
+        rowEvents: {mouseover: _96(true), mouseout: _96(false), click: _9e, dblclick: _a9, contextmenu: _ae},
+        rowStyler: function (_253, _254) {
 },loader:function(_255,_256,_257){
 var opts=$(this).datagrid("options");
 if(!opts.url){

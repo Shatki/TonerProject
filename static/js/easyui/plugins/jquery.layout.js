@@ -1,7 +1,7 @@
 /**
- * EasyUI for jQuery 1.5.3
- * 
- * Copyright (c) 2009-2017 www.jeasyui.com. All rights reserved.
+ * EasyUI for jQuery 1.5.5.4
+ *
+ * Copyright (c) 2009-2018 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
  * To use it on other terms please contact us: info@jeasyui.com
@@ -247,8 +247,8 @@ _4f(_3a,_3b);
 p.panel("expand",false).panel("open");
 var _41=_42();
 p.panel("resize",_41.collapse);
-p.panel("panel").animate(_41.expand,function(){
-$(this).unbind(".layout").bind("mouseleave.layout",{region:_3b},function(e){
+    p.panel("panel").unbind(".layout").bind("mouseleave.layout", {region: _3b}, function (e) {
+        $(this).stop(true, true);
 if(_1==true){
 return;
 }
@@ -257,6 +257,7 @@ return;
 }
 _39(_3a,e.data.region);
 });
+    p.panel("panel").animate(_41.expand, function () {
 $(_3a).layout("options").onExpand.call(_3a,_3b);
 });
 }
