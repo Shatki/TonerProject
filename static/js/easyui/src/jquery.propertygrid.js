@@ -1,6 +1,6 @@
 /**
  * EasyUI for jQuery 1.5.5.4
- *
+ * 
  * Copyright (c) 2009-2018 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
@@ -489,7 +489,7 @@
 
         setGroupIndex: function (target) {
             var index = 0;
-            for(var i=0; i<this.groups.length; i++){
+            for (var i = 0; i < this.groups.length; i++) {
                 var group = this.groups[i];
                 group.startIndex = index;
                 index += group.rows.length;

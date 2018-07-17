@@ -5,12 +5,10 @@
     -webkit-border-radius: 4px 4px 4px 4px;
     border-radius: 4px 4px 4px 4px;
 }
-
 .checkbox-checked {
     border: 0;
     background: #00bbee;
 }
-
 .checkbox-inner {
     position: absolute;
     left: 0;
@@ -18,15 +16,12 @@
     width: 100%;
     height: 100%;
 }
-
 .checkbox path {
     stroke-width: 2px;
 }
-
 .checkbox-disabled {
     opacity: 0.6;
 }
-
 .checkbox-value {
     position: absolute;
     overflow: hidden;

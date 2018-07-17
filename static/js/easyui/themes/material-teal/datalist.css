@@ -1,7 +1,6 @@
 .datalist .datagrid-header {
     border-width: 0;
 }
-
 .datalist .datagrid-group,
 .m-list .m-list-group {
     height: 25px;
@@ -13,31 +12,25 @@
     border-width: 0 0 1px 0;
     border-color: #dfdfdf;
 }
-
 .datalist .datagrid-group-expander {
     display: none;
 }
-
 .datalist .datagrid-group-title {
     padding: 0 4px;
 }
-
 .datalist .datagrid-btable {
     width: 100%;
     table-layout: fixed;
 }
-
 .datalist .datagrid-row td {
     border-style: solid;
     border-left-color: transparent;
     border-right-color: transparent;
     border-bottom-width: 0;
 }
-
 .datalist-lines .datagrid-row td {
     border-bottom-width: 1px;
 }
-
 .datalist .datagrid-cell,
 .m-list li {
     width: auto;
@@ -49,7 +42,6 @@
     text-overflow: ellipsis;
     overflow: hidden;
 }
-
 .datalist-link,
 .m-list li > a {
     display: block;
@@ -66,7 +58,6 @@
     text-overflow: ellipsis;
     overflow: hidden;
 }
-
 .datalist-link::after,
 .m-list li > a::after {
     position: absolute;
@@ -85,13 +76,11 @@
     -o-transform: rotate(45deg);
     transform: rotate(45deg);
 }
-
 .m-list {
     margin: 0;
     padding: 0;
     list-style: none;
 }
-
 .m-list li {
     border-style: solid;
     border-width: 0 0 1px 0;
@@ -102,7 +91,6 @@
     background: #eee;
     color: #404040;
 }
-
 .m-list .m-list-group {
     padding: 0 4px;
 }

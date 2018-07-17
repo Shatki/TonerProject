@@ -7,48 +7,38 @@
     -webkit-border-radius: 0 0 0 0;
     border-radius: 0 0 0 0;
 }
-
 .panel-header,
 .panel-body {
     border-width: 1px;
     border-style: solid;
 }
-
 .panel-header {
     padding: 5px;
     position: relative;
 }
-
 .panel-title {
     background: url('images/blank.gif') no-repeat;
 }
-
 .panel-header-noborder {
     border-width: 0 0 1px 0;
 }
-
 .panel-body {
     overflow: auto;
     border-top-width: 0;
     padding: 0;
 }
-
 .panel-body-noheader {
     border-top-width: 1px;
 }
-
 .panel-body-noborder {
     border-width: 0px;
 }
-
 .panel-body-nobottom {
     border-bottom-width: 0;
 }
-
 .panel-with-icon {
     padding-left: 18px;
 }
-
 .panel-icon,
 .panel-tool {
     position: absolute;
@@ -57,17 +47,14 @@
     height: 16px;
     overflow: hidden;
 }
-
 .panel-icon {
     left: 5px;
     width: 16px;
 }
-
 .panel-tool {
     right: 5px;
     width: auto;
 }
-
 .panel-tool a {
     display: inline-block;
     width: 16px;
@@ -77,7 +64,6 @@
     margin: 0 0 0 2px;
     vertical-align: top;
 }
-
 .panel-tool a:hover {
     opacity: 1;
     filter: alpha(opacity=100);
@@ -86,15 +72,12 @@
     -webkit-border-radius: 2px 2px 2px 2px;
     border-radius: 2px 2px 2px 2px;
 }
-
 .panel-loading {
     padding: 11px 0px 10px 30px;
 }
-
 .panel-noscroll {
     overflow: hidden;
 }
-
 .panel-fit,
 .panel-fit body {
     height: 100%;
@@ -103,50 +86,39 @@
     border: 0;
     overflow: hidden;
 }
-
 .panel-loading {
     background: url('images/loading.gif') no-repeat 10px 10px;
 }
-
 .panel-tool-close {
     background: url('images/panel_tools.png') no-repeat -16px 0px;
 }
-
 .panel-tool-min {
     background: url('images/panel_tools.png') no-repeat 0px 0px;
 }
-
 .panel-tool-max {
     background: url('images/panel_tools.png') no-repeat 0px -16px;
 }
-
 .panel-tool-restore {
     background: url('images/panel_tools.png') no-repeat -16px -16px;
 }
-
 .panel-tool-collapse {
     background: url('images/panel_tools.png') no-repeat -32px 0;
 }
-
 .panel-tool-expand {
     background: url('images/panel_tools.png') no-repeat -32px -16px;
 }
-
 .panel-header,
 .panel-body {
     border-color: #dfdfdf;
 }
-
 .panel-header {
     background-color: #fafafa;
 }
-
 .panel-body {
     background-color: #ffffff;
     color: #404040;
     font-size: 14px;
 }
-
 .panel-title {
     font-size: 14px;
     font-weight: bold;
@@ -154,17 +126,14 @@
     height: 20px;
     line-height: 20px;
 }
-
 .panel-footer {
     border: 1px solid #dfdfdf;
     overflow: hidden;
     background: #fafafa;
 }
-
 .panel-footer-noborder {
     border-width: 1px 0 0 0;
 }
-
 .panel-hleft,
 .panel-hright {
     position: relative;

@@ -190,7 +190,6 @@
     opacity: 0.6;
     cursor: default;
 }
-
 .textbox-readonly .spinner-arrow .spinner-arrow-up:hover,
 .textbox-disabled .spinner-arrow .spinner-arrow-up:hover,
 .textbox-readonly .spinner-arrow .spinner-arrow-down:hover,
@@ -405,7 +404,6 @@ eui-button-group eui-linkbutton:last-child .l-btn {
     height: 200px;
     z-index: 9999;
 }
-
 .combo-panel eui-virtual-scroll,
 .combo-panel eui-datagrid,
 .combo-panel eui-treegrid {
@@ -462,7 +460,6 @@ eui-treegrid-view, eui-treegrid-body {
 .datagrid-view3 .datagrid-body-inner {
     padding-bottom: 20px;
 }
-
 .datagrid-view3 .datagrid-header td,
 .datagrid-view3 .datagrid-body td,
 .datagrid-view3 .datagrid-footer td {
@@ -477,7 +474,6 @@ eui-treegrid-view, eui-treegrid-body {
 .datagrid-htable {
     height: 100%;
 }
-
 .datagrid-header .datagrid-header,
 .datagrid-footer .datagrid-header {
     border-width: 0 0 0 1px;

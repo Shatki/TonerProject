@@ -5,21 +5,17 @@
     padding: 6px 4px;
     line-height: 20px;
 }
-
 .combobox-item-disabled {
     opacity: 0.5;
     filter: alpha(opacity=50);
 }
-
 .combobox-gitem {
     padding-left: 10px;
 }
-
 .combobox-group,
 .combobox-stick {
     font-weight: bold;
 }
-
 .combobox-stick {
     position: absolute;
     top: 1px;
@@ -27,17 +23,14 @@
     right: 1px;
     background: inherit;
 }
-
 .combobox-item-hover {
     background-color: #eee;
     color: #404040;
 }
-
 .combobox-item-selected {
     background-color: #eee;
     color: #39c;
 }
-
 .combobox-icon {
     display: inline-block;
     width: 16px;

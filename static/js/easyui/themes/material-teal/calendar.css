@@ -4,7 +4,6 @@
     padding: 1px;
     overflow: hidden;
 }
-
 .calendar table {
     table-layout: fixed;
     border-collapse: separate;
@@ -12,26 +11,21 @@
     width: 100%;
     height: 100%;
 }
-
 .calendar table td,
 .calendar table th {
     font-size: 14px;
 }
-
 .calendar-noborder {
     border: 0;
 }
-
 .calendar-header {
     position: relative;
     height: 28px;
 }
-
 .calendar-title {
     text-align: center;
     height: 28px;
 }
-
 .calendar-title span {
     position: relative;
     display: inline-block;
@@ -45,7 +39,6 @@
     -webkit-border-radius: 4px 4px 4px 4px;
     border-radius: 4px 4px 4px 4px;
 }
-
 .calendar-prevmonth,
 .calendar-nextmonth,
 .calendar-prevyear,
@@ -61,36 +54,29 @@
     -webkit-border-radius: 4px 4px 4px 4px;
     border-radius: 4px 4px 4px 4px;
 }
-
 .calendar-prevmonth {
     left: 20px;
     background: url('images/calendar_arrows.png') no-repeat -16px 0;
 }
-
 .calendar-nextmonth {
     right: 20px;
     background: url('images/calendar_arrows.png') no-repeat -32px 0;
 }
-
 .calendar-prevyear {
     left: 3px;
     background: url('images/calendar_arrows.png') no-repeat 0px 0;
 }
-
 .calendar-nextyear {
     right: 3px;
     background: url('images/calendar_arrows.png') no-repeat -48px 0;
 }
-
 .calendar-body {
     position: relative;
 }
-
 .calendar-body th,
 .calendar-body td {
     text-align: center;
 }
-
 .calendar-day {
     border: 0;
     padding: 1px;
@@ -99,18 +85,15 @@
     -webkit-border-radius: 4px 4px 4px 4px;
     border-radius: 4px 4px 4px 4px;
 }
-
 .calendar-other-month {
     opacity: 0.3;
     filter: alpha(opacity=30);
 }
-
 .calendar-disabled {
     opacity: 0.6;
     filter: alpha(opacity=60);
     cursor: default;
 }
-
 .calendar-menu {
     position: absolute;
     top: 0;
@@ -122,12 +105,10 @@
     display: none;
     overflow: hidden;
 }
-
 .calendar-menu-year-inner {
     text-align: center;
     padding-bottom: 5px;
 }
-
 .calendar-menu-year {
     width: 80px;
     line-height: 26px;
@@ -144,7 +125,6 @@
     -webkit-border-radius: 4px 4px 4px 4px;
     border-radius: 4px 4px 4px 4px;
 }
-
 .calendar-menu-prev,
 .calendar-menu-next {
     display: inline-block;
@@ -156,17 +136,14 @@
     -webkit-border-radius: 4px 4px 4px 4px;
     border-radius: 4px 4px 4px 4px;
 }
-
 .calendar-menu-prev {
     margin-right: 10px;
     background: url('images/calendar_arrows.png') no-repeat 5px center;
 }
-
 .calendar-menu-next {
     margin-left: 10px;
     background: url('images/calendar_arrows.png') no-repeat -44px center;
 }
-
 .calendar-menu-month {
     text-align: center;
     cursor: pointer;
@@ -175,62 +152,49 @@
     -webkit-border-radius: 4px 4px 4px 4px;
     border-radius: 4px 4px 4px 4px;
 }
-
 .calendar-body th,
 .calendar-menu-month {
     color: #8d8d8d;
 }
-
 .calendar-day {
     color: #404040;
 }
-
 .calendar-sunday {
     color: #CC2222;
 }
-
 .calendar-saturday {
     color: #00ee00;
 }
-
 .calendar-today {
     color: #0000ff;
 }
-
 .calendar-menu-year {
     border-color: #dfdfdf;
 }
-
 .calendar {
     border-color: #dfdfdf;
 }
-
 .calendar-header {
     background: #fafafa;
 }
-
 .calendar-body,
 .calendar-menu {
     background: #ffffff;
 }
-
 .calendar-body th {
     background: #fafafa;
     padding: 4px 0;
 }
-
 .calendar-hover,
 .calendar-nav-hover,
 .calendar-menu-hover {
     background-color: #eee;
     color: #404040;
 }
-
 .calendar-hover {
     border: 1px solid #ccc;
     padding: 0;
 }
-
 .calendar-selected {
     background-color: #eee;
     color: #39c;

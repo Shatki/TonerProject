@@ -73,31 +73,29 @@ class AccountAdmin(UserAdmin):
                    )
     fieldsets = (
         (None, {
-            'fields': ('email',
-                       'username',
-                       'password',
-                       )}),
+            'fields': (
+                'email', 'username', 'password',
+            )
+        }),
+
         (u'Персональная информация', {
             'fields': (
-                'first_name',
-                'last_name',
-                'photo',
-                'contractor',
-                'tagline',
-            )}),
+                'first_name', 'last_name', 'photo', 'contractor', 'tagline',
+            )
+        }),
+
 
         (u'Права доступа', {
             'fields': (
-                'is_admin',
-                'is_staff',
-                'is_company',
-                'groups',
-                'user_permissions',
-            )}),
+                'is_admin', 'is_staff', 'is_company', 'groups', 'user_permissions',
+            )
+        }),
+
         (u'Важные даты', {
             'fields': (
                 'last_login',
-            )}),
+            )
+        }),
     )
 
     add_fieldsets = (
@@ -109,7 +107,8 @@ class AccountAdmin(UserAdmin):
                 'password2',
                 'is_staff',
                 'is_admin',
-            )}),
+            )
+        }),
     )
 
     search_fields = ('username',
@@ -120,5 +119,6 @@ class AccountAdmin(UserAdmin):
 
     form = AccountChangeForm
     add_form = AccountCreationForm
+
 
 admin.site.unregister(Group)
