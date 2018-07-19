@@ -1,5 +1,5 @@
 /**
- * EasyDocUI for jQuery
+ * EasyDocUI for jQuery.EasyUI
  *
  * Copyright (c) 2016-2018 Seliverstov Dmitriy. All rights reserved.
  *
@@ -152,6 +152,7 @@ function formatRouble(value) {
 
     $.fn.easydocui = function (options, params) {
         if (typeof options === 'string') {
+            //alert(params.toSource());
             alert(options.toSource());
             var result = $.fn.easydocui.methods[options];
             if (result) {

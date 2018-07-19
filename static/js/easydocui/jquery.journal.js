@@ -1,5 +1,5 @@
 /**
- * EasyDocUI for jQuery
+ * EasyDocUI for jQuery.EasyUI
  *
  * Copyright (c) 2016-2018 Seliverstov Dmitriy. All rights reserved.
  *
