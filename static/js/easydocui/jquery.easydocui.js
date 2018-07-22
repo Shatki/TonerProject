@@ -68,6 +68,21 @@ $.extend(
     }
 );
 
+function formatDollar(value) {
+    if (value) {
+        return '$' + value;
+    } else {
+        return '';
+    }
+}
+
+function formatRouble(value) {
+    if (value) {
+        return 'P' + value;
+    } else {
+        return '';
+    }
+}
 
 (function ($) {
     $.fn.classes = function (callback) {
@@ -90,21 +105,7 @@ $.extend(
     };
 })(jQuery);
 
-function formatDollar(value) {
-    if (value) {
-        return '$' + value;
-    } else {
-        return '';
-    }
-}
 
-function formatRouble(value) {
-    if (value) {
-        return 'P' + value;
-    } else {
-        return '';
-    }
-}
 
 (function ($) {
     function init(target, options) {
