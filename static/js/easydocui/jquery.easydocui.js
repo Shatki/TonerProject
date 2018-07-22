@@ -125,15 +125,16 @@ function formatRouble(value) {
                 if (indexTab === 0) {
                     tab.addClass('easydocui-journal');
                     tab.journal(options);
-                    //alert(tab.classes().toSource());
                 } else if (indexTab > 0) {
                     tab.addClass('easydocui-document');
+                    alert(tab.classes().toSource());
                     tab.document(options);
                 } else {
                     $.error('jQuery.easydocui: index of tab error');
                 }
             }
         }).tabs('add', {
+            //Принудительно делаем индекс журнала 0
             index: 0,
             href: options.url,
             method: 'POST',
