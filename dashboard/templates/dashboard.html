@@ -21,9 +21,7 @@
         <script type='text/javascript' src="{% static 'js/datagrid-cellediting.js' %}"></script>
         <script type='text/javascript' src="{% static 'js/datagrid-scrollview.js' %}"></script>
 
-        <script type='text/javascript' src="{% static 'js/easydocui/jquery.easydocui.js' %}"></script>
-        <script type='text/javascript' src="{% static 'js/easydocui/jquery.journal.js' %}"></script>
-        <script type='text/javascript' src="{% static 'js/easydocui/jquery.document.js' %}"></script>
+        <script type='text/javascript' src="{% static 'js/easydocui/jquery.easyui.easydoc.js' %}"></script>
 
         <script type='text/javascript' src="{% static 'js/ajax.js' %}"></script>
         <script type='text/javascript' src="{% static 'js/cookies.js' %}"></script>
@@ -69,7 +67,7 @@
             {% endblock property %}
         </div>
         <div data-options="region:'center'">
-            <div id="easydocui" class="easyui-tabs easydocui"
+            <div id="easydoc" class="easyui-tabs easydoc"
                  data-options="
                     fit:true,
                     border:false,
@@ -87,7 +85,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $(function () {
-                $('.easydocui').easydocui({
+                $('.easydoc').easydoc({
                     type: 'consignment',
                     url: '/document/journal/consignment/',
                     title: 'Журнал документов',

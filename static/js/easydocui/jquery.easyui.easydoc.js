@@ -112,6 +112,52 @@ function formatRouble(value) {
 
 // Делаем замыкание
 (function ($) {
+    function init(target, options) {
+        // Если опция undefined, сделаем ее просто пустой
+        options = options || {};
+        // Получаем target для поиска элемента на который вешаем плагин
+        var easydoc = $(target);
+        // Полученый target должен быть класса easyui-tabs
+        if (!easydoc || !easydoc.hasClass('easyui-tabs')) {
+            $.error('jQuery.easydoc: Не могу обнаружить easyui-tabs или easydoc');
+            return this;
+        }
+        // Инициализируем Tabs
+        easydoc.tabs({
+            onLoad: function (panel) {
+                // Первая вкладка всегда journal с индексом 0
+                var indexTab = panel.panel('options').index;
+                var tab = easydoc.tabs('getTab', indexTab);
+                //alert(tab.find('div').classes().toSource());
+                if (indexTab === 0) {
+                    tab.addClass('easydoc-journal');
+                    tab.journal(options);
+                } else if (indexTab > 0) {
+                    tab.addClass('easydoc-document');
+                    alert(tab.classes().toSource());
+                    tab.document(options);
+                } else {
+                    $.error('jQuery.easydoc: index of tab error');
+                }
+            }
+        }).tabs('add', {
+            //Принудительно делаем индекс журнала 0
+            index: 0,
+            href: options.url,
+            method: 'POST',
+            title: options.title,
+            closable: false,
+            selected: true
+        });
+        //var journal = easydocui.tabs('getTab',0);
+        //alert(journal.classes().toSource());
+        return {
+            options: options,
+            easydocui: easydoc,
+            journal: easydoc.tabs('getTab', 0)
+        };
+    }
+
     $.fn.easydoc = function (options, params) {
     };
     $.fn.easydoc.methods = {};
