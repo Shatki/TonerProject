@@ -140,7 +140,7 @@ $.extend(
             }
             ///////
         } else {
-            $.error('jQuery.document: Не могу обнаружить easydocui-document');
+            $.error('jQuery.document: Не могу обнаружить easydoc-document');
             return false;
         }
 
@@ -272,7 +272,7 @@ $.extend(
     };
 
     $.fn.document.defaults = {
-        selector: '.easydocui-document',
+        selector: '.easydoc-document',
         url: '/document/'
     };
 })(jQuery);

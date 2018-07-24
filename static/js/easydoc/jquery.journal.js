@@ -20,7 +20,7 @@
      * Динамическое создание меню для journal
      */
     function popupmenu(target, index, row) {
-        // var menu = $('<div id="journal-popupmenu" class="easyui-menu easydocui-popupmenu"></div>').appendTo(target);
+        // var menu = $('<div id="journal-popupmenu" class="easyui-menu easydoc-popupmenu"></div>').appendTo(target);
         var menu = $.data(target, 'journal').menu;
         //alert(menu.html().toSource());
         menu.empty().menu('appendItem', {
@@ -70,7 +70,7 @@
      */
     function openDoc(target, params) {
         var _easydocui = $(target).easydocui('journal');
-        //alert(easydocui.tabs('tabs').toSource());
+        //alert(easydoc.tabs('tabs').toSource());
         alert(_easydocui.html().toSource());
 
 
@@ -241,10 +241,10 @@
                 $.error('jQuery.journal: Не могу обнаружить datagrid table');
                 return false;
             } else {
-                table.addClass('easydocui-journal-table')
+                table.addClass('easydoc-journal-table')
             }
         } else {
-            $.error('jQuery.journal: Не могу обнаружить easydocui-journal');
+            $.error('jQuery.journal: Не могу обнаружить easydoc-journal');
             return false;
         }
 
@@ -321,9 +321,9 @@
         var opts = $.data(target, 'journal').options;
         var toolbar = $.data(target, 'journal').toolbar;
         //var panel = $.data(target, 'combo').panel;
-        var buttonCreate = toolbar.find('a.easydocui-createdoc');
-        var buttonEdit = toolbar.find('a.easydocui-editdoc');
-        var buttonRemove = toolbar.find('a.easydocui-removedoc');
+        var buttonCreate = toolbar.find('a.easydoc-createdoc');
+        var buttonEdit = toolbar.find('a.easydoc-editdoc');
+        var buttonRemove = toolbar.find('a.easydoc-removedoc');
 
         $(document).unbind('.journal');
         toolbar.unbind('.journal');
@@ -442,7 +442,7 @@
     };
 
     $.fn.journal.defaults = {
-        selector: '.easydocui-journal',
+        selector: '.easydoc-journal',
         url: '/document/'
     }
 })(jQuery);

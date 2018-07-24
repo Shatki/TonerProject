@@ -114,6 +114,7 @@ function formatRouble(value) {
 (function ($) {
     function init(target, options) {
         // Если опция undefined, сделаем ее просто пустой
+        alert('Work!');
         options = options || {};
         // Получаем target для поиска элемента на который вешаем плагин
         var easydoc = $(target);
@@ -123,9 +124,11 @@ function formatRouble(value) {
             return this;
         }
         // Инициализируем Tabs
+
         easydoc.tabs({
             onLoad: function (panel) {
                 // Первая вкладка всегда journal с индексом 0
+
                 var indexTab = panel.panel('options').index;
                 var tab = easydoc.tabs('getTab', indexTab);
                 //alert(tab.find('div').classes().toSource());
@@ -149,16 +152,61 @@ function formatRouble(value) {
             closable: false,
             selected: true
         });
-        //var journal = easydocui.tabs('getTab',0);
+        //var journal = easydoc.tabs('getTab',0);
         //alert(journal.classes().toSource());
         return {
             options: options,
-            easydocui: easydoc,
+            easydoc: easydoc,
             journal: easydoc.tabs('getTab', 0)
         };
     }
 
     $.fn.easydoc = function (options, params) {
+        /*  Функция вызова головного плагина EasyDoc
+            @param      options (string, необязательный) имя вызываемого метода
+            @param      params (object)
+            @param      options (object)
+            @return     (object) this для каждого экземпляра
+            */
+        // Если пришло имя функции то string, если данные то объект
+        if (typeof options === 'string') {
+            //alert(params.toSource());
+            //alert(options.toSource());
+
+            // first option:
+            // var result = $.fn.easydoc.methods[options](this, params);
+            // second option:
+            var result = $.fn.easydoc.methods[options];
+            if (result) {
+                return result(this, params);
+            } else {
+                $.error('Метод с именем ' + options + ' не существует для jQuery.easydocui');
+                return this;
+            }
+        }
+        //
+        options = options || {};
+        alert($(this).html().toSource());
+        return this.each(function () {
+            // Делаем инициализацию
+            var state = $.data(this, 'easydocui');
+            if (state) {
+                $.extend(state.options, options);
+            } else {
+                var r = init(this, options);
+                $.data(this, 'easydocui', {
+                    //options: $.extend({}, $.fn.journal.defaults, parseOptions(this), options),
+                    options: $.extend({}, $.fn.document.defaults, options),
+                    easydocui: r.easydocui,
+                    journal: r.journal
+                });
+                $(this).removeAttr('disabled');
+            }
+            //setDisabled(this, state.options.disabled);
+            //Активация кнопок
+            //bindEvents(this);
+            //validate(this);
+        });
     };
     $.fn.easydoc.methods = {};
     $.fn.easydoc.defaults = {};
