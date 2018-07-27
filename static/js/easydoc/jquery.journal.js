@@ -362,8 +362,7 @@
                 var r = init(this, options);
                 //alert(r.toSource());
                 $.data(this, 'journal', {
-                    //options: $.extend({}, $.fn.journal.defaults, parseOptions(this), options),
-                    options: $.extend({}, $.fn.journal.defaults, options),
+                    options: $.extend($.fn.journal.defaults, options),
                     journal: r.journal,
                     table: r.table,
                     toolbar: r.toolbar,
