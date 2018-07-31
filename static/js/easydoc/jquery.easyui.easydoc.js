@@ -36,9 +36,12 @@
                 var tab = easydoc.tabs('getTab', indexTab);
                 //alert(tab.find('div').classes().toSource());
                 if (indexTab === 0) {
+                    // Тут журнал
                     tab.addClass('easydoc-journal');
-                    tab.journal(options);
+                    // Инициализация журнала
+                    tab.journal({easydoc: easydoc});
                 } else if (indexTab > 0) {
+                    // Тут документ
                     tab.addClass('easydoc-document');
                     alert(tab.classes().toSource());
                     tab.document(options);
@@ -296,18 +299,13 @@
      * Функция открытия документа из journal datagrid в новой tab вкладки для редактирования
      */
     function openDoc(target, params) {
-        var easydoc = $.data(target, 'easydoc'); //// почему не видит????-----------------------------------------------
         var journal = $.data(target, 'journal');
         var opts = journal.options;
+        var easydoc = opts.easydoc;
 
-        alert(journal.toSource());
-
-        alert(easydoc.toSource());
-
-
-        if (_easydocui.tabs('exists', params.title)) {
+        if (easydoc.tabs('exists', params.title)) {
             // Если такой документ открыт, то переключимся на нее
-            _easydocui.tabs('select', params.title);
+            easydoc.tabs('select', params.title);
         } else {
             alert(params.url);
             $.ajax({
@@ -317,7 +315,7 @@
                     //Найдем в полученом HTML id документа и добавим его в data-options к tabs
                     var idDoc = +($("<div/>", {"html": html}).find('#doc-id').html());
                     if (idDoc >= 0) {
-                        _easydocui.tabs('add', {
+                        easydoc.tabs('add', {
                             //index: idDoc,
                             idDoc: idDoc,
                             title: params.title,
@@ -329,6 +327,7 @@
                 }
             });
         }
+        return this;
     }
 
     /**
@@ -345,7 +344,7 @@
         if (row) {
             openDoc(target, {
                 title: row.name,
-                url: opts.journal_url + row.id + opts.edit_url,
+                url: opts.url + row.id + opts.edit_url,
                 idDoc: row.id
             });
         }
@@ -497,7 +496,7 @@
         selector: '.easydoc-journal',
         journal: '#journal-table',
 
-        journal_url: '/document/consignment/',
+        url: '/document/consignment/',
         open_url: '/open/',
         edit_url: '/edit/',
 
