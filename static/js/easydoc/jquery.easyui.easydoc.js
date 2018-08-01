@@ -1,5 +1,5 @@
 /**
- * EasyDoc for jQuery.EasyUI
+ * easyDoc for jQuery.EasyUI
  *
  * Copyright (c) 2016-2018 Seliverstov Dmitriy. All rights reserved.
  *
@@ -120,19 +120,21 @@
         },
         tabs: function (jq) {
             return $.data(jq[0], 'easydoc').tabs;
-        },
+        }
+        /**
         close: function (jq, params) {
             return jq.each(function () {
                 // Пока не работает
                 close(this, params);
             });
         },
+
         add: function (jq, params) {
             return jq.each(function () {
                 addTab(this, params);
             })
         }
-
+         */
     };
     $.fn.easydoc.defaults = {
         test: 'easydoc-defaults',
@@ -153,7 +155,6 @@
      * Динамическое создание меню для journal
      */
     function popupmenu(target, index, row) {
-        // var menu = $('<div id="journal-popupmenu" class="easyui-menu easydoc-popupmenu"></div>').appendTo(target);
         var menu = $.data(target, 'journal').menu;
         //alert(menu.html().toSource());
         menu.empty().menu('appendItem', {
@@ -296,13 +297,15 @@
 
 
     /**
-     * Функция открытия документа из journal datagrid в новой tab вкладки для редактирования
+     * Функция открытия документа из journal datagrid или создание нового документа
+     * в новой tab вкладки для редактирования
      */
-    function openDoc(target, params) {
-        var journal = $.data(target, 'journal');
+    function openDoc(container, params) {
+        var journal = $.data(container, 'journal');
         var opts = journal.options;
         var easydoc = opts.easydoc;
 
+        // Переработать для открытия через easyDoc
         if (easydoc.tabs('exists', params.title)) {
             // Если такой документ открыт, то переключимся на нее
             easydoc.tabs('select', params.title);
@@ -333,9 +336,9 @@
     /**
      * Редактирование документа, выделенного в journal datagrid
      */
-    function editDoc(target) {
+    function editDoc(container) {
         // Извлекаем jQ объект таблицы
-        var journal = $.data(target, 'journal');
+        var journal = $.data(container, 'journal');
         var opts = journal.options;
         // alert(table.html().toSource());
         // Берем выделенный документ
@@ -395,6 +398,7 @@
         if (typeof options === 'string') {
             var result = $.fn.journal.methods[options](this, params);
             if (result) {
+                alert(result.toSource());
                 return result(this, params);
             } else {
                 $.error('The method with name:' + options + ' does not exist in jQuery.easydoc.journal');
@@ -499,6 +503,7 @@
         url: '/document/consignment/',
         open_url: '/open/',
         edit_url: '/edit/',
+        new_url: '/new/',
 
         timedelta: 90,     // период журнала в днях
         dateto: null,

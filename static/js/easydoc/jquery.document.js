@@ -272,6 +272,7 @@ $.extend(
     };
 
     $.fn.document.defaults = {
+        idDoc: null,
         selector: '.easydoc-document',
         url: '/document/'
     };
