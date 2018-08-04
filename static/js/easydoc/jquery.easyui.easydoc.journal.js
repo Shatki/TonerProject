@@ -169,9 +169,10 @@
         // Извлекаем jQ объект таблицы
         var journal = $.data(container, 'journal');
         var opts = journal.options;
-        var easydoc = opts.easydoc;
+        var easydoc = $(opts.easydoc);
 
         var row = journal.table.datagrid('getSelected');
+
         if (row) {
             var add_params = {
                 title: row.name,
@@ -333,7 +334,7 @@
         test: 'journal-defaults',
         selector: '.easydoc-journal',
         journal: '#journal-table',
-        title_new: 'Новая накладная от ',
+        title_new: 'Новая накладная от {d}',
 
         timedelta: 90,     // период журнала в днях
         dateto: null,

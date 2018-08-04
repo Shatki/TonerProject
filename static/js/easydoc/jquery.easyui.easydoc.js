@@ -170,7 +170,7 @@
         add: function (jq, params) {
             return jq.each(function () {
                 alert(params.toSource());
-                penDoc(this, params);
+                openDoc(this, params);
             })
         }
 
