@@ -167,10 +167,10 @@
             });
         },
 
-        add: function (jq, params) {
+        new: function (jq, params) {
             return jq.each(function () {
                 alert(params.toSource());
-                openDoc(this, params);
+                //openDoc(this, params);
             })
         }
 

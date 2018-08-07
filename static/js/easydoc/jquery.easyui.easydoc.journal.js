@@ -165,14 +165,11 @@
     /**
      * Создание или редактирование документа, выделенного в journal datagrid
      */
-    function openDoc(container, params) {
+    function editDoc(container) {
         // Извлекаем jQ объект таблицы
         var journal = $.data(container, 'journal');
-        var opts = journal.options;
-        var easydoc = $(opts.easydoc);
-
+        var easydoc = $(journal.easydoc);
         var row = journal.table.datagrid('getSelected');
-
         if (row) {
             var add_params = {
                 title: row.name,
@@ -181,11 +178,23 @@
             }
         }
         // Открываем
-        easydoc('add', $.extend($.fn.journal.defaults.open_params, add_params));
+        easydoc.easydoc('edit', $.extend($.fn.journal.defaults.open_params, add_params));
         return this;
-
-
     }
+
+    function newDoc(container) {
+        // Извлекаем jQ объект таблицы
+        var journal = $.data(container, 'journal');
+        //var opts = journal.options;
+        var easydoc = $(journal.easydoc);
+        var date = $.fn.datebox.defaults.formatter(new Date());
+        easydoc.easydoc('new', {
+            title: $.fn.journal.defaults.title_new + date
+        });
+        return this;
+    }
+
+
 
     /**
      * Привязка событий
@@ -232,7 +241,7 @@
             var result = $.fn.journal.methods[options](this, params);
             if (result) {
                 alert(result.toSource());
-                return result(this, params);
+                return result;
             } else {
                 $.error('The method with name:' + options + ' does not exist in jQuery.easydoc.journal');
                 return this;
@@ -251,6 +260,7 @@
                 //alert(r.toSource());
                 $.data(this, 'journal', {
                     options: $.extend($.fn.journal.defaults, options),
+                    easydoc: options.easydoc,
                     journal: r.journal,
                     table: r.table,
                     toolbar: r.toolbar,
@@ -282,25 +292,14 @@
                 destroy(this);
             });
         },
-
-        ///// ???????
-        add: function (jq, params) {
-            return jq.each(function () {
-                openDoc(this, params);
-            })
-        },
         new: function (jq) {
             return jq.each(function () {
-                var date = $.fn.datebox.defaults.formatter(new Date());
-                openDoc(this, {
-                    action: 'new',
-                    title: $.fn.journal.defaults.title_new + date
-                });
+                newDoc(this);
             })
         },
         edit: function (jq) {
             return jq.each(function () {
-                openDoc(this);
+                editDoc(this);
             })
         },
         remove: function (jq) {
