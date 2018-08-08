@@ -134,7 +134,7 @@
                 // с нашими настройками и сохраним их в data
                 $.data(this, 'easydoc', {
                     // Берем для EasyDoc настройки по-умолчанию и дополняем их полученными
-                    options: $.extend($.fn.easydoc.defaults, options),
+                    options: $.extend({}, $.fn.easydoc.defaults, options),
                     // Сохраним jQuery объект нашего элемента DOM
                     easydoc: r.easydoc,
                     // При инициализации создается и журнал, сохраним его jQuery объект
@@ -169,16 +169,13 @@
 
         new: function (jq, params) {
             return jq.each(function () {
-                alert(params.toSource());
-                //openDoc(this, params);
+                openDoc(this, params);
             })
         }
 
     };
     $.fn.easydoc.defaults = {
-        test: 'easydoc-defaults',
         type: 'consignment',                // Потом поменять на 'all'
-
         url: '/document/consignment/',
         open_url: '/open/',
         edit_url: '/edit/',

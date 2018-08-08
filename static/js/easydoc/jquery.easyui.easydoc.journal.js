@@ -60,8 +60,8 @@
             text: 'Печать',
             name: 'print',
             iconCls: 'icon-print'
-        }).menu('options').onClick = function (item) {
-            $(target).journal(item.name)
+        }).menu('options').onClick = function (action) {
+            $(target).journal(action.name)
         };
         return menu;
     }
@@ -163,7 +163,7 @@
     }
 
     /**
-     * Создание или редактирование документа, выделенного в journal datagrid
+     * Редактирование документа, выделенного в journal datagrid
      */
     function editDoc(container) {
         // Извлекаем jQ объект таблицы
@@ -175,21 +175,27 @@
                 title: row.name,
                 // url: opts.url + row.id + opts.edit_url,
                 idDoc: row.id
-            }
+            };
+            easydoc.easydoc('edit', $.extend($.fn.journal.defaults.open_params, add_params));
+        } else {
+            $.error('easyDoc.journal.editDoc: row\'s choice error')
         }
         // Открываем
-        easydoc.easydoc('edit', $.extend($.fn.journal.defaults.open_params, add_params));
         return this;
     }
 
+    /**
+     * Создание нового документа, в journal datagrid
+     */
     function newDoc(container) {
         // Извлекаем jQ объект таблицы
         var journal = $.data(container, 'journal');
-        //var opts = journal.options;
         var easydoc = $(journal.easydoc);
+        //var opts = journal.options;
         var date = $.fn.datebox.defaults.formatter(new Date());
-        easydoc.easydoc('new', {
-            title: $.fn.journal.defaults.title_new + date
+        easydoc.easydoc('open', {
+            action: 'new',
+            title: $.fn.journal.defaults.document_title
         });
         return this;
     }
@@ -240,10 +246,10 @@
         if (typeof options === 'string') {
             var result = $.fn.journal.methods[options](this, params);
             if (result) {
-                alert(result.toSource());
+                //alert(result.toSource());
                 return result;
             } else {
-                $.error('The method with name:' + options + ' does not exist in jQuery.easydoc.journal');
+                $.error('jQuery.easydoc.journal: The method with name:' + options + ' does not exist');
                 return this;
             }
         }
@@ -259,7 +265,7 @@
                 var r = init(this, options);
                 //alert(r.toSource());
                 $.data(this, 'journal', {
-                    options: $.extend($.fn.journal.defaults, options),
+                    options: $.extend({}, $.fn.journal.defaults, options),
                     easydoc: options.easydoc,
                     journal: r.journal,
                     table: r.table,
@@ -285,6 +291,9 @@
         },
         journal: function (jq) {
             return $.data(jq[0], 'journal').journal;
+        },
+        easydoc: function (jq) {
+            return $.data(jq[0], 'journal').easydoc;
         },
         destroy: function (jq) {
             return jq.each(function () {
@@ -330,15 +339,18 @@
     };
 
     $.fn.journal.defaults = {
-        test: 'journal-defaults',
-        selector: '.easydoc-journal',
         journal: '#journal-table',
-        title_new: 'Новая накладная от {d}',
+        journal_title: 'Documents\'s journal',
+        selector: '.easydoc-journal',
+        date: "01-01-2001",
+
+        document: 'накладная',
+        document_title: 'Новая ${document} от ${date}',
 
         timedelta: 90,     // период журнала в днях
         dateto: null,
         datefrom: null,
-        title: 'Documents\'s journal',
+
         open_params: {action: 'new'}
 
     };
