@@ -10,24 +10,10 @@
 
 // Делаем замыкание
 (function ($) {
-
-    function init(target, options) {
-        /*  Функция инициализации плагина EasyDoc
-            @param      target  (jQuery) целевой элемент DOM
-            @param      options (object) параметры настройки плагина
-            @return             (object) содержит options, easydoc, journal
-            */
-
-        // Если options === undefined, сделаем ее просто пустой
-        options = options || {};
-        // Получаем target для поиска элемента на который вешаем плагин
-        var easydoc = $(target);
-        // Полученый target должен быть класса easyui-tabs
-        if (!easydoc || !easydoc.hasClass('easyui-tabs')) {
-            $.error('jQuery.easydoc: can\'t find easyui-tabs or easydoc');
-            return this;
-        }
-
+    /**
+     * Функция создает на нулевой вкладке журнал,
+     */
+    function journalCreate(easydoc, options) {
         // Инициализируем Tabs
         easydoc.tabs({
             onLoad: function (panel) {
@@ -59,11 +45,33 @@
             selected: true
         });
         //var journal = easydoc.tabs('getTab',0);
-        //alert(journal.classes().toSource());
+        //  Вернем журнал
+        return easydoc.tabs('getTab', 0);
+    }
+
+    /**
+     * Функция инициализатор плагина easyDoc,
+     */
+    function init(target, options) {
+        /*  Функция инициализации плагина EasyDoc
+            @param      target  (jQuery) целевой элемент DOM
+            @param      options (object) параметры настройки плагина
+            @return             (object) содержит options, easydoc, journal
+            */
+
+        // Если options === undefined, сделаем ее просто пустой
+        options = options || {};
+        // Получаем target для поиска элемента на который вешаем плагин
+        var easydoc = $(target);
+        // Полученый target должен быть класса easyui-tabs
+        if (!easydoc || !easydoc.hasClass('easyui-tabs')) {
+            $.error('jQuery.easydoc: can\'t find easyui-tabs or easydoc');
+            return this;
+        }
         return {
             options: options,
             easydoc: easydoc,
-            journal: easydoc.tabs('getTab', 0)
+            journal: journalCreate(easydoc, options)
         };
     }
 
@@ -71,8 +79,17 @@
      * Функция открытия документа из journal datagrid или создание нового документа
      * в новой tab вкладки для редактирования
      */
-    function openDoc(container, params) {
-        var easydoc = $(container);
+    function documentOpen(container, params) {
+        let easydoc = $(container);
+        let date = $.fn.datebox.defaults.formatter(new Date());
+
+
+        // Создать функцию генерации Title для Тав
+        let title = $.fn.easydoc.defaults.getTitle({
+            date: date
+        });
+
+        alert(title);
 
         // Переработать для открытия через easyDoc
         if (easydoc.tabs('exists', params.title)) {
@@ -102,7 +119,7 @@
         return this;
     }
 
-    function closeDoc(container, param) {
+    function documentClose(container, param) {
 
     }
 
@@ -163,23 +180,34 @@
 
         close: function (jq, params) {
             return jq.each(function () {
-                closeDoc(this, params);
+                documentClose(this, params);
             });
         },
 
         new: function (jq, params) {
             return jq.each(function () {
-                openDoc(this, params);
+                documentOpen(this, params);
             })
         }
 
     };
     $.fn.easydoc.defaults = {
-        type: 'consignment',                // Потом поменять на 'all'
-        url: '/document/consignment/',
-        open_url: '/open/',
-        edit_url: '/edit/',
-        new_url: '/new/'
+        type: `consignment`,                // Потом поменять на 'all'
+        option: null,
+        open_url: `/open/`,
+        edit_url: `/edit/`,
+        new_url: `/new/`,
+        url: `/document/${this.type}/${this.target}/${this.option}`,
+
+        date: `31/10/1985`,
+        document_type: `накладная`,
+        document_title: `Новая ${this.document_type} от ${this.date}`,
+        getTitle: function (param) {
+            let date = param.date;
+            return this.document_title;
+        }
+
+
     };
 })(jQuery);
 

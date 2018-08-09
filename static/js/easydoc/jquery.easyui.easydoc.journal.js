@@ -192,11 +192,7 @@
         var journal = $.data(container, 'journal');
         var easydoc = $(journal.easydoc);
         //var opts = journal.options;
-        var date = $.fn.datebox.defaults.formatter(new Date());
-        easydoc.easydoc('open', {
-            action: 'new',
-            title: $.fn.journal.defaults.document_title
-        });
+        easydoc.easydoc('new');
         return this;
     }
 
@@ -342,10 +338,6 @@
         journal: '#journal-table',
         journal_title: 'Documents\'s journal',
         selector: '.easydoc-journal',
-        date: "01-01-2001",
-
-        document: 'накладная',
-        document_title: 'Новая ${document} от ${date}',
 
         timedelta: 90,     // период журнала в днях
         dateto: null,
