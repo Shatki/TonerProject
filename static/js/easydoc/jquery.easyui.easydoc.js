@@ -18,8 +18,8 @@
         easydoc.tabs({
             onLoad: function (panel) {
                 // Первая вкладка всегда journal с индексом 0
-                var indexTab = panel.panel('options').index;
-                var tab = easydoc.tabs('getTab', indexTab);
+                let indexTab = panel.panel('options').index;
+                let tab = easydoc.tabs('getTab', indexTab);
                 //alert(tab.find('div').classes().toSource());
                 if (indexTab === 0) {
                     // Тут журнал
@@ -44,7 +44,7 @@
             closable: false,
             selected: true
         });
-        //var journal = easydoc.tabs('getTab',0);
+        //let journal = easydoc.tabs('getTab',0);
         //  Вернем журнал
         return easydoc.tabs('getTab', 0);
     }
@@ -62,7 +62,7 @@
         // Если options === undefined, сделаем ее просто пустой
         options = options || {};
         // Получаем target для поиска элемента на который вешаем плагин
-        var easydoc = $(target);
+        let easydoc = $(target);
         // Полученый target должен быть класса easyui-tabs
         if (!easydoc || !easydoc.hasClass('easyui-tabs')) {
             $.error('jQuery.easydoc: can\'t find easyui-tabs or easydoc');
@@ -81,13 +81,11 @@
      */
     function documentOpen(container, params) {
         let easydoc = $(container);
-        let date = $.fn.datebox.defaults.formatter(new Date());
+        //let date = $.fn.datebox.defaults.formatter(new Date());
 
 
         // Создать функцию генерации Title для Тав
-        let title = $.fn.easydoc.defaults.getTitle({
-            date: date
-        });
+        let title = $.fn.easydoc.defaults.getTitle();
 
         alert(title);
 
@@ -102,7 +100,7 @@
                 cache: true,
                 success: function (html) {
                     //Найдем в полученом HTML id документа и добавим его в data-options к tabs
-                    var idDoc = +($("<div/>", {"html": html}).find('#doc-id').html());
+                    let idDoc = +($("<div/>", {"html": html}).find('#doc-id').html());
                     if (idDoc >= 0) {
                         easydoc.tabs('add', {
                             //index: idDoc,
@@ -140,13 +138,13 @@
 
         return this.each(function () {
             // Ищем в data уже существующий компонент
-            var state = $.data(this, 'easydoc');
+            let state = $.data(this, 'easydoc');
             if (state) {
                 // Если уже создан, расширим опции
                 $.extend(state.options, options);
             } else {
                 // Инициализируем объект с требуемыми опциями
-                var r = init(this, options);
+                let r = init(this, options);
                 // Получим созданный объект с элементами easydoc и journal
                 // с нашими настройками и сохраним их в data
                 $.data(this, 'easydoc', {
@@ -193,20 +191,33 @@
     };
     $.fn.easydoc.defaults = {
         type: `consignment`,                // Потом поменять на 'all'
+        document_type: `накладная`,
         option: null,
+
         open_url: `/open/`,
         edit_url: `/edit/`,
         new_url: `/new/`,
-        url: `/document/${this.type}/${this.target}/${this.option}`,
 
         date: `31/10/1985`,
-        document_type: `накладная`,
-        document_title: `Новая ${this.document_type} от ${this.date}`,
-        getTitle: function (param) {
-            let date = param.date;
-            return this.document_title;
-        }
 
+        getTitle: function (params) {
+            params = params || {};
+            // Если не пришла дата, то возьмем ее из delaults
+            if (!params.date) {
+                params.date = $.fn.easydoc.defaults.date;
+                //$.fn.datebox.defaults.formatter(new Date());
+            }
+            // Если не пришли параметры, то создадим новый документ
+            if (!params.document_type) {
+                params.document_type = $.fn.easydoc.defaults.document_type;
+                params.date = $.fn.datebox.defaults.formatter(new Date());
+            }
+            return `Новая ${params.document_type} от ${params.date}`;
+        },
+
+        getUrl: function (params) {
+            return `/document/${params.type}/${params.target}/${params.option}`;
+        }
 
     };
 })(jQuery);

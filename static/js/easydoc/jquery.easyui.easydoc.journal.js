@@ -22,7 +22,7 @@
      * Динамическое создание меню для journal
      */
     function popupmenu(target, index, row) {
-        var menu = $.data(target, 'journal').menu;
+        let menu = $.data(target, 'journal').menu;
         //alert(menu.html().toSource());
         menu.empty().menu('appendItem', {
             text: 'Создать',
@@ -70,9 +70,10 @@
      * Активация компонента journal плагина EasyDoc на вкладке easyui-tabs
      */
     function init(target, options) {
-        var journal = $(target);
+        let journal = $(target);
+        let table = journal.find('.easyui-datagrid');
+
         if (journal) {
-            var table = journal.find('.easyui-datagrid');
             if (!table) {
                 $.error('jQuery.easydoc.journal: can\'t find datagrid table');
                 return false;
@@ -86,24 +87,24 @@
 
         // Инициализацию функциональных элементов оформления придется описать каждый отдельно
         // Находим в "data-options" плагина datagrid элемент меню
-        var menu = $(table.datagrid('options').popupmenu);
+        let menu = $(table.datagrid('options').popupmenu);
         if (menu.length !== 1) {
             $.error('jQuery.easydoc.journal: didn\'t find or multiple menu elements');
             return false;
         }
         // Находим в "data-options" плагина datagrid элемент toolbar
-        var toolbar = $(table.datagrid('options').toolbar);
+        let toolbar = $(table.datagrid('options').toolbar);
         if (toolbar.length !== 1) {
             $.error('jQuery.easydoc.journal: didn\'t find or multiple  toolbar elements');
             return false;
         }
         // Находим по тегам элементы дат начала и конца периода в journal
-        var dateFrom = toolbar.find('input.journal-datefrom');
+        let dateFrom = toolbar.find('input.journal-datefrom');
         if (dateFrom.length !== 1) {
             $.error('jQuery.easydoc.journal: didn\'t find or multiple  dateFrom elements');
             return false;
         }
-        var dateTo = toolbar.find('input.journal-dateto');
+        let dateTo = toolbar.find('input.journal-dateto');
         if (dateTo.length !== 1) {
             $.error('jQuery.easydoc.journal: didn\'t find or multiple dateTo elements');
             return false;
@@ -167,11 +168,11 @@
      */
     function editDoc(container) {
         // Извлекаем jQ объект таблицы
-        var journal = $.data(container, 'journal');
-        var easydoc = $(journal.easydoc);
-        var row = journal.table.datagrid('getSelected');
+        let journal = $.data(container, 'journal');
+        let easydoc = $(journal.easydoc);
+        let row = journal.table.datagrid('getSelected');
         if (row) {
-            var add_params = {
+            letadd_params = {
                 title: row.name,
                 // url: opts.url + row.id + opts.edit_url,
                 idDoc: row.id
@@ -189,9 +190,9 @@
      */
     function newDoc(container) {
         // Извлекаем jQ объект таблицы
-        var journal = $.data(container, 'journal');
-        var easydoc = $(journal.easydoc);
-        //var opts = journal.options;
+        let journal = $.data(container, 'journal');
+        let easydoc = $(journal.easydoc);
+        //letopts = journal.options;
         easydoc.easydoc('new');
         return this;
     }
@@ -202,14 +203,14 @@
      * Привязка событий
      */
     function bindEvents(target) {
-        //var options = $.data(target, 'journal').options;
+        //letoptions = $.data(target, 'journal').options;
         // Извлекаем jQ объект тулбара
-        var toolbar = $.data(target, 'journal').toolbar;
+        let toolbar = $.data(target, 'journal').toolbar;
         $(document).unbind('.journal');
         toolbar.unbind('.journal');
 
         // Кнопка "Создать"
-        var buttonCreate = $('#easydoc-createdoc');
+        let buttonCreate = $('#easydoc-createdoc');
 
         buttonCreate.bind('click.journal', function (e) {
                 $(target).journal('new');
@@ -217,14 +218,14 @@
         );
 
         // Кнопка "Редактировать"
-        var buttonEdit = $('#easydoc-editdoc');
+        let buttonEdit = $('#easydoc-editdoc');
         buttonEdit.bind('click.journal', function (e) {
                 $(target).journal('edit');
             }
         );
 
         // Кнопка "Удалить"
-        var buttonRemove = $('#easydoc-removedoc');
+        let buttonRemove = $('#easydoc-removedoc');
         buttonRemove.bind('click.journal', function (e) {
                 $(target).journal('remove');
             }
@@ -240,7 +241,7 @@
          * @return     this (object) объект экземпляра для поддержки цепочки вызовов
          */
         if (typeof options === 'string') {
-            var result = $.fn.journal.methods[options](this, params);
+            let result = $.fn.journal.methods[options](this, params);
             if (result) {
                 //alert(result.toSource());
                 return result;
@@ -254,11 +255,11 @@
         //alert($(this).html().toSource());
         return this.each(function () {
             // Делаем инициализацию
-            var state = $.data(this, 'journal');
+            let state = $.data(this, 'journal');
             if (state) {
                 $.extend(state.options, options);
             } else {
-                var r = init(this, options);
+                let r = init(this, options);
                 //alert(r.toSource());
                 $.data(this, 'journal', {
                     options: $.extend({}, $.fn.journal.defaults, options),
