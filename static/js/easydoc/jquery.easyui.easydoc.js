@@ -79,13 +79,14 @@
      * Функция открытия документа из journal datagrid или создание нового документа
      * в новой tab вкладки для редактирования
      */
-    function documentOpen(container, params) {
-        let easydoc = $(container);
+    function documentOpen(target, params) {
+        //let easydoc = $(target);
         //let date = $.fn.datebox.defaults.formatter(new Date());
 
+        let easydoc = $.data(target, 'easydoc')[0];
 
         // Создать функцию генерации Title для Тав
-        let title = $.fn.easydoc.defaults.getTitle(params);
+        let title = easydoc('options').getTitle(params);
 
         alert(title);
 
@@ -122,7 +123,7 @@
     }
 
     $.fn.easydoc = function (options, params) {
-        /*  Функция "точка" вызова плагина EasyDoc
+        /*  Функция "точка" вызова плагина easyDoc
             @param      options (string, необязательный) имя вызываемого метода
             @param      params (object) параметры настройки плагина
             @return     this (object) объект экземпляра для поддержки цепочки вызовов
@@ -144,16 +145,16 @@
                 $.extend(state.options, options);
             } else {
                 // Инициализируем объект с требуемыми опциями
-                let r = init(this, options);
+                let result = init(this, options);
                 // Получим созданный объект с элементами easydoc и journal
                 // с нашими настройками и сохраним их в data
                 $.data(this, 'easydoc', {
+                    // Сохраним jQuery объект нашего элемента DOM
+                    easydoc: result.easydoc,
                     // Берем для EasyDoc настройки по-умолчанию и дополняем их полученными
                     options: $.extend({}, $.fn.easydoc.defaults, options),
-                    // Сохраним jQuery объект нашего элемента DOM
-                    easydoc: r.easydoc,
                     // При инициализации создается и журнал, сохраним его jQuery объект
-                    journal: r.journal
+                    journal: result.journal
                 });
                 $(this).removeAttr('disabled');
             }
@@ -178,13 +179,13 @@
 
         close: function (jq, params) {
             return jq.each(function () {
-                documentClose(this, params);
+                documentClose(jq[0], params);
             });
         },
 
         new: function (jq, params) {
             return jq.each(function () {
-                documentOpen(this, params);
+                documentOpen(jq[0], params);
             })
         }
 
