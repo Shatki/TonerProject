@@ -85,7 +85,7 @@
 
 
         // Создать функцию генерации Title для Тав
-        let title = $.fn.easydoc.defaults.getTitle();
+        let title = $.fn.easydoc.defaults.getTitle(params);
 
         alert(title);
 
