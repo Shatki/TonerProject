@@ -62,16 +62,16 @@
         // Если options === undefined, сделаем ее просто пустой
         options = options || {};
         // Получаем target для поиска элемента на который вешаем плагин
-        let easydoc = $(target);
+        let container = $(target);
         // Полученый target должен быть класса easyui-tabs
-        if (!easydoc || !easydoc.hasClass('easyui-tabs')) {
+        if (!container || !container.hasClass('easyui-tabs')) {
             $.error('jQuery.easydoc: can\'t find easyui-tabs or easydoc');
             return this;
         }
         return {
             options: options,
-            easydoc: easydoc,
-            journal: journalCreate(easydoc, options)
+            easydoc: container.easydoc,
+            journal: journalCreate(container, options)
         };
     }
 
@@ -80,15 +80,23 @@
      * в новой tab вкладки для редактирования
      */
     function documentOpen(target, params) {
-        //let easydoc = $(target);
+        alert(target.options.toSource());
+
+        let easydoc = $.data(target, 'easydoc').easydoc;
+        let options = $.data(target, 'easydoc').options;
+
+
+
         //let date = $.fn.datebox.defaults.formatter(new Date());
 
-        let easydoc = $.data(target, 'easydoc')[0];
+        // Получим название вкладки документа согласно полученым параметрам
+        let title = options.getTitle(params);
+        alert(params.title);
 
-        // Создать функцию генерации Title для Тав
-        let title = easydoc('options').getTitle(params);
+        // Получим url запроса документа согласно полученым параметрам
+        let url = easydoc.options.getUrl(params);
 
-        alert(title);
+        alert(url);
 
         // Переработать для открытия через easyDoc
         if (easydoc.tabs('exists', params.title)) {
@@ -170,6 +178,9 @@
         options: function (jq) {
             return $.data(jq[0], 'easydoc').options;
         },
+        easydoc: function (jq) {
+            return $.data(jq[0], 'easydoc').easydoc;
+        },
         journal: function (jq) {
             return $.data(jq[0], 'easydoc').journal;
         },
@@ -179,45 +190,38 @@
 
         close: function (jq, params) {
             return jq.each(function () {
-                documentClose(jq[0], params);
+                documentClose(this, params);
             });
         },
 
         new: function (jq, params) {
             return jq.each(function () {
-                documentOpen(jq[0], params);
+                documentOpen(this, params);
             })
         }
 
     };
     $.fn.easydoc.defaults = {
-        type: `consignment`,                // Потом поменять на 'all'
-        document_type: `накладная`,
-        option: null,
+        document_type: `consignment`,               // Потом поменять на 'all'
+        document_type_name: `накладная`,
+        document_date: `31/10/1985`,
 
-        open_url: `/open/`,
+        option: null,                       // Url параметр запроса {json, ...}
+
+        common_url: `/all/`,
         edit_url: `/edit/`,
         new_url: `/new/`,
-
-        date: `31/10/1985`,
 
         getTitle: function (params) {
             params = params || {};
             // Если не пришла дата, то возьмем ее из delaults
-            if (!params.date) {
-                params.date = $.fn.easydoc.defaults.date;
-                //$.fn.datebox.defaults.formatter(new Date());
-            }
+            // params.date = $.fn.datebox.defaults.formatter(new Date());
             // Если не пришли параметры, то создадим новый документ
-            if (!params.document_type) {
-                params.document_type = $.fn.easydoc.defaults.document_type;
-                params.date = $.fn.datebox.defaults.formatter(new Date());
-            }
-            return `Новая ${params.document_type} от ${params.date}`;
+            return `Новая ${params.document_type} от ${params.document_date ? params.document_date : this.document_date }`;
         },
 
         getUrl: function (params) {
-            return `/document/${params.type}/${params.target}/${params.option}`;
+            return `/document/${params.document_type}/${params.target}/${params.option}`;
         }
 
     };

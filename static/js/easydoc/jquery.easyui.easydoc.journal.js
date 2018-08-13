@@ -172,7 +172,7 @@
         let easydoc = $(journal.easydoc);
         let row = journal.table.datagrid('getSelected');
         if (row) {
-            letadd_params = {
+            let add_params = {
                 title: row.name,
                 // url: opts.url + row.id + opts.edit_url,
                 idDoc: row.id
@@ -188,12 +188,13 @@
     /**
      * Создание нового документа, в journal datagrid
      */
-    function newDoc(container) {
+    function newDoc(target) {
         // Извлекаем jQ объект таблицы
-        let journal = $.data(container, 'journal');
-        let easydoc = $(journal.easydoc);
-        //letopts = journal.options;
-        easydoc.easydoc('new');
+        let journal = $.data(target, 'journal').journal;
+        let easydoc = journal.options.easydoc;
+        //alert(journal.toSource());
+        //let easydoc = $(journal.easydoc);
+        journal.easydoc('new', {});
         return this;
     }
 
