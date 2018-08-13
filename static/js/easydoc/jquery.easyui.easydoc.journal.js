@@ -191,8 +191,8 @@
     function newDoc(target) {
         // Извлекаем jQ объект таблицы
         let journal = $.data(target, 'journal').journal;
-        let easydoc = journal.options.easydoc;
-        //alert(journal.toSource());
+        //let easydoc = journal.options.easydoc;
+        alert($.data(target, 'journal').toSource());
         //let easydoc = $(journal.easydoc);
         journal.easydoc('new', {});
         return this;
