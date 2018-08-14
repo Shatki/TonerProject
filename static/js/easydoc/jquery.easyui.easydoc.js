@@ -11,7 +11,10 @@
 // Делаем замыкание
 (function ($) {
     /**
-     * Функция создает на нулевой вкладке журнал,
+     * Функция создает на нулевой вкладке журнал
+     * @param      easydoc  (object)    Объект jQuery.easydoc для инициализации плагина jQuery.easyui.easydoc.journal
+     * @param      options  (object)    Объект с настройками плагина
+     * @return              (object)    Инициализированный объект jQuery.easyui.journal
      */
     function journalCreate(easydoc, options) {
         // Инициализируем Tabs
@@ -50,7 +53,10 @@
     }
 
     /**
-     * Функция инициализатор плагина easyDoc,
+     * Функция инициализатор плагина easyDoc
+     * @param      target   (object)    Объект DOM класса easyui-tabs  для активации на нем плагина easyDoc
+     * @param      options  (object)    Объект с настройками плагина
+     * @return              (object)    Объект содержащий настройки и ициализированные jQuery.easydoc jQuery.journal
      */
     function init(target, options) {
         /*  Функция инициализации плагина EasyDoc
@@ -78,9 +84,12 @@
     /**
      * Функция открытия документа из journal datagrid или создание нового документа
      * в новой tab вкладки для редактирования
+     * @param      target   (string)
+     * @param      params   (object)
+     * @return              (object)
      */
     function documentOpen(target, params) {
-        alert(target.options.toSource());
+        //alert(target.options.toSource());
 
         let easydoc = $.data(target, 'easydoc').easydoc;
         let options = $.data(target, 'easydoc').options;
@@ -131,11 +140,11 @@
     }
 
     $.fn.easydoc = function (options, params) {
-        /*  Функция "точка" вызова плагина easyDoc
-            @param      options (string, необязательный) имя вызываемого метода
-            @param      params (object) параметры настройки плагина
-            @return     this (object) объект экземпляра для поддержки цепочки вызовов
-            */
+        /** Функция "точка" вызова плагина easyDoc
+         * @param      options (string, необязательный) имя вызываемого метода
+         * @param      params (object) параметры настройки плагина
+         * @return     this (object) объект экземпляра для поддержки цепочки вызовов
+         * */
         // Если пришло имя функции то string
         if (typeof options === 'string') {
             return $.fn.easydoc.methods[options](this, params);
@@ -153,13 +162,14 @@
                 $.extend(state.options, options);
             } else {
                 // Инициализируем объект с требуемыми опциями
+                // Возвращается объект с options/easydoc/journal
                 let result = init(this, options);
-                // Получим созданный объект с элементами easydoc и journal
-                // с нашими настройками и сохраним их в data
+                // Сохраним созданный объект с элементами easydoc и journal
+                // с нашими настройками в контекст data
                 $.data(this, 'easydoc', {
                     // Сохраним jQuery объект нашего элемента DOM
                     easydoc: result.easydoc,
-                    // Берем для EasyDoc настройки по-умолчанию и дополняем их полученными
+                    // Берем для easyDoc настройки по-умолчанию и дополняем их полученными
                     options: $.extend({}, $.fn.easydoc.defaults, options),
                     // При инициализации создается и журнал, сохраним его jQuery объект
                     journal: result.journal
@@ -184,10 +194,6 @@
         journal: function (jq) {
             return $.data(jq[0], 'easydoc').journal;
         },
-        tabs: function (jq) {
-            return $.data(jq[0], 'easydoc').tabs;
-        },
-
         close: function (jq, params) {
             return jq.each(function () {
                 documentClose(this, params);
