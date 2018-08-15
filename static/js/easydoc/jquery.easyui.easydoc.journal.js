@@ -9,16 +9,14 @@
  *      journal for easyDoc
  */
 
-// Делаем замыкание
+// Компонент journal из плагина EasyDoc
 (function ($) {
     /**
      * Компонент journal из плагина EasyDoc
-     * @param      target (jQuery) целевой элемент DOM
-     * @param      options (object) параметры настройки плагина
-     * @return             (object) содержит options, journal, table, toolbar, menu
-     */
-
-    /**
+     * @param      target   (jQuery)
+     * @param      index    (number)
+     * @param      row      (number)
+     * @return              (object) Объект меню
      * Динамическое создание меню для journal
      */
     function popupmenu(target, index, row) {
@@ -68,6 +66,9 @@
 
     /**
      * Активация компонента journal плагина EasyDoc на вкладке easyui-tabs
+     * @param      target   (jQuery) целевой элемент DOM
+     * @param      options  (object) настройки для активации компонента
+     * @return              (object) содержит options, journal, table, toolbar, menu
      */
     function init(target, options) {
         let journal = $(target);
