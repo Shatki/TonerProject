@@ -14,9 +14,9 @@
     /**
      * Компонент journal из плагина EasyDoc
      * @param      target   (jQuery)
-     * @param      index    (number)
-     * @param      row      (number)
-     * @return              (object) Объект меню
+     * @param      index    (Number)
+     * @param      row      (Number)
+     * @return              (Object) Объект меню
      * Динамическое создание меню для journal
      */
     function popupmenu(target, index, row) {
@@ -67,8 +67,8 @@
     /**
      * Активация компонента journal плагина EasyDoc на вкладке easyui-tabs
      * @param      target   (jQuery) целевой элемент DOM
-     * @param      options  (object) настройки для активации компонента
-     * @return              (object) содержит options, journal, table, toolbar, menu
+     * @param      options  (Object) настройки для активации компонента
+     * @return              (Object) содержит options, journal, table, toolbar, menu
      */
     function init(target, options) {
         let journal = $(target);
@@ -166,11 +166,15 @@
 
     /**
      * Редактирование документа, выделенного в journal datagrid
+     * @param      target   (jQuery) элемент DOM
      */
-    function editDoc(container) {
+    function editDoc(target) {
+        // Из data получаем объект данных привязанных journal
+        let container = $.data(target, 'journal');
+        // Получаем jQ объект easydoc
+        let jQ = $(container.easydoc);
+
         // Извлекаем jQ объект таблицы
-        let journal = $.data(container, 'journal');
-        let easydoc = $(journal.easydoc);
         let row = journal.table.datagrid('getSelected');
         if (row) {
             let add_params = {
@@ -178,12 +182,11 @@
                 // url: opts.url + row.id + opts.edit_url,
                 idDoc: row.id
             };
-            easydoc.easydoc('edit', $.extend($.fn.journal.defaults.open_params, add_params));
+            // Открываем
+            jQ.easydoc('edit', $.extend($.fn.journal.defaults.open_params, add_params));
         } else {
             $.error('easyDoc.journal.editDoc: row\'s choice error')
         }
-        // Открываем
-        return this;
     }
 
     /**
@@ -196,7 +199,6 @@
         alert($.data(target, 'journal').toSource());
         //let easydoc = $(journal.easydoc);
         journal.easydoc('new', {});
-        return this;
     }
 
 
@@ -238,9 +240,9 @@
     $.fn.journal = function (options, params) {
         /**
          * Функция "точка" вызова компонента journal плагина EasyDoc
-         * @param      options (string, необязательный) имя вызываемого метода
-         * @param      params (object) параметры настройки плагина
-         * @return     this (object) объект экземпляра для поддержки цепочки вызовов
+         * @param      options  (String, необязательный) имя вызываемого метода
+         * @param      params   (Object) параметры настройки плагина
+         * @return     this     (Object) объект экземпляра для поддержки цепочки вызовов
          */
         if (typeof options === 'string') {
             let result = $.fn.journal.methods[options](this, params);
@@ -256,17 +258,18 @@
         options = options || {};
         //alert($(this).html().toSource());
         return this.each(function () {
-            // Делаем инициализацию
+            // Извлекаем данные из объекта DOM
             let state = $.data(this, 'journal');
+            // данных нет? инициализируем: изменяем данные в journal
             if (state) {
                 $.extend(state.options, options);
             } else {
                 let r = init(this, options);
                 //alert(r.toSource());
                 $.data(this, 'journal', {
+                    journal: r.journal,
                     options: $.extend({}, $.fn.journal.defaults, options),
                     easydoc: options.easydoc,
-                    journal: r.journal,
                     table: r.table,
                     toolbar: r.toolbar,
                     menu: r.menu
