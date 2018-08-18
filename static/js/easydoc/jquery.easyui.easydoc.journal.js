@@ -170,35 +170,43 @@
      */
     function editDoc(target) {
         // Из data получаем объект данных привязанных journal
-        let container = $.data(target, 'journal');
-        // Получаем jQ объект easydoc
-        let jQ = $(container.easydoc);
+        let journal = $.data(target, 'journal');
+        // Создаем jQuery объект
+        let $this = journal.easydoc;
 
-        // Извлекаем jQ объект таблицы
         let row = journal.table.datagrid('getSelected');
         if (row) {
-            let add_params = {
-                title: row.name,
-                // url: opts.url + row.id + opts.edit_url,
-                idDoc: row.id
-            };
             // Открываем
-            jQ.easydoc('edit', $.extend($.fn.journal.defaults.open_params, add_params));
+            $this.easydoc('edit', {
+                document_type: journal.options.document_type,
+                document_type_name: row.name,
+                document_date: $.fn.datebox.defaults.formatter(new Date()),
+                target: row.id,
+                idDoc: row.id,
+                index: row.id
+                //target:
+            });
         } else {
             $.error('easyDoc.journal.editDoc: row\'s choice error')
         }
     }
-
     /**
      * Создание нового документа, в journal datagrid
+     * @param      target   (jQuery) элемент DOM, datagrid журнала
      */
     function newDoc(target) {
+        // target - datagrid у журнала
         // Извлекаем jQ объект таблицы
-        let journal = $.data(target, 'journal').journal;
-        //let easydoc = journal.options.easydoc;
-        alert($.data(target, 'journal').toSource());
-        //let easydoc = $(journal.easydoc);
-        journal.easydoc('new', {});
+        let journal = $.data(target, 'journal');
+        let $this = journal.easydoc;
+        //alert(journal.document_type_name.toSource());
+        $this.easydoc('new', {
+            document_type: journal.options.document_type,
+            document_type_name: journal.options.document_type_name,
+            document_date: $.fn.datebox.defaults.formatter(new Date()),
+            index: 0
+            //target:
+        });
     }
 
 
@@ -341,6 +349,10 @@
     };
 
     $.fn.journal.defaults = {
+        document_type: `consignment`,               // Потом поменять на 'all'
+        document_type_name: `накладная`,            // Потом 'все'
+        document_date: `31/10/1985`,
+
         journal: '#journal-table',
         journal_title: 'Documents\'s journal',
         selector: '.easydoc-journal',
