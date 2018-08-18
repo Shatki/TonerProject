@@ -217,7 +217,9 @@
             // Если не пришла дата, то возьмем ее из delaults
             // params.date = $.fn.datebox.defaults.formatter(new Date());
             // Если не пришли параметры, то создадим новый документ
-            return `Новая ${params.document_type_name} от ${params.document_date ? params.document_date : this.document_date }`;
+            return (params.index ?
+                params.document_type_name :
+                `Новая ${params.document_type_name} от ${params.document_date ? params.document_date : this.document_date }`);
         },
 
         getUrl: function (params) {
