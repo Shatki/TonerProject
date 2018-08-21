@@ -166,7 +166,7 @@
 
     /**
      * Редактирование документа, выделенного в journal datagrid
-     * @param      target   (jQuery) элемент DOM
+     * @param      target   (DOM Object) элемент DOM
      */
     function editDoc(target) {
         // Из data получаем объект данных привязанных journal
@@ -360,8 +360,6 @@
         timedelta: 90,     // период журнала в днях
         dateto: null,
         datefrom: null,
-
-        open_params: {action: 'new'}
 
     };
 
