@@ -11,6 +11,90 @@
 // Делаем замыкание
 (function ($) {
     /**
+     * Функция создания журнала документов
+     * @param       target      (object DOM)    DOM Объект плагина
+     * @param       options     (object)        Настройки плагина
+     */
+    function journalCreate(target, options) {
+        let easydoc = $(target);
+
+        let dateTo = $('<input>', {
+            'id': "journal-datefrom",
+            'class': "easyui-datetimebox",
+            'style': "padding: 5px",
+            'required': "required",
+            'title': "From",
+            'data-options': `width:200,labelWidth:30,label:'${options.title_dateFrom}',
+                                labelPosition:'before',labelAlign:'right'`
+        });
+        let dateFrom = $('<input>', {
+            'id': "journal-dateto",
+            'class': "easyui-datetimebox",
+            'style': "padding: 5px",
+            'required': "required",
+            'title': "To",
+            'data-options': `width:200,labelWidth:30,label:'${options.title_dateTo}',
+                                labelPosition:'before',labelAlign:'right'`
+
+        });
+        let datefilter = $('<div></div>', {
+            'id': "journal-datefilter",
+            'style': "padding: 5px"
+        }).append(dateTo).append(dateFrom);
+
+        let button_create = $('<a></a>', {
+            'id': "journal-createdoc",
+            'class': "easyui-linkbutton",
+            'text': `${options.title_button_create}`,
+            'href': "javascript:void(0)",
+            'style': "padding: 5px",
+            'data-options': "iconCls:'icon-add'",
+            'plain': "true"
+        });
+        let button_edit = $('<a></a>', {
+            'id': "journal-editdoc",
+            'class': "easyui-linkbutton",
+            'text': `${options.title_button_edit}`,
+            'href': "javascript:void(0)",
+            'style': "padding: 5px",
+            'data-options': "iconCls:'icon-edit'",
+            'plain': "true"
+        });
+
+        let toolbar = $('<div></div>', {
+            'id': "journal-toolbar",
+            'style': "padding: 5px"
+        }).append(datefilter).append(button_create).append(button_edit);
+
+        easydoc.tabs('add', {
+            //Принудительно делаем индекс журнала 0
+            index: 0,
+            content: toolbar,
+            //title: options.getTitle(options),
+            title: options.journal_title,
+            closable: false,
+            selected: true
+        }).tabs({
+            onLoad: function (panel) {
+                // Переименовывание панели
+            }
+        });
+        //let journal = easydoc.tabs('getTab',0).append(toolbar);
+
+        //alert(journal.html().toSource());
+
+        //append(`<div id="journal-toolbar" class="journal-toolbar"></div>`);
+
+        //
+
+        //let journal = $(, );
+
+        //let toolbar = `<div id="journal-toolbar" class="journal-toolbar"></div>`;
+        //let table = `<table class ="easyui-datagrid"></table>`;
+    }
+
+
+    /**
      * Функция инициализатор плагина easyDoc
      * @param      target   (object DOM)    Объект DOM класса easyui-tabs  для активации на нем плагина easyDoc
      * @param      options  (object)    Объект с настройками плагина
@@ -27,50 +111,13 @@
             return this;
         }
 
-        alert(options.toSource());
-        // Инициализируем Tabs
-        easydoc.tabs({
-            onLoad: function (panel) {
-                // Первая вкладка всегда journal с индексом 0
-                let indexTab = panel.panel('options').index;
-                let tab = easydoc.tabs('getTab', indexTab);
-                //alert(tab.find('div').classes().toSource());
-                if (indexTab === 0) {
-                    // Тут журнал
-                    tab.addClass('easydoc-journal');
-                    // Инициализация журнала
-                    easydoc.easydoc('addTab', {
-                        type: 'journal',
-                        tab: tab
-                    });
-                } else if (indexTab > 0) {
-                    // Тут документ
-                    tab.addClass('easydoc-document');
-                    alert(tab.classes().toSource());
-                    easydoc.easydoc('addTab', {
-                        type: 'document',
-                        tab: tab
-                    });
-                } else {
-                    $.error('jQuery.easydoc: index of tab error');
-                }
-            }
-        }).tabs('add', {
-            //Принудительно делаем индекс журнала 0
-            index: 0,
-            href: options.url,
-            method: 'POST',
-            title: options.title,
-            closable: false,
-            selected: true
-        });
-        // let journal = easydoc.tabs('getTab',0);
-        // Вернем журнал
+        let journal = journalCreate(target, options);
+        //alert(options.toSource());
 
         return {
             options: options,
-            easydoc: easydoc,
-            journal: easydoc.tabs('getTab', 0)
+            easydoc: target,  // или easydoc?
+            journal: journal
         };
     }
 
@@ -134,16 +181,21 @@
         target: `new`,
 
 
+        title_button_create: 'Создать',
+        title_button_edit: 'Редактировать',
+        title_button_delete: 'Удалить',
+        title_dateTo: 'До:',
+        title_dateFrom: 'От:',
         document_type: `all`,
         document_type_name: `document`,
         document_type_name_new: `a new document`,
         document_type_name_plural: `documents`,
         journal_title: 'documents\'s journal',
 
-        document_date: `31/10/1985`,
+        document_date: `01/01/2001`,
 
-        //journal: '#journal-table',
-        //title:         `Журнал документов`,
+        //journal:      '#journal-table',
+        //title:        `Журнал документов`,
         selector: '.easydoc-journal',
 
         timedelta: 90,     // период журнала в днях
@@ -157,7 +209,7 @@
             // Если не пришли параметры, то создадим новый документ
             return params.index ?
                 params.document_type_name :
-                `Новая ${params.document_type_name} от ${params.document_date ? params.document_date : this.document_date }`;
+                `${params.document_type_name_new} от ${params.document_date ? params.document_date : this.document_date }`;
         },
 
         getUrl: function (params) {
