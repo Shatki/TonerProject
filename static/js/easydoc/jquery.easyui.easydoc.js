@@ -41,7 +41,6 @@
             'id': "journal-datefilter",
             'style': "padding: 5px"
         }).append(dateTo).append(dateFrom);
-
         let button_create = $('<a></a>', {
             'id': "journal-createdoc",
             'class': "easyui-linkbutton",
@@ -69,12 +68,10 @@
             'data-options': "iconCls:'icon-remove'",
             'plain': "true"
         });
-
         let toolbar = $('<div></div>', {
             'id': `${options.journal_toolbar}`,
             'style': "padding: 5px"
         }).append(datefilter).append(button_create).append(button_edit).append(button_delete);
-
         let table = $('<table></table>', {
             'class': "easyui-datagrid",
             'data-options': `url:'${options.getUrl({
@@ -90,7 +87,17 @@
                             popupmenu:'#${options.journal_popupmenu}',
                             rownumbers:true,
                             autoRowHeight:false,
-                            singleSelect:true`,
+                            singleSelect:true,
+                            columns:[[
+                                    {field: 'id', width: 3, title: 'ID'},
+                                    {field: 'ck', width: 3, checkbox: 'true'},
+                                    {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left'},
+                                    {field: 'seller', width: 20, title: '${options.title_field_seller}', align: 'left'},
+                                    {field: 'buyer', width: 20, title: '${options.title_field_buyer}', align: 'left'},
+                                    {field: 'total', width: 5, title: '${options.title_field_total}',align: 'center'},
+                                    {field: 'enable', width: 3, title: '${options.title_field_active}',
+                                     align: 'center', editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
+                                    ]]`
         });
 
         easydoc.tabs('add', {
@@ -107,24 +114,8 @@
             }
         });
 
+        let journal = easydoc.tabs('getTab', 0);
 
-        let journal = easydoc.tabs('getTab', 0).datagrid({
-            columns: [[
-                {field: 'itemid', title: 'Item ID', width: 80},
-                {field: 'productid', title: 'Product ID', width: 120},
-                {field: 'listprice', title: 'List Price', width: 80, align: 'right'},
-                {field: 'unitcost', title: 'Unit Cost', width: 80, align: 'right'},
-                {field: 'attr1', title: 'Attribute', width: 250},
-                {field: 'status', title: 'Status', width: 60, align: 'center'}
-            ]],
-            onHeaderContextMenu: function (e, field) {
-                e.preventDefault();
-                $(this).datagrid('columnMenu').menu('show', {
-                    left: e.pageX,
-                    top: e.pageY
-                });
-            }
-        });
 
         //alert(journal.html().toSource());
 
@@ -230,6 +221,12 @@
         document_type_name_new: `a new document`,
         document_type_name_plural: `documents`,
         journal_title: 'documents\'s journal',
+
+        title_field_name: 'Kind, number, date of document',
+        title_field_seller: 'Seller',
+        title_field_buyer: 'Buyer',
+        title_field_total: 'Total',
+        title_field_active: 'Active',
 
         document_date: `01/01/2001`,
 
