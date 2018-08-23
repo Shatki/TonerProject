@@ -60,16 +60,43 @@
             'data-options': "iconCls:'icon-edit'",
             'plain': "true"
         });
+        let button_delete = $('<a></a>', {
+            'id': "journal-deletedoc",
+            'class': "easyui-linkbutton",
+            'text': `${options.title_button_delete}`,
+            'href': "javascript:void(0)",
+            'style': "padding: 5px",
+            'data-options': "iconCls:'icon-remove'",
+            'plain': "true"
+        });
 
         let toolbar = $('<div></div>', {
-            'id': "journal-toolbar",
+            'id': `${options.journal_toolbar}`,
             'style': "padding: 5px"
-        }).append(datefilter).append(button_create).append(button_edit);
+        }).append(datefilter).append(button_create).append(button_edit).append(button_delete);
+
+        let table = $('<table></table>', {
+            'class': "easyui-datagrid",
+            'data-options': `url:'${options.getUrl({
+                document_type: options.document_type,
+                target: options.all,
+                option: options.json
+            })}',
+                            method: 'post',
+                            fit:true,
+                            fitColumns:true,
+                            idField:'id',
+                            toolbar:'#${options.journal_toolbar}',
+                            popupmenu:'#${options.journal_popupmenu}',
+                            rownumbers:true,
+                            autoRowHeight:false,
+                            singleSelect:true`,
+        });
 
         easydoc.tabs('add', {
-            //Принудительно делаем индекс журнала 0
+            // Принудительно делаем индекс журнала 0
             index: 0,
-            content: toolbar,
+            content: table,
             //title: options.getTitle(options),
             title: options.journal_title,
             closable: false,
@@ -79,18 +106,30 @@
                 // Переименовывание панели
             }
         });
-        //let journal = easydoc.tabs('getTab',0).append(toolbar);
+
+
+        let journal = easydoc.tabs('getTab', 0).datagrid({
+            columns: [[
+                {field: 'itemid', title: 'Item ID', width: 80},
+                {field: 'productid', title: 'Product ID', width: 120},
+                {field: 'listprice', title: 'List Price', width: 80, align: 'right'},
+                {field: 'unitcost', title: 'Unit Cost', width: 80, align: 'right'},
+                {field: 'attr1', title: 'Attribute', width: 250},
+                {field: 'status', title: 'Status', width: 60, align: 'center'}
+            ]],
+            onHeaderContextMenu: function (e, field) {
+                e.preventDefault();
+                $(this).datagrid('columnMenu').menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                });
+            }
+        });
 
         //alert(journal.html().toSource());
 
         //append(`<div id="journal-toolbar" class="journal-toolbar"></div>`);
 
-        //
-
-        //let journal = $(, );
-
-        //let toolbar = `<div id="journal-toolbar" class="journal-toolbar"></div>`;
-        //let table = `<table class ="easyui-datagrid"></table>`;
     }
 
 
@@ -175,17 +214,17 @@
 
     $.fn.easydoc.defaults = {
         option: null,                       // Url параметр запроса {json, ...}
-        common: `all`,
+        json: `json/`,
+        all: `all`,
         edit: `edit/`,
         new: ``,
         target: `new`,
 
-
-        title_button_create: 'Создать',
-        title_button_edit: 'Редактировать',
-        title_button_delete: 'Удалить',
-        title_dateTo: 'До:',
-        title_dateFrom: 'От:',
+        title_button_create: 'Create',
+        title_button_edit: 'Edit',
+        title_button_delete: 'Delete',
+        title_dateTo: 'To:',
+        title_dateFrom: 'From:',
         document_type: `all`,
         document_type_name: `document`,
         document_type_name_new: `a new document`,
@@ -194,8 +233,10 @@
 
         document_date: `01/01/2001`,
 
-        //journal:      '#journal-table',
-        //title:        `Журнал документов`,
+        journal_table: 'journal-table',
+        journal_toolbar: 'journal-toolbar',
+        journal_popupmenu: 'journal-popupmenu',
+
         selector: '.easydoc-journal',
 
         timedelta: 90,     // период журнала в днях
@@ -217,7 +258,7 @@
             let type = params.document_type;
             let target = params.target ? params.target : this.target;   // all or number
             let option = params.index > 0 ? this.edit : this.option;             // json or null
-            return `/document/${type}/${target}/${option}`;
+            return `/document/${type}/${target}/${params.option ? params.option : option}`;
         }
     }
 })(jQuery);
