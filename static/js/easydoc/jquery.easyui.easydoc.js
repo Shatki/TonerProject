@@ -175,7 +175,7 @@
         $.data(target, 'journal', {
             journal: journal,
             table: journal.find('.easyui-datagrid'),
-            popupmenu: journal.find(`div#${options.journal_popupmenu}`),
+            popupmenu: journal.find('div#journal-popupmenu'),
             datefrom: journal.find('input#journal-datefrom'),
             dateto: journal.find('input#journal-dateto')
         })
