@@ -1,10 +1,10 @@
 /**
  * easyDoc for jQuery.EasyUI
  *
- * Copyright (c) 2016-2018 Seliverstov Dmitriy. All rights reserved.
+ * Copyright (c) Seliverstov Dmitriy. All rights reserved.
  *
  * Licensed under the freeware license: http://www.-------.-----/--------
- * To use it on other terms please contact us: -----@-------.---
+ * To use it on other terms please contact us: selidimail@gmail.com
  *
  */
 
@@ -114,11 +114,10 @@
             }
         });
 
-        let journal = easydoc.tabs('getTab', 0);
+        let journal = easydoc.tabs('getTab', 0).addClass("easydoc-journal").append(toolbar);
 
 
         //alert(journal.html().toSource());
-
         //append(`<div id="journal-toolbar" class="journal-toolbar"></div>`);
 
     }

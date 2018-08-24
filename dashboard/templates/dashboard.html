@@ -23,6 +23,7 @@
 
         <script type='text/javascript' src="{% static 'js/jquery.easyuisetup.js' %}"></script>
         <script type='text/javascript' src="{% static 'js/easydoc/jquery.easyui.easydoc.js' %}"></script>
+        <script type='text/javascript' src="{% static 'js/easydoc/jquery.easyui.console.js' %}"></script>
 
         <script type='text/javascript' src="{% static 'js/ajax.js' %}"></script>
         <script type='text/javascript' src="{% static 'js/cookies.js' %}"></script>
@@ -41,7 +42,7 @@
                     hideCollapsedContent:false,iconCls:'icon-tip',
                     tools: [{iconCls:'icon-clear',handler:function(){alert('clear')}}]" style="height:300px;">
             {% block console %}
-                <div id="console">
+                <div id="easyconsole">
                     ! 16-10-2017 Запущено приложение
                 </div>
             {% endblock console %}
@@ -86,7 +87,8 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $(function () {
-                $('.easydoc').easydoc({
+                // Запуск easyDoc
+                $('#easydoc').easydoc({
                     //test:           'dashboard',
                     document_type: 'consignment',
                     document_type_name: `накладная`,
@@ -106,6 +108,8 @@
                     title_field_total: 'Сумма',
                     title_field_active: 'Активный',
                 });
+                // Запуск консоли
+                $('#easyconsole').easyconsole({});
             });
 
             if (!navigator.cookieEnabled) {
