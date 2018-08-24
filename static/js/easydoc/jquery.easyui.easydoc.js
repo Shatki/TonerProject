@@ -11,6 +11,59 @@
 // Делаем замыкание
 (function ($) {
     /**
+     * pop up menu плагина EasyDoc
+     * @param      target   (object DOM)
+     * @param      index    (number)
+     * @param      row      (number)
+     * @return              (object) Объект меню
+     * Динамическое создание меню для journal
+     */
+    function popupmenu(target, index, row) {
+        let menu = $.data(target, 'journal').menu;
+        //alert(menu.html().toSource());
+        menu.empty().menu('appendItem', {
+            text: 'Создать',
+            name: 'new',
+            iconCls: 'icon-add'
+        }).menu('appendItem', {
+            text: 'Редактировать',
+            name: 'edit',
+            iconCls: 'icon-edit'
+        }).menu('appendItem', {
+            text: 'Удалить',
+            name: 'remove',
+            iconCls: 'icon-remove'
+        }).menu('appendItem', {
+            separator: true
+        }).menu('appendItem', {
+            text: 'Копировать',
+            name: 'copy',
+            iconCls: 'icon-copy'
+        }).menu('appendItem', {
+            text: 'Вставить',
+            name: 'paste',
+            iconCls: 'icon-paste'
+        }).menu('appendItem', {
+            text: 'Дублировать',
+            name: 'remove',
+            iconCls: 'icon-paste'
+        }).menu('appendItem', {
+            separator: true
+        }).menu('appendItem', {
+            text: 'Обновить',
+            name: 'reload',
+            iconCls: 'icon-reload'
+        }).menu('appendItem', {
+            text: 'Печать',
+            name: 'print',
+            iconCls: 'icon-print'
+        }).menu('options').onClick = function (action) {
+            $(target).easydoc(action.name)
+        };
+        return menu;
+    }
+
+    /**
      * Функция создания журнала документов
      * @param       target      (object DOM)    DOM Объект плагина
      * @param       options     (object)        Настройки плагина
@@ -24,7 +77,7 @@
             'style': "padding: 5px",
             'required': "required",
             'title': "From",
-            'data-options': `width:200,labelWidth:30,label:'${options.title_dateFrom}',
+            'data-options': `width:200,labelWidth:40,label:'${options.title_dateFrom}',
                                 labelPosition:'before',labelAlign:'right'`
         });
         let dateFrom = $('<input>', {
@@ -33,47 +86,50 @@
             'style': "padding: 5px",
             'required': "required",
             'title': "To",
-            'data-options': `width:200,labelWidth:30,label:'${options.title_dateTo}',
+            'data-options': `width:200,labelWidth:40,label:'${options.title_dateTo}',
                                 labelPosition:'before',labelAlign:'right'`
 
         });
-        let datefilter = $('<div></div>', {
+        let dateFilter = $('<div></div>', {
             'id': "journal-datefilter",
             'style': "padding: 5px"
         }).append(dateTo).append(dateFrom);
-        let button_create = $('<a></a>', {
+        let buttonCreate = $('<a></a>', {
             'id': "journal-createdoc",
             'class': "easyui-linkbutton",
             'text': `${options.title_button_create}`,
             'href': "javascript:void(0)",
-            'style': "padding: 5px",
             'data-options': "iconCls:'icon-add'",
             'plain': "true"
         });
-        let button_edit = $('<a></a>', {
+        let buttonEdit = $('<a></a>', {
             'id': "journal-editdoc",
             'class': "easyui-linkbutton",
             'text': `${options.title_button_edit}`,
             'href': "javascript:void(0)",
-            'style': "padding: 5px",
             'data-options': "iconCls:'icon-edit'",
             'plain': "true"
         });
-        let button_delete = $('<a></a>', {
+        let buttonDelete = $('<a></a>', {
             'id': "journal-deletedoc",
             'class': "easyui-linkbutton",
             'text': `${options.title_button_delete}`,
             'href': "javascript:void(0)",
-            'style': "padding: 5px",
             'data-options': "iconCls:'icon-remove'",
             'plain': "true"
         });
         let toolbar = $('<div></div>', {
-            'id': `${options.journal_toolbar}`,
+            'id': `journal-toolbar`,
             'style': "padding: 5px"
-        }).append(datefilter).append(button_create).append(button_edit).append(button_delete);
-        let table = $('<table></table>', {
+        }).append(dateFilter).append(buttonCreate).append(buttonEdit).append(buttonDelete);
+        let popupMenu = $('<div></div>', {
+            'id': "journal-popupmenu",
+            'class': "easyui-menu"
+        });
+        // Общее содержимое вкладки
+        let content = $('<table></table>', {
             'class': "easyui-datagrid",
+            'id': "journal-table",
             'data-options': `url:'${options.getUrl({
                 document_type: options.document_type,
                 target: options.all,
@@ -83,8 +139,8 @@
                             fit:true,
                             fitColumns:true,
                             idField:'id',
-                            toolbar:'#${options.journal_toolbar}',
-                            popupmenu:'#${options.journal_popupmenu}',
+                            toolbar:'#journal-toolbar',
+                            popupmenu:'#journal-popupmenu',
                             rownumbers:true,
                             autoRowHeight:false,
                             singleSelect:true,
@@ -98,12 +154,12 @@
                                     {field: 'enable', width: 3, title: '${options.title_field_active}',
                                      align: 'center', editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
                                     ]]`
-        });
+        }).append(toolbar).append(popupMenu);
 
         easydoc.tabs('add', {
             // Принудительно делаем индекс журнала 0
             index: 0,
-            content: table,
+            content: content,
             //title: options.getTitle(options),
             title: options.journal_title,
             closable: false,
@@ -114,12 +170,15 @@
             }
         });
 
-        let journal = easydoc.tabs('getTab', 0).addClass("easydoc-journal").append(toolbar);
+        let journal = easydoc.tabs('getTab', 0).addClass("easydoc-journal");
 
-
-        //alert(journal.html().toSource());
-        //append(`<div id="journal-toolbar" class="journal-toolbar"></div>`);
-
+        $.data(target, 'journal', {
+            journal: journal,
+            table: journal.find('.easyui-datagrid'),
+            popupmenu: journal.find(`div#${options.journal_popupmenu}`),
+            datefrom: journal.find('input#journal-datefrom'),
+            dateto: journal.find('input#journal-dateto')
+        })
     }
 
 
@@ -228,10 +287,6 @@
         title_field_active: 'Active',
 
         document_date: `01/01/2001`,
-
-        journal_table: 'journal-table',
-        journal_toolbar: 'journal-toolbar',
-        journal_popupmenu: 'journal-popupmenu',
 
         selector: '.easydoc-journal',
 
