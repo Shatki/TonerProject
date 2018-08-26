@@ -1,5 +1,5 @@
 /**
- * Console for jQuery.EasyUI
+ * easyConsole for jQuery.EasyUI
  *
  * Copyright (c) Seliverstov Dmitriy. All rights reserved.
  *
@@ -12,7 +12,7 @@
 (function ($) {
     function init(target, params) {
         easyconsole = $(target).empty().append('Пусто');
-        alert(target.toSource());
+        //alert(target.toSource());
     }
 
     $.fn.easyconsole = function (options, params) {
