@@ -135,6 +135,8 @@
                 target: options.all,
                 option: options.json
             })}',
+                            clickToEdit: false,
+                            dblclickToEdit: true,
                             fit:true,
                             fitColumns:true,
                             idField:'id',
@@ -231,8 +233,6 @@
 
         /* Инициализацию функциональных элементов оформления придется описать каждый отдельно */
         table.datagrid({
-            clickToEdit: false,
-            dblclickToEdit: true,
             onRowContextMenu: function (e, index, row) {
                 e.preventDefault();
                 // Включаем контекстное меню для редактирования таблицы документов
