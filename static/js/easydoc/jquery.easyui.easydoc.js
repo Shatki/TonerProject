@@ -170,7 +170,7 @@
                                 //    date_start: data.date_from,
                                 //    date_end: data.date_to
                                 //});
-                                alert('loadFilter'+ data.date_from + data.date_to);
+                                // alert('loadFilter'+ data.date_from + data.date_to);
                                 dateFrom.datetimebox('setValue', data.date_from);
                                 dateTo.datetimebox('setValue', data.date_to);
                                 return data;
