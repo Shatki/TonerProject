@@ -147,12 +147,12 @@
                             singleSelect:true,
                             columns:[[
                                     {field: 'id', width: 3, title: 'ID'},
-                                    {field: 'ck', width: 3, checkbox: 'true'},
+                                    {field: 'ck', width: 2, checkbox: 'true'},
                                     {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left'},
                                     {field: 'seller', width: 20, title: '${options.title_field_seller}', align: 'left'},
                                     {field: 'buyer', width: 20, title: '${options.title_field_buyer}', align: 'left'},
                                     {field: 'total', width: 5, title: '${options.title_field_total}',align: 'center'},
-                                    {field: 'enable', width: 3, title: '${options.title_field_active}',
+                                    {field: 'enable', width: 5, title: '${options.title_field_active}',
                                      align: 'center', editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
                                     ]],
                             clickToEdit: false,
@@ -166,45 +166,17 @@
                                 });
                             },
                             loadFilter: function (data) {
-                                $.data(table, 'journal', {
-                                    date_start: data.date_from,
-                                    date_end: data.date_to
-                                });
+                                //$.data(table, 'journal', {
+                                //    date_start: data.date_from,
+                                //    date_end: data.date_to
+                                //});
+                                alert('loadFilter'+ data.date_from + data.date_to);
                                 dateFrom.datetimebox('setValue', data.date_from);
                                 dateTo.datetimebox('setValue', data.date_to);
                                 return data;
                             }
                             `
         }).append(toolbar).append(popupMenu);
-
-        dateTo.datetimebox({
-            onChange: function (newValue, oldValue) {
-                //let value = $.data(table, 'journal').date_end;
-                //alert('dateTo-' + value);
-                if (newValue !== oldValue) {
-                    table.datagrid({
-                        queryParams: {
-                            dateTo: newValue,
-                            dateFrom: dateFrom.datetimebox('getValue')
-                        }
-                    })
-                }
-            }
-        });
-        dateFrom.datetimebox({
-            onChange: function (newValue, oldValue) {
-                //let value = $.data(table, 'journal').date_start;
-                //alert('dateFrom-' + value);
-                if (newValue !== oldValue) {
-                    table.datagrid({
-                        queryParams: {
-                            dateFrom: newValue,
-                            dateTo: dateTo.datetimebox('getValue')
-                        }
-                    })
-                }
-            }
-        });
 
         easydoc.tabs('add', {
             // Принудительно делаем индекс журнала 0
@@ -223,15 +195,9 @@
         let journal = easydoc.tabs('getTab', 0).addClass("easydoc-journal");
         let table = journal.find('.easyui-datagrid');
 
-        $.data(target, 'journal', {
-            journal: journal,
-            table: table,
-            popupmenu: journal.find('div#journal-popupmenu'),
-            datefrom: journal.find('input#journal-datefrom'),
-            dateto: journal.find('input#journal-dateto')
-        });
-
         /* Инициализацию функциональных элементов оформления придется описать каждый отдельно */
+        //alert(table.datagrid('options').toSource());
+        /*
         table.datagrid({
             onRowContextMenu: function (e, index, row) {
                 e.preventDefault();
@@ -242,17 +208,58 @@
                 });
             },
             loadFilter: function (data) {
-                $.data(table, 'journal', {
-                    date_start: data.date_from,
-                    date_end: data.date_to
-                });
+                //$.data(table, 'journal', {
+                //    date_start: data.date_from,
+                //    date_end: data.date_to
+                //});
+                alert('loadFilter'+ data.date_from + data.date_to);
                 dateFrom.datetimebox('setValue', data.date_from);
                 dateTo.datetimebox('setValue', data.date_to);
                 return data;
             }
         });
+        */
+
+        dateTo.datetimebox({
+            onChange: function (newValue, oldValue) {
+                //let value = $.data(table, 'journal').date_end;
+                //alert('dateTo-');
+                if (newValue !== oldValue && oldValue) {
+                    table.datagrid({
+                        queryParams: {
+                            dateTo: newValue,
+                            dateFrom: dateFrom.datetimebox('getValue')
+                        }
+                    })
+                }
+            }
+        });
+
+
+        dateFrom.datetimebox({
+            onChange: function (newValue, oldValue) {
+                //let value = $.data(table, 'journal').date_start;
+                //alert('dateFrom-');
+                if (newValue !== oldValue && oldValue) {
+                    table.datagrid({
+                        queryParams: {
+                            dateFrom: newValue,
+                            dateTo: dateTo.datetimebox('getValue')
+                        }
+                    })
+                }
+            }
+        });
+        $.data(target, 'journal', {
+            journal: journal,
+            table: table,
+            popupmenu: journal.find('div#journal-popupmenu'),
+            datefrom: journal.find('input#journal-datefrom'),
+            dateto: journal.find('input#journal-dateto')
+        });
 
     }
+
 
     /**
      * Функция инициализатор плагина easyDoc
