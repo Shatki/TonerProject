@@ -70,8 +70,7 @@
      */
     function journalCreate(target, options) {
         let easydoc = $(target);
-        let tab = easydoc.tabs('getTab', 0);
-
+        let table = easydoc.tabs('getTab', 0);
         let dateFrom = $('<input>', {
             'id': "journal-datefrom",
             'class': "easyui-datetimebox",
@@ -206,21 +205,15 @@
                             }
                             `
         }).append(toolbar).append(popupMenu);
-
-        //let table = journal.find('.easyui-datagrid');
-        /*
-        $.data(target, 'journal', {
-            //journal: journal,
-            table: table,
+        //alert(content.html());
+        return {
+            content: content,
+            table: table.find('table#journal-table'),
             popupmenu: table.find('div#journal-popupmenu'),
             datefrom: table.find('input#journal-datefrom'),
             dateto: table.find('input#journal-dateto')
-        });
-*/
-        //alert(content.html());
-        return content;
+        };
     }
-
 
     function initTabs(target, options) {
         // Обернем DOM объект в jQuery функционал
@@ -229,26 +222,37 @@
             onAdd: function (title, index) {
                 // Первая вкладка всегда journal с индексом 0
                 let tab = easydoc.tabs('getTab', index);
-
+                let tabtitle = options.getTitle({index: index});
                 if (index === 0) {
                     // Тут журнал
                     tab.addClass('easydoc-journal');
                     // Инициализация журнала
-
-                    tab.tabs({
-                        title: options.journal_title,
-                        content: journalCreate(target, options)
+                    let result = journalCreate(target, options);
+                    alert(result.toSource());
+                    easydoc.tabs('update', {
+                        tab: tab,
+                        options: {
+                            title: tabtitle,
+                            content: result.content
+                        }
                     });
-
+                    $.data(target, 'journal', {
+                        table: result.table,
+                        popupmenu: result.popupmenu,
+                        datefrom: result.datefrom,
+                        dateto: result.dateto
+                    });
                 } else if (index > 0) {
                     // Тут документ
                     tab.addClass('easydoc-document');
-                    alert(tab.classes().toSource());
-                    //easydoc.easydoc('addTab', {
-                    //    type: 'document',
-                    //    title: options.getTitle(options),
-                    //    tab: ''// доделать!!!
-                    //});
+                    // Инициализация документа
+                    easydoc.tabs('update', {
+                        tab: tab,
+                        options: {
+                            title: tabtitle,
+                            content: documentCreate(target, options)
+                        }
+                    });
                 } else {
                     $.error('jQuery.easydoc: index of tab error');
                 }
@@ -256,13 +260,10 @@
         }).tabs('add', {
             //Принудительно делаем индекс журнала 0
             index: 0,
-            //title: options.journal_title,
             closable: false,
             selected: true
         });
-
-        // Вернем журнал
-        return easydoc.tabs('getTab', 0).addClass("easydoc-journal");
+        return easydoc.tabs('getTab', 0);
     }
 
     /**
@@ -281,17 +282,12 @@
             $.error('jQuery.easydoc: can\'t find easyui-tabs or easydoc');
             return this;
         }
-
         // Создадим нулевую вкладку
-        let journal = initTabs(target, options);
-
-        //let journal = journalCreate(target, options);
-        //alert(options.toSource());
-
+        let result = initTabs(target, options);
         return {
             options: options,
             easydoc: target,  // или easydoc?
-            journal: journal
+            journal: result.journal
         };
     }
 
@@ -380,6 +376,7 @@
         getTitle: function (params) {
             params = params || {};
             // Если не пришла дата, то возьмем ее из defaults
+            if (params.index === 0) return this.journal_title;
             // params.date = $.fn.datebox.defaults.formatter(new Date());
             // Если не пришли параметры, то создадим новый документ
             return params.index ?
