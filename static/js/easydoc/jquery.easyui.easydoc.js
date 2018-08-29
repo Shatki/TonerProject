@@ -70,6 +70,7 @@
      */
     function journalCreate(target, options) {
         let easydoc = $(target);
+        let tab = easydoc.tabs('getTab', 0);
 
         let dateFrom = $('<input>', {
             'id': "journal-datefrom",
@@ -77,8 +78,23 @@
             'style': "padding: 5px",
             'required': "required",
             'title': "From",
-            'data-options': `width:200,labelWidth:40,label:'${options.title_dateFrom}',
-                                labelPosition:'before',labelAlign:'right'`
+            'data-options': `width:200,
+                            labelWidth:40,
+                            label:'${options.title_dateFrom}',
+                            labelPosition:'before',
+                            labelAlign:'right',
+                            onChange: function (newValue, oldValue) {
+                                //let value = $.data(table, 'journal').date_start;
+                                //alert('dateFrom-');
+                                if (newValue !== oldValue && oldValue) {
+                                    table.datagrid({
+                                        queryParams: {
+                                            dateFrom: newValue,
+                                            dateTo: dateTo.datetimebox('getValue')
+                                        }
+                                    })
+                                }
+                            }`
         });
         let dateTo = $('<input>', {
             'id': "journal-dateto",
@@ -86,8 +102,23 @@
             'style': "padding: 5px",
             'required': "required",
             'title': "To",
-            'data-options': `width:200,labelWidth:40,label:'${options.title_dateTo}',
-                                labelPosition:'before',labelAlign:'right'`
+            'data-options': `width:200,
+                            labelWidth:40,
+                            label:'${options.title_dateTo}',
+                            labelPosition:'before',
+                            labelAlign:'right',
+                            onChange: function (newValue, oldValue) {
+                                //let value = $.data(easydoc, 'journal').date_end;
+                                //alert('dateTo-');
+                                if (newValue !== oldValue && oldValue) {
+                                    table.datagrid({
+                                        queryParams: {
+                                            dateTo: newValue,
+                                            dateFrom: dateFrom.datetimebox('getValue')
+                                        }
+                                    })
+                                }
+                            }`
 
         });
         let dateFilter = $('<div></div>', {
@@ -119,7 +150,7 @@
             'plain': "true"
         });
         let toolbar = $('<div></div>', {
-            'id': `journal-toolbar`,
+            'id': "journal-toolbar",
             'style': "padding: 5px"
         }).append(dateFilter).append(buttonCreate).append(buttonEdit).append(buttonDelete);
         let popupMenu = $('<div></div>', {
@@ -166,100 +197,73 @@
                                 });
                             },
                             loadFilter: function (data) {
-                                //$.data(table, 'journal', {
-                                //    date_start: data.date_from,
-                                //    date_end: data.date_to
-                                //});
-                                // alert('loadFilter'+ data.date_from + data.date_to);
-                                dateFrom.datetimebox('setValue', data.date_from);
-                                dateTo.datetimebox('setValue', data.date_to);
+                                // Почему работает только так, не понятно
+                                $('#journal-datefrom').datetimebox('setValue', data.date_from);
+                                $('#journal-dateto').datetimebox('setValue', data.date_to);
+                                //dateFrom.datetimebox('setValue', data.date_from);
+                                //dateTo.datetimebox('setValue', data.date_to);
                                 return data;
                             }
                             `
         }).append(toolbar).append(popupMenu);
 
-        easydoc.tabs('add', {
-            // Принудительно делаем индекс журнала 0
-            index: 0,
-            content: content,
-            //title: options.getTitle(options),
-            title: options.journal_title,
-            closable: false,
-            selected: true,
-            onLoad: function (panel) {
-                alert('onload');
-                // Переименовывание панели
-            }
-        });
-
-        let journal = easydoc.tabs('getTab', 0).addClass("easydoc-journal");
-        let table = journal.find('.easyui-datagrid');
-
-        /* Инициализацию функциональных элементов оформления придется описать каждый отдельно */
-        //alert(table.datagrid('options').toSource());
+        //let table = journal.find('.easyui-datagrid');
         /*
-        table.datagrid({
-            onRowContextMenu: function (e, index, row) {
-                e.preventDefault();
-                // Включаем контекстное меню для редактирования таблицы документов
-                popupmenu(target, index, row).menu('show', {
-                    left: e.pageX,
-                    top: e.pageY
-                });
-            },
-            loadFilter: function (data) {
-                //$.data(table, 'journal', {
-                //    date_start: data.date_from,
-                //    date_end: data.date_to
-                //});
-                alert('loadFilter'+ data.date_from + data.date_to);
-                dateFrom.datetimebox('setValue', data.date_from);
-                dateTo.datetimebox('setValue', data.date_to);
-                return data;
-            }
-        });
-        */
-
-        dateTo.datetimebox({
-            onChange: function (newValue, oldValue) {
-                //let value = $.data(table, 'journal').date_end;
-                //alert('dateTo-');
-                if (newValue !== oldValue && oldValue) {
-                    table.datagrid({
-                        queryParams: {
-                            dateTo: newValue,
-                            dateFrom: dateFrom.datetimebox('getValue')
-                        }
-                    })
-                }
-            }
-        });
-
-
-        dateFrom.datetimebox({
-            onChange: function (newValue, oldValue) {
-                //let value = $.data(table, 'journal').date_start;
-                //alert('dateFrom-');
-                if (newValue !== oldValue && oldValue) {
-                    table.datagrid({
-                        queryParams: {
-                            dateFrom: newValue,
-                            dateTo: dateTo.datetimebox('getValue')
-                        }
-                    })
-                }
-            }
-        });
         $.data(target, 'journal', {
-            journal: journal,
+            //journal: journal,
             table: table,
-            popupmenu: journal.find('div#journal-popupmenu'),
-            datefrom: journal.find('input#journal-datefrom'),
-            dateto: journal.find('input#journal-dateto')
+            popupmenu: table.find('div#journal-popupmenu'),
+            datefrom: table.find('input#journal-datefrom'),
+            dateto: table.find('input#journal-dateto')
         });
-
+*/
+        //alert(content.html());
+        return content;
     }
 
+
+    function initTabs(target, options) {
+        // Обернем DOM объект в jQuery функционал
+        let easydoc = $(target);
+        easydoc.tabs({
+            onAdd: function (title, index) {
+                // Первая вкладка всегда journal с индексом 0
+                let tab = easydoc.tabs('getTab', index);
+
+                if (index === 0) {
+                    // Тут журнал
+                    tab.addClass('easydoc-journal');
+                    // Инициализация журнала
+
+                    tab.tabs({
+                        title: options.journal_title,
+                        content: journalCreate(target, options)
+                    });
+
+                } else if (index > 0) {
+                    // Тут документ
+                    tab.addClass('easydoc-document');
+                    alert(tab.classes().toSource());
+                    //easydoc.easydoc('addTab', {
+                    //    type: 'document',
+                    //    title: options.getTitle(options),
+                    //    tab: ''// доделать!!!
+                    //});
+                } else {
+                    $.error('jQuery.easydoc: index of tab error');
+                }
+            }
+        }).tabs('add', {
+            //Принудительно делаем индекс журнала 0
+            index: 0,
+            //title: options.journal_title,
+            closable: false,
+            selected: true
+        });
+
+        // Вернем журнал
+        return easydoc.tabs('getTab', 0).addClass("easydoc-journal");
+    }
 
     /**
      * Функция инициализатор плагина easyDoc
@@ -278,7 +282,10 @@
             return this;
         }
 
-        let journal = journalCreate(target, options);
+        // Создадим нулевую вкладку
+        let journal = initTabs(target, options);
+
+        //let journal = journalCreate(target, options);
         //alert(options.toSource());
 
         return {
