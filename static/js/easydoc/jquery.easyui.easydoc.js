@@ -13,15 +13,11 @@
     /**
      * pop up menu плагина EasyDoc
      * @param      target   (object DOM)
-     * @param      index    (number)
-     * @param      row      (number)
      * @return              (object) Объект меню
      * Динамическое создание меню для journal
      */
-    function popupmenu(target, index, row) {
-        let menu = $.data(target, 'journal').popupmenu;
-        //alert(menu.html().toSource());
-        menu.empty().menu('appendItem', {
+    function popupMenuCreate(target) {
+        target.empty().menu('appendItem', {
             text: 'Создать',
             name: 'new',
             iconCls: 'icon-add'
@@ -60,7 +56,7 @@
         }).menu('options').onClick = function (action) {
             $(target).easydoc(action.name)
         };
-        return menu;
+        return this;
     }
 
     /**
@@ -69,31 +65,38 @@
      * @param       options     (object)        Настройки плагина
      */
     function journalCreate(target, options) {
-        let easydoc = $(target);
-        let table = easydoc.tabs('getTab', 0);
+        //let easydoc = $(target);
+        //let tab = easydoc.tabs('getTab', 0);
+        let table = $('<table></table>', {
+            'class': "easyui-datagrid",
+            'id': "journal-table",
+            'data-options': `
+                            clickToEdit: false,
+                            dblclickToEdit: true,
+                            fit:true,
+                            fitColumns:true,
+                            idField:'id',
+                            rownumbers:true,
+                            autoRowHeight:false,
+                            singleSelect:true,
+                            columns:[[
+                                    {field: 'id', width: 3, title: 'ID'},
+                                    {field: 'ck', width: 2, checkbox: 'true'},
+                                    {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left'},
+                                    {field: 'seller', width: 20, title: '${options.title_field_seller}', align: 'left'},
+                                    {field: 'buyer', width: 20, title: '${options.title_field_buyer}', align: 'left'},
+                                    {field: 'total', width: 5, title: '${options.title_field_total}',align: 'center'},
+                                    {field: 'enable', width: 5, title: '${options.title_field_active}',
+                                     align: 'center', editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
+                                    ]]`
+        });
         let dateFrom = $('<input>', {
             'id': "journal-datefrom",
             'class': "easyui-datetimebox",
             'style': "padding: 5px",
             'required': "required",
             'title': "From",
-            'data-options': `width:200,
-                            labelWidth:40,
-                            label:'${options.title_dateFrom}',
-                            labelPosition:'before',
-                            labelAlign:'right',
-                            onChange: function (newValue, oldValue) {
-                                //let value = $.data(table, 'journal').date_start;
-                                //alert('dateFrom-');
-                                if (newValue !== oldValue && oldValue) {
-                                    table.datagrid({
-                                        queryParams: {
-                                            dateFrom: newValue,
-                                            dateTo: dateTo.datetimebox('getValue')
-                                        }
-                                    })
-                                }
-                            }`
+            'data-options': "width:200,labelWidth:40,labelPosition:'before',labelAlign:'right'"
         });
         let dateTo = $('<input>', {
             'id': "journal-dateto",
@@ -101,23 +104,7 @@
             'style': "padding: 5px",
             'required': "required",
             'title': "To",
-            'data-options': `width:200,
-                            labelWidth:40,
-                            label:'${options.title_dateTo}',
-                            labelPosition:'before',
-                            labelAlign:'right',
-                            onChange: function (newValue, oldValue) {
-                                //let value = $.data(easydoc, 'journal').date_end;
-                                //alert('dateTo-');
-                                if (newValue !== oldValue && oldValue) {
-                                    table.datagrid({
-                                        queryParams: {
-                                            dateTo: newValue,
-                                            dateFrom: dateFrom.datetimebox('getValue')
-                                        }
-                                    })
-                                }
-                            }`
+            'data-options': "width:200,labelWidth:40,labelPosition:'before',labelAlign:'right'"
 
         });
         let dateFilter = $('<div></div>', {
@@ -152,67 +139,12 @@
             'id': "journal-toolbar",
             'style': "padding: 5px"
         }).append(dateFilter).append(buttonCreate).append(buttonEdit).append(buttonDelete);
-        let popupMenu = $('<div></div>', {
+        let popupmenu = $('<div></div>', {
             'id': "journal-popupmenu",
             'class': "easyui-menu"
         });
         // Общее содержимое вкладки
-        let content = $('<table></table>', {
-            'class': "easyui-datagrid",
-            'id': "journal-table",
-            'data-options': `url:'${options.getUrl({
-                document_type: options.document_type,
-                target: options.all,
-                option: options.json
-            })}',
-                            clickToEdit: false,
-                            dblclickToEdit: true,
-                            fit:true,
-                            fitColumns:true,
-                            idField:'id',
-                            toolbar:'#journal-toolbar',
-                            popupmenu:'#journal-popupmenu',
-                            rownumbers:true,
-                            autoRowHeight:false,
-                            singleSelect:true,
-                            columns:[[
-                                    {field: 'id', width: 3, title: 'ID'},
-                                    {field: 'ck', width: 2, checkbox: 'true'},
-                                    {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left'},
-                                    {field: 'seller', width: 20, title: '${options.title_field_seller}', align: 'left'},
-                                    {field: 'buyer', width: 20, title: '${options.title_field_buyer}', align: 'left'},
-                                    {field: 'total', width: 5, title: '${options.title_field_total}',align: 'center'},
-                                    {field: 'enable', width: 5, title: '${options.title_field_active}',
-                                     align: 'center', editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
-                                    ]],
-                            clickToEdit: false,
-                            dblclickToEdit: true,
-                            onRowContextMenu: function (e, index, row) {
-                                e.preventDefault();
-                                // Включаем контекстное меню для редактирования таблицы документов
-                                popupmenu(target, index, row).menu('show', {
-                                    left: e.pageX,
-                                    top: e.pageY
-                                });
-                            },
-                            loadFilter: function (data) {
-                                // Почему работает только так, не понятно
-                                $('#journal-datefrom').datetimebox('setValue', data.date_from);
-                                $('#journal-dateto').datetimebox('setValue', data.date_to);
-                                //dateFrom.datetimebox('setValue', data.date_from);
-                                //dateTo.datetimebox('setValue', data.date_to);
-                                return data;
-                            }
-                            `
-        }).append(toolbar).append(popupMenu);
-        //alert(content.html());
-        return {
-            content: content,
-            table: table.find('table#journal-table'),
-            popupmenu: table.find('div#journal-popupmenu'),
-            datefrom: table.find('input#journal-datefrom'),
-            dateto: table.find('input#journal-dateto')
-        };
+        return table.append(toolbar).append(popupmenu);
     }
 
     function initTabs(target, options) {
@@ -227,20 +159,76 @@
                     // Тут журнал
                     tab.addClass('easydoc-journal');
                     // Инициализация журнала
-                    let result = journalCreate(target, options);
-                    alert(result.toSource());
                     easydoc.tabs('update', {
                         tab: tab,
                         options: {
                             title: tabtitle,
-                            content: result.content
+                            content: journalCreate(target, options)
                         }
                     });
+                    let table = tab.find('#journal-table');
+                    let popupmenu = tab.find('div#journal-popupmenu');
+                    let datefrom = tab.find('input#journal-datefrom');
+                    let dateto = tab.find('input#journal-dateto');
+
+                    // Привязка событий
+                    datefrom.datetimebox({
+                        label: options.title_dateFrom,
+                        onChange: function (newValue, oldValue) {
+                            if (newValue !== oldValue && oldValue) {
+                                table.datagrid({
+                                    queryParams: {
+                                        dateFrom: newValue,
+                                        dateTo: dateto.datetimebox('getValue')
+                                    }
+                                })
+                            }
+                        }
+                    });
+                    dateto.datetimebox({
+                        label: options.title_dateTo,
+                        onChange: function (newValue, oldValue) {
+                            if (newValue !== oldValue && oldValue) {
+                                table.datagrid({
+                                    queryParams: {
+                                        dateTo: newValue,
+                                        dateFrom: datefrom.datetimebox('getValue')
+                                    }
+                                })
+                            }
+                        }
+                    });
+                    table.datagrid({
+                        toolbar: '#journal-toolbar',
+                        //popupmenu:'#journal-popupmenu',
+                        url: `${options.getUrl({
+                            document_type: options.document_type,
+                            target: options.all,
+                            option: options.json
+                        })}`,
+                        loadFilter: function (data) {
+                            datefrom.datetimebox('setValue', data.date_from);
+                            dateto.datetimebox('setValue', data.date_to);
+                            return data;
+                        },
+
+                        onRowContextMenu: function (e, index, row) {
+                            e.preventDefault();
+                            // Включаем контекстное меню для редактирования таблицы документов
+                            popupmenu.menu('show', {
+                                left: e.pageX,
+                                top: e.pageY
+                            });
+                        }
+                    });
+
+                    popupMenuCreate(popupmenu);
+
                     $.data(target, 'journal', {
-                        table: result.table,
-                        popupmenu: result.popupmenu,
-                        datefrom: result.datefrom,
-                        dateto: result.dateto
+                        table: table,
+                        popupmenu: popupmenu,
+                        datefrom: datefrom,
+                        dateto: dateto
                     });
                 } else if (index > 0) {
                     // Тут документ
