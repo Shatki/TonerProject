@@ -17,7 +17,7 @@
      * Динамическое создание меню для journal
      */
     function journalMenuCreate(target, options) {
-        menu = $('#journal-popupmenu');
+        let menu = $('#journal-popupmenu');
         menu.//empty().
         menu('appendItem', {
             text: `${options.title_create}`,
@@ -140,16 +140,15 @@
             'data-options': "iconCls:'icon-edit'",
             'plain': "true"
         }).appendTo(toolbar);
-        // buttonDelete
+        // buttonRemove
         $('<a></a>', {
-            'id': "journal-deletedoc",
+            'id': "journal-removedoc",
             'class': "easyui-linkbutton",
             'text': `${options.title_remove}`,
             'href': "javascript:void(0)",
             'data-options': "iconCls:'icon-remove'",
             'plain': "true"
         }).appendTo(toolbar);
-
         // popupmenu
         $('<div></div>', {
             'id': "journal-popupmenu",
@@ -190,6 +189,16 @@
                     let popupmenu = journalMenuCreate(target, options);
 
                     // Привязка событий
+                    tab.find('a#journal-createdoc').bind('click.easydoc', function () {
+                        easydoc.easydoc('create')
+                    });
+                    tab.find('#journal-editdoc').bind('click.easydoc', function () {
+                        easydoc.easydoc('edit')
+                    });
+                    tab.find('#journal-removedoc').bind('click.easydoc', function () {
+                        easydoc.easydoc('remove')
+                    });
+
                     datefrom.datetimebox({
                         label: options.title_dateFrom,
                         onChange: function (newValue, oldValue) {
@@ -218,7 +227,6 @@
                     });
                     table.datagrid({
                         toolbar: '#journal-toolbar',
-                        //popupmenu:'#journal-popupmenu',
                         url: `${options.getUrl({
                             document_type: options.document_type,
                             target: options.all,
@@ -350,16 +358,45 @@
         journal: function (jq) {
             return $.data(jq[0], 'easydoc').table;
         },
-        create: function (jq, params) {
+        create: function (jq) {
             jq.each(function () {
                 alert('create');
             });
         },
-        edit: function (jq, params) {
+        edit: function (jq) {
             jq.each(function () {
                 alert('edit');
             })
-
+        },
+        remove: function (jq) {
+            jq.each(function () {
+                alert('remove');
+            });
+        },
+        copy: function (jq) {
+            jq.each(function () {
+                alert('copy');
+            });
+        },
+        paste: function (jq) {
+            jq.each(function () {
+                alert('paste');
+            });
+        },
+        dublicate: function (jq) {
+            jq.each(function () {
+                alert('dublicate');
+            });
+        },
+        print: function (jq) {
+            jq.each(function () {
+                alert('print');
+            });
+        },
+        reload: function (jq) {
+            jq.each(function () {
+                alert('reload');
+            });
         }
     };
 
