@@ -12,45 +12,48 @@
 (function ($) {
     /**
      * pop up menu плагина EasyDoc
-     * @param      target   (object DOM)
-     * @return              (object) Объект меню
+     * @param       target      (object DOM)    Объект DOM плагина
+     * @param       options     (object)        Настройки
+     * @return                  (object)        this
      * Динамическое создание меню для journal
      */
-    function popupMenuCreate(target) {
-        target.empty().menu('appendItem', {
-            text: 'Создать',
-            name: 'new',
+    function journalMenuCreate(target, options) {
+        menu = $.data(target, 'journal').popupmenu;
+        menu.//empty().
+        menu('appendItem', {
+            text: `${options.title_create}`,
+            name: 'create',
             iconCls: 'icon-add'
         }).menu('appendItem', {
-            text: 'Редактировать',
+            text: `${options.title_edit}`,
             name: 'edit',
             iconCls: 'icon-edit'
         }).menu('appendItem', {
-            text: 'Удалить',
+            text: `${options.title_remove}`,
             name: 'remove',
             iconCls: 'icon-remove'
         }).menu('appendItem', {
             separator: true
         }).menu('appendItem', {
-            text: 'Копировать',
+            text: `${options.title_copy}`,
             name: 'copy',
             iconCls: 'icon-copy'
         }).menu('appendItem', {
-            text: 'Вставить',
+            text: `${options.title_paste}`,
             name: 'paste',
             iconCls: 'icon-paste'
         }).menu('appendItem', {
-            text: 'Дублировать',
-            name: 'remove',
+            text: `${options.title_dublicate}`,
+            name: 'dublicate',
             iconCls: 'icon-paste'
         }).menu('appendItem', {
             separator: true
         }).menu('appendItem', {
-            text: 'Обновить',
+            text: `${options.title_reload}`,
             name: 'reload',
             iconCls: 'icon-reload'
         }).menu('appendItem', {
-            text: 'Печать',
+            text: `${options.title_print}`,
             name: 'print',
             iconCls: 'icon-print'
         }).menu('options').onClick = function (action) {
@@ -90,15 +93,27 @@
                                      align: 'center', editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
                                     ]]`
         });
-        let dateFrom = $('<input>', {
+        // toolbar
+        let toolbar = $('<div></div>', {
+            'id': "journal-toolbar",
+            'style': "padding: 5px"
+        }).appendTo(table);
+        // dateFilter
+        let datefilter = $('<div></div>', {
+            'id': "journal-datefilter",
+            'style': "padding: 5px"
+        }).appendTo(toolbar);
+        // dateFrom
+        $('<input>', {
             'id': "journal-datefrom",
             'class': "easyui-datetimebox",
             'style': "padding: 5px",
             'required': "required",
             'title': "From",
             'data-options': "width:200,labelWidth:40,labelPosition:'before',labelAlign:'right'"
-        });
-        let dateTo = $('<input>', {
+        }).appendTo(datefilter);
+        // dateTo
+        $('<input>', {
             'id': "journal-dateto",
             'class': "easyui-datetimebox",
             'style': "padding: 5px",
@@ -106,45 +121,42 @@
             'title': "To",
             'data-options': "width:200,labelWidth:40,labelPosition:'before',labelAlign:'right'"
 
-        });
-        let dateFilter = $('<div></div>', {
-            'id': "journal-datefilter",
-            'style': "padding: 5px"
-        }).append(dateFrom).append(dateTo);
-        let buttonCreate = $('<a></a>', {
+        }).appendTo(datefilter);
+        // buttonCreate
+        $('<a></a>', {
             'id': "journal-createdoc",
             'class': "easyui-linkbutton",
-            'text': `${options.title_button_create}`,
+            'text': `${options.title_create}`,
             'href': "javascript:void(0)",
             'data-options': "iconCls:'icon-add'",
             'plain': "true"
-        });
-        let buttonEdit = $('<a></a>', {
+        }).appendTo(toolbar);
+        // buttonEdit
+        $('<a></a>', {
             'id': "journal-editdoc",
             'class': "easyui-linkbutton",
-            'text': `${options.title_button_edit}`,
+            'text': `${options.title_edit}`,
             'href': "javascript:void(0)",
             'data-options': "iconCls:'icon-edit'",
             'plain': "true"
-        });
-        let buttonDelete = $('<a></a>', {
+        }).appendTo(toolbar);
+        // buttonDelete
+        $('<a></a>', {
             'id': "journal-deletedoc",
             'class': "easyui-linkbutton",
-            'text': `${options.title_button_delete}`,
+            'text': `${options.title_remove}`,
             'href': "javascript:void(0)",
             'data-options': "iconCls:'icon-remove'",
             'plain': "true"
-        });
-        let toolbar = $('<div></div>', {
-            'id': "journal-toolbar",
-            'style': "padding: 5px"
-        }).append(dateFilter).append(buttonCreate).append(buttonEdit).append(buttonDelete);
-        let popupmenu = $('<div></div>', {
+        }).appendTo(toolbar);
+
+        // popupmenu
+        $('<div></div>', {
             'id': "journal-popupmenu",
             'class': "easyui-menu"
-        });
+        }).appendTo(table);
         // Общее содержимое вкладки
-        return table.append(toolbar).append(popupmenu);
+        return table;
     }
 
     function initTabs(target, options) {
@@ -167,7 +179,7 @@
                         }
                     });
                     let table = tab.find('#journal-table');
-                    let popupmenu = tab.find('div#journal-popupmenu');
+                    let popupmenu = $('#journal-popupmenu');
                     let datefrom = tab.find('input#journal-datefrom');
                     let dateto = tab.find('input#journal-dateto');
 
@@ -211,7 +223,6 @@
                             dateto.datetimebox('setValue', data.date_to);
                             return data;
                         },
-
                         onRowContextMenu: function (e, index, row) {
                             e.preventDefault();
                             // Включаем контекстное меню для редактирования таблицы документов
@@ -222,14 +233,15 @@
                         }
                     });
 
-                    popupMenuCreate(popupmenu);
-
                     $.data(target, 'journal', {
                         table: table,
                         popupmenu: popupmenu,
                         datefrom: datefrom,
                         dateto: dateto
                     });
+
+                    journalMenuCreate(target, options);
+
                 } else if (index > 0) {
                     // Тут документ
                     tab.addClass('easydoc-document');
@@ -336,11 +348,25 @@
         new: ``,
         target: `new`,
 
-        title_button_create: 'Create',
-        title_button_edit: 'Edit',
-        title_button_delete: 'Delete',
+        document_date: `01/01/2001`,
+        selector: '.easydoc-journal',
+
+        timedelta: 90,     // период журнала в днях
+        dateto: null,
+        datefrom: null,
+
+        /* Настройки локализации */
+        title_create: 'Create',
+        title_edit: 'Edit',
+        title_remove: 'Remove',
+        title_copy: 'Copy',
+        title_paste: 'Paste',
+        title_dublicate: 'Dublicate',
+        title_print: 'Print',
+        title_reload: 'Reload',
         title_dateTo: 'To:',
         title_dateFrom: 'From:',
+
         document_type: `all`,
         document_type_name: `document`,
         document_type_name_new: `a new document`,
@@ -352,14 +378,6 @@
         title_field_buyer: 'Buyer',
         title_field_total: 'Total',
         title_field_active: 'Active',
-
-        document_date: `01/01/2001`,
-
-        selector: '.easydoc-journal',
-
-        timedelta: 90,     // период журнала в днях
-        dateto: null,
-        datefrom: null,
 
         getTitle: function (params) {
             params = params || {};
