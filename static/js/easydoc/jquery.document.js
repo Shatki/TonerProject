@@ -20,7 +20,7 @@ $.extend(
     // Предотвращение выбора категории в combotreegrid
     $.fn.combotreegrid.defaults.onBeforeSelect = function (row) {
         // Запрет выбора таких ID
-        if (row.itemId.substring(0, 3) == 'DIR') {
+        if (row.itemId.substring(0, 3) === 'DIR') {
             return false;
         }
     }

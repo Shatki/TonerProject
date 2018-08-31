@@ -62,16 +62,16 @@
     }
 
     /**
-     * Функция создания журнала документов
-     * @param       target      (object DOM)    DOM Объект плагина
+     * Функция создания панели журнала документов
+     * @param       target      (object DOM)    DOM объект плагина
      * @param       options     (object)        Настройки плагина
      */
     function journalCreate(target, options) {
         //let easydoc = $(target);
         //let tab = easydoc.tabs('getTab', 0);
         let table = $('<table></table>', {
-            'class': "easyui-datagrid",
             'id': "journal-table",
+            'class': "easyui-datagrid",
             'data-options': `
                             popupmenu: '#journal-popupmenu',
                             clickToEdit: false,
@@ -156,6 +156,39 @@
         }).appendTo(table);
         // Общее содержимое вкладки
         return table;
+    }
+
+    /**
+     * Функция создания панели документа
+     * @param       target      (object DOM)    DOM объект плагина
+     * @param       options     (object)        Настройки плагина
+     */
+    function documentCreate(target, options) {
+        let table = $('<table></table>', {
+            'id': "document-table",
+            'class': "easyui-datagrid",
+            'data-options': `
+                            fit:true,
+                            fitColumns:true,
+                            toolbar:'#toolbar-document-{{ document.id }}',
+                            popupmenu:'#item-table-popup-menu',
+                            idField:'id',
+                            textField:'name',
+                            rownumbers:true,
+                            autoRowHeight:true,
+                            singleSelect:true,
+                            showFooter:true">
+                            columns:[[
+                                    {field: 'id', width: 3, title: 'ID'},
+                                    {field: 'ck', width: 2, checkbox: 'true'},
+                                    {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left'},
+                                    {field: 'seller', width: 20, title: '${options.title_field_seller}', align: 'left'},
+                                    {field: 'buyer', width: 20, title: '${options.title_field_buyer}', align: 'left'},
+                                    {field: 'total', width: 5, title: '${options.title_field_total}',align: 'center'},
+                                    {field: 'enable', width: 5, title: '${options.title_field_active}',
+                                     align: 'center', editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
+                                    ]]`
+        });
     }
 
     /**
@@ -264,6 +297,59 @@
                             content: documentOpen(target, options)
                         }
                     });
+
+                    let table = tab.find('#document-table');
+                    let popupmenu = documentMenuCreate(target, options);
+                    table.// Активация cell-editing функции, а также запуск дополнительных возможностей datagrid
+                    datagrid('enableCellEditing').datagrid({
+                        onEndEdit: function (rowIndex, row, changes) {
+                            // get all changes
+                            for (var name in changes) {
+                                // Изменяем текствовое поле на  c id на name
+                                var ed = table.datagrid('getEditor', {index: rowIndex, field: name});
+                                row.name = $(ed.target).combotreegrid('getText');
+
+                                // Автокалькуляция значений в строках
+                                if (changes.cost) {
+                                    // autosumm column   total = quantity * cost
+                                    $(this).datagrid('updateRow', {
+                                        index: rowIndex,
+                                        row: {
+                                            total: (row.cost * row.quantity).toFixed(2)
+                                        }
+                                    });
+                                } else if (changes.quantity) {
+                                    // alert(changes.quantity);
+                                    // autosumm column   total = quantity * cost
+                                    $(this).datagrid('updateRow', {
+                                        index: rowIndex,
+                                        row: {
+                                            total: (row.cost * row.quantity).toFixed(2)
+                                        }
+                                    });
+                                } else if (changes.total) {
+                                    // alert(changes.total);
+                                    // autosumm column   cost = total / quantity
+                                    $(this).datagrid('updateRow', {
+                                        index: rowIndex,
+                                        row: {
+                                            cost: (row.total / row.quantity).toFixed(2)
+                                        }
+                                    });
+                                }
+                            }
+                        },
+                        onRowContextMenu: function (e, index, row) {
+                            e.preventDefault();
+                            // Включаем контекстное меню для редактирования таблицы документов
+                            popupmenu.menu('show', {
+                                left: e.pageX,
+                                top: e.pageY
+                            });
+                        }
+                    });
+
+
                 } else {
                     $.error('jQuery.easydoc: index of tab error');
                 }
@@ -275,6 +361,11 @@
             selected: true
         });
         return easydoc.tabs('getTab', 0);
+    }
+
+    function documentOpen(target, params) {
+        easydoc = $(target);
+        easydoc.tabs('add', {});
     }
 
     /**
@@ -297,9 +388,64 @@
         let result = initTabs(target, options);
         return {
             options: options,
-            easydoc: target,  // или easydoc?
+            easydoc: target,
             journal: result
         };
+    }
+
+    /**
+     * Функция создание иерархии каталога продукции на Фронтэнде
+     * @param       rows        (Array)         Полученные данные
+     * @returns     {Array}
+     */
+    function productLoadFilter(rows) {
+        function exists(rows, parentId) {
+            for (var i = 0; i < rows.length; i++) {
+                if (rows[i].itemId == parentId) return true;
+            }
+            return false;
+        }
+
+        var nodes = [];
+        // get the top level nodes
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (!exists(rows, row.parentId)) {
+                nodes.push({
+                    itemId: row.itemId,
+                    itemName: row.itemName,
+                    state: row.state,
+                    parentId: row.parentId
+                    //добавить еще данные
+                });
+            }
+        }
+        var toDo = [];
+        for (var i = 0; i < nodes.length; i++) {
+            toDo.push(nodes[i]);
+        }
+        while (toDo.length) {
+            var node = toDo.shift();    // the parent node
+            // get the children nodes
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                if (row.parentId == node.itemId) {
+                    var child = {
+                        itemId: row.itemId,
+                        itemName: row.itemName,
+                        state: row.state,
+                        parentId: row.parentId
+                    };
+                    if (node.children) {
+                        node.children.push(child);
+                    } else {
+                        node.children = [child];
+                    }
+                    toDo.push(child);
+                }
+            }
+        }
+        return nodes;
     }
 
     /**
@@ -360,7 +506,10 @@
         },
         create: function (jq) {
             jq.each(function () {
-                alert('create');
+                documentOpen(this, {
+                    index: -1,
+                    action: 'new'
+                });
             });
         },
         edit: function (jq) {
@@ -449,7 +598,6 @@
                 params.document_type_name :
                 `${params.document_type_name_new} от ${params.document_date ? params.document_date : this.document_date }`;
         },
-
         getUrl: function (params) {
             // Доделать!!!
             let type = params.document_type;
