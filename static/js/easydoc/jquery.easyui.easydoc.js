@@ -11,14 +11,13 @@
 // Делаем замыкание
 (function ($) {
     /**
-     * pop up menu плагина EasyDoc
-     * @param       target      (object DOM)    Объект DOM плагина
-     * @param       options     (object)        Настройки
-     * @return                  (object)        this
+     * Создание меню журнала плагина EasyDoc
+     * @param       target      (object DOM)    DOM Объект плагина
+     * @param       options     (object)        Настройки плагина
      * Динамическое создание меню для journal
      */
     function journalMenuCreate(target, options) {
-        menu = $.data(target, 'journal').popupmenu;
+        menu = $('#journal-popupmenu');
         menu.//empty().
         menu('appendItem', {
             text: `${options.title_create}`,
@@ -59,7 +58,7 @@
         }).menu('options').onClick = function (action) {
             $(target).easydoc(action.name)
         };
-        return this;
+        return menu;
     }
 
     /**
@@ -74,6 +73,7 @@
             'class': "easyui-datagrid",
             'id': "journal-table",
             'data-options': `
+                            popupmenu: '#journal-popupmenu',
                             clickToEdit: false,
                             dblclickToEdit: true,
                             fit:true,
@@ -159,6 +159,12 @@
         return table;
     }
 
+    /**
+     * Инициализация вкладок для работы
+     * @param       target      (object DOM)    DOM объект нашего плагина
+     * @param       options     (object)        Настройки плагина
+     * @returns     tab         (object DOM)    DOM
+     */
     function initTabs(target, options) {
         // Обернем DOM объект в jQuery функционал
         let easydoc = $(target);
@@ -179,9 +185,9 @@
                         }
                     });
                     let table = tab.find('#journal-table');
-                    let popupmenu = $('#journal-popupmenu');
                     let datefrom = tab.find('input#journal-datefrom');
                     let dateto = tab.find('input#journal-dateto');
+                    let popupmenu = journalMenuCreate(target, options);
 
                     // Привязка событий
                     datefrom.datetimebox({
@@ -239,9 +245,6 @@
                         datefrom: datefrom,
                         dateto: dateto
                     });
-
-                    journalMenuCreate(target, options);
-
                 } else if (index > 0) {
                     // Тут документ
                     tab.addClass('easydoc-document');
@@ -250,7 +253,7 @@
                         tab: tab,
                         options: {
                             title: tabtitle,
-                            content: documentCreate(target, options)
+                            content: documentOpen(target, options)
                         }
                     });
                 } else {
@@ -268,9 +271,9 @@
 
     /**
      * Функция инициализатор плагина easyDoc
-     * @param      target   (object DOM)    Объект DOM класса easyui-tabs  для активации на нем плагина easyDoc
-     * @param      options  (object)    Объект с настройками плагина
-     * @return              (object)    Объект содержащий {настройки, ициализированные jQuery.easydoc, jQuery.journal}
+     * @param      target   (object DOM)        Объект DOM класса easyui-tabs  для активации на нем плагина easyDoc
+     * @param      options  (object)            Объект с настройками плагина
+     * @return              (object)            Объект содержащий {настройки, ициализированные jQuery.easydoc, jQuery.journal}
      */
     function init(target, options) {
         // Если options === undefined, сделаем ее просто пустой
@@ -287,15 +290,15 @@
         return {
             options: options,
             easydoc: target,  // или easydoc?
-            journal: result.journal
+            journal: result
         };
     }
 
     /**
      * Функция "точка" вызова плагина easyDoc
-     * @param      options  (string, необязательный) имя вызываемого метода
-     * @param      params   (object) параметры настройки плагина
-     * @return     this     (object) объект экземпляра для поддержки цепочки вызовов
+     * @param      options  (string, необяз)    Имя вызываемого метода
+     * @param      params   (object)            Параметры настройки плагина
+     * @return     this     (object)            Объект экземпляра для поддержки цепочки вызовов
      * */
     $.fn.easydoc = function (options, params) {
         // Если пришло имя функции то string
@@ -338,6 +341,26 @@
     };
 
     $.fn.easydoc.methods = {
+        options: function (jq) {
+            return $.data(jq[0], 'easydoc').options;
+        },
+        easydoc: function (jq) {
+            return $.data(jq[0], 'easydoc').easydoc;
+        },
+        journal: function (jq) {
+            return $.data(jq[0], 'easydoc').table;
+        },
+        create: function (jq, params) {
+            jq.each(function () {
+                alert('create');
+            });
+        },
+        edit: function (jq, params) {
+            jq.each(function () {
+                alert('edit');
+            })
+
+        }
     };
 
     $.fn.easydoc.defaults = {
