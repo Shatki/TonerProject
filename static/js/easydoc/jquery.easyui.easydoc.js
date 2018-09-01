@@ -170,25 +170,20 @@
             'data-options': `
                             fit:true,
                             fitColumns:true,
-                            toolbar:'#toolbar-document-{{ document.id }}',
-                            popupmenu:'#item-table-popup-menu',
+                            toolbar:'#toolbar-document',
                             idField:'id',
                             textField:'name',
                             rownumbers:true,
                             autoRowHeight:true,
                             singleSelect:true,
-                            showFooter:true">
+                            showFooter:true,
                             columns:[[
-                                    {field: 'id', width: 3, title: 'ID'},
                                     {field: 'ck', width: 2, checkbox: 'true'},
-                                    {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left'},
-                                    {field: 'seller', width: 20, title: '${options.title_field_seller}', align: 'left'},
-                                    {field: 'buyer', width: 20, title: '${options.title_field_buyer}', align: 'left'},
-                                    {field: 'total', width: 5, title: '${options.title_field_total}',align: 'center'},
-                                    {field: 'enable', width: 5, title: '${options.title_field_active}',
-                                     align: 'center', editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
+                                    {field: 'itemId', width: 3, title: '${options.title_field_article}'},
+                                    {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left',},                                                           
                                     ]]`
         });
+        return table;
     }
 
     /**
@@ -294,19 +289,21 @@
                         tab: tab,
                         options: {
                             title: tabtitle,
-                            content: documentOpen(target, options)
+                            content: documentCreate(target, options)
                         }
                     });
 
-                    let table = tab.find('#document-table');
+                    /*
+                    let table = tab.find('#document-table-' + index);
                     let popupmenu = documentMenuCreate(target, options);
+
                     table.// Активация cell-editing функции, а также запуск дополнительных возможностей datagrid
                     datagrid('enableCellEditing').datagrid({
                         onEndEdit: function (rowIndex, row, changes) {
                             // get all changes
-                            for (var name in changes) {
+                            for (let name in changes) {
                                 // Изменяем текствовое поле на  c id на name
-                                var ed = table.datagrid('getEditor', {index: rowIndex, field: name});
+                                let ed = table.datagrid('getEditor', {index: rowIndex, field: name});
                                 row.name = $(ed.target).combotreegrid('getText');
 
                                 // Автокалькуляция значений в строках
@@ -348,7 +345,7 @@
                             });
                         }
                     });
-
+                    */
 
                 } else {
                     $.error('jQuery.easydoc: index of tab error');
@@ -364,8 +361,13 @@
     }
 
     function documentOpen(target, params) {
-        easydoc = $(target);
-        easydoc.tabs('add', {});
+        let easydoc = $(target);
+        easydoc.tabs('add', {
+            //index: 1,  //params.index,
+            //title: index,
+            closable: true,
+            selected: true
+        });
     }
 
     /**
@@ -504,12 +506,9 @@
         journal: function (jq) {
             return $.data(jq[0], 'easydoc').table;
         },
-        create: function (jq) {
+        create: function (jq, params) {
             jq.each(function () {
-                documentOpen(this, {
-                    index: -1,
-                    action: 'new'
-                });
+                documentOpen(this, params);
             });
         },
         edit: function (jq) {
@@ -582,11 +581,16 @@
         document_type_name_plural: `documents`,
         journal_title: 'documents\'s journal',
 
-        title_field_name: 'Kind, number, date of document',
+        title_field_document: 'Kind, number, date of document',
         title_field_seller: 'Seller',
         title_field_buyer: 'Buyer',
         title_field_total: 'Total',
         title_field_active: 'Active',
+
+        title_field_article: 'Article',
+        title_field_name: 'The name of goods, works, services',
+
+
 
         getTitle: function (params) {
             params = params || {};
