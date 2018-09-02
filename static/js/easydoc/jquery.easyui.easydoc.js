@@ -165,7 +165,7 @@
      */
     function documentCreate(target, options) {
         let table = $('<table></table>', {
-            'id': "document-table",
+            'id': `document-table-`, //${options.index}
             'class': "easyui-datagrid",
             'data-options': `
                             fit:true,
@@ -176,13 +176,58 @@
                             rownumbers:true,
                             autoRowHeight:true,
                             singleSelect:true,
-                            showFooter:true,
-                            columns:[[
-                                    {field: 'ck', width: 2, checkbox: 'true'},
-                                    {field: 'itemId', width: 3, title: '${options.title_field_article}'},
-                                    {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left',},                                                           
-                                    ]]`
+                            showFooter:true
+                            `
         });
+        let thead = $('<thead></thead>').appendTo(table);
+        let tr = $('<tr></tr>').appendTo(thead);
+        $('<th></th>', {
+            'data-options': `field:'ck',width:2,checkbox:true`
+        }).appendTo(tr);
+        $('<th></th>', {
+            'data-options': `field:'itemId',width:3,align:'center',title:'${options.title_field_article}'`
+        }).appendTo(tr);
+        $('<th></th>', {
+            'data-options': `field:'itemName',width:30,align:'center',title:'${options.title_field_name}',
+                    editor:{
+                        type: 'combotreegrid',
+                        options: {
+                            idField: 'itemId',
+                            treeField: 'itemName',
+                            url:'/catalog/product/json/',
+                            fit:true,
+                            fitColumns:true,
+                            animate:true,
+                            panelWidth: '50%',
+                            loadFilter: function(rows){return productLoadFilter(rows);},
+                            columns: [[
+                                {field:'itemId',title:'Item ID',width:'10%'},
+                                {field:'itemName',title:'Name',width:'80%'},
+                                {field:'parentId',title:'parentId',width:'10%'}
+                            ]]
+                        }}`
+        }).appendTo(tr);
+        $('<th></th>', {
+            'data-options': `field:'measure',width:5,align:'center',title:'${options.title_field_measure}',
+                    editor:{
+                        type: 'combogrid',
+                        options: {
+                            idField:'id',
+                            textField: 'name',
+                            scrollbarSize:0,
+                            url:'/system/measure/json/',
+                            columns:[[
+                                    {field:'name',
+                                     title:'Ед. изм.',
+                                     width:'100%'},
+                            ]]
+                        }}`
+        }).appendTo(tr);
+
+        let toolbar = $('<div></div>', {
+            'id': "journal-toolbar",
+            'style': "padding: 5px"
+        }).appendTo(table);
         return table;
     }
 
@@ -589,6 +634,7 @@
 
         title_field_article: 'Article',
         title_field_name: 'The name of goods, works, services',
+        title_field_measure: 'Measure <br> (pcs/kg)',
 
 
 
