@@ -170,7 +170,7 @@
             'data-options': `
                             fit:true,
                             fitColumns:true,
-                            toolbar:'#toolbar-document',
+                            toolbar:'#document-toolbar-',
                             idField:'id',
                             textField:'name',
                             rownumbers:true,
@@ -223,11 +223,98 @@
                             ]]
                         }}`
         }).appendTo(tr);
+        $('<th></th>', {
+            'data-options': `field:'quantity',width:5,align:'center',title:'${options.title_field_quantity}',
+                    editor:{
+                        type: 'numberbox',
+                        options: {
+                            precision:2,
+                        }}`
+        }).appendTo(tr);
+        $('<th></th>', {
+            'data-options': `field:'country',width:10,align:'center',title:'${options.title_field_country}',
+                    editor:{
+                        type: 'combogrid',
+                        options: {
+                            idField: 'id',
+                            textField: 'name',
+                            scrollbarSize:0,
+                            url:'/system/country/json/',
+                            columns:[[
+                                    {field:'name',
+                                     title:'Страна изготовитель',
+                                     width:'100%'},
+                                    ]]
+                        }}`
+        }).appendTo(tr);
+        $('<th></th>', {
+            'data-options': `field:'cost',width:10,align:'center',title:'${options.title_field_cost}',
+                    editor:{
+                        type: 'numberbox',
+                        options: {
+                            precision:2,
+                        }}`,
+            'formatter': `${options.formatter}`,
+        }).appendTo(tr);
+        $('<th></th>', {
+            'data-options': `field:'tax',width:10,align:'center',title:'${options.title_field_tax}',
+                    editor:{
+                        type: 'numberbox',
+                        options: {
+                            precision:2,
+                        }}`,
+            'formatter': `${options.formatter}`
+        }).appendTo(tr);
+        $('<th></th>', {
+            'data-options': `field:'total',width:10,align:'center',title:'${options.title_field_total}',
+                    editor:{
+                        type: 'numberbox',
+                        options: {
+                            precision:2,
+                        }}`,
+            'formatter': `${options.formatter}`
+        }).appendTo(tr);
 
         let toolbar = $('<div></div>', {
-            'id': "journal-toolbar",
+            'id': "document-toolbar-",
             'style': "padding: 5px"
         }).appendTo(table);
+        let form = $('<form></form>', {
+            'id': "document-form"
+        }).appendTo(toolbar);
+        // Номер документа в тулбаре
+        $('<input>', {
+            'id': "document-number",
+            'name': "number",
+            'class': "easyui-textbox",
+            'placeholder': "0000000001",
+            'required': "required",
+            'label': `${options.document_type_name} №`,
+            'title': "document:",
+            'data-options': "width:250,labelWidth:100,labelPosition:'before',labelAlign:'right'"
+        }).appendTo(form);
+        // Дата документа в тулбаре
+        $('<input>', {
+            'id': "document-date",
+            'name': "date",
+            'class': "easyui-datetimebox",
+            'placeholder': "31/10/1985",
+            'required': "required",
+            'label': `${options.title_dateFrom}:`,
+            'title': "From:",
+            'data-options': `width:220,labelWidth:50,labelPosition:'before',labelAlign:'right',
+                            currentText:'${options.title_today}',closeText:'${options.title_close}'
+                            `
+        }).appendTo(form);
+        // Продавец
+        $('<select></select>', {
+            'id': "document-receiver-",
+            'name': "receiver",
+            'label': `${options.title_seller}:`,
+            'data-options': `labelPosition:'top'`
+        }).appendTo(form);
+
+
         return table;
     }
 
@@ -607,6 +694,7 @@
         timedelta: 90,     // период журнала в днях
         dateto: null,
         datefrom: null,
+        formatter: 'formatDollar',
 
         /* Настройки локализации */
         title_create: 'Create',
@@ -617,8 +705,12 @@
         title_dublicate: 'Dublicate',
         title_print: 'Print',
         title_reload: 'Reload',
-        title_dateTo: 'To:',
-        title_dateFrom: 'From:',
+        title_dateTo: 'To',
+        title_dateFrom: 'From',
+        title_today: 'Today',
+        title_close: 'Close',
+        title_seller: 'Seller',
+        title_buyer: 'Buyer',
 
         document_type: `all`,
         document_type_name: `document`,
@@ -626,16 +718,19 @@
         document_type_name_plural: `documents`,
         journal_title: 'documents\'s journal',
 
-        title_field_document: 'Kind, number, date of document',
-        title_field_seller: 'Seller',
-        title_field_buyer: 'Buyer',
-        title_field_total: 'Total',
-        title_field_active: 'Active',
 
-        title_field_article: 'Article',
-        title_field_name: 'The name of goods, works, services',
-        title_field_measure: 'Measure <br> (pcs/kg)',
-
+        title_field_document: '<p>Kind, number, date of document</p>',
+        title_field_seller: '<p>Seller</p>',
+        title_field_buyer: '<p>Buyer</p>',
+        title_field_active: '<p>Active</p>',
+        title_field_article: '<p>Article</p>',
+        title_field_name: '<p>The name of goods, works, services</p>',
+        title_field_measure: '<p>Measure <br> (pcs/kg)</p>',
+        title_field_quantity: '<p>Quantity<br><em>(pcs)</em></p>',
+        title_field_country: '<p>Country of<br>production</p>',
+        title_field_cost: '<p>Cost of<br>piece</p>',
+        title_field_tax: '<p>Tax</p>',
+        title_field_total: '<p>Total</p>',
 
 
         getTitle: function (params) {
