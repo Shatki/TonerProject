@@ -14,6 +14,7 @@
      * Создание меню журнала плагина EasyDoc
      * @param       target      (object DOM)    DOM Объект плагина
      * @param       options     (object)        Настройки плагина
+     * @return      {*}         (object)        HTML объект разметки
      * Динамическое создание меню для journal
      */
     function journalMenuCreate(target, options) {
@@ -65,6 +66,7 @@
      * Функция создания панели журнала документов
      * @param       target      (object DOM)    DOM объект плагина
      * @param       options     (object)        Настройки плагина
+     * @return      {*}         (object)        HTML объект разметки
      */
     function journalCreate(target, options) {
         //let easydoc = $(target);
@@ -107,17 +109,17 @@
         $('<input>', {
             'id': "journal-datefrom",
             'class': "easyui-datetimebox",
-            'style': "padding: 5px",
             'required': "required",
             'title': "From",
+            'style': "padding: 5px",
             'data-options': "width:200,labelWidth:40,labelPosition:'before',labelAlign:'right'"
         }).appendTo(datefilter);
         // dateTo
         $('<input>', {
             'id': "journal-dateto",
             'class': "easyui-datetimebox",
-            'style': "padding: 5px",
             'required': "required",
+            'style': "padding: 5px",
             'title': "To",
             'data-options': "width:200,labelWidth:40,labelPosition:'before',labelAlign:'right'"
 
@@ -154,7 +156,7 @@
             'id': "journal-popupmenu",
             'class': "easyui-menu"
         }).appendTo(table);
-        // Общее содержимое вкладки
+        // Вернем маккет
         return table;
     }
 
@@ -162,6 +164,7 @@
      * Функция создания панели документа
      * @param       target      (object DOM)    DOM объект плагина
      * @param       options     (object)        Настройки плагина
+     * @return      {*}         (object)        HTML объект разметки
      */
     function documentCreate(target, options) {
         let table = $('<table></table>', {
@@ -185,7 +188,7 @@
             'data-options': `field:'ck',width:2,checkbox:true`
         }).appendTo(tr);
         $('<th></th>', {
-            'data-options': `field:'itemId',width:3,align:'center',title:'${options.title_field_article}'`
+            'data-options': `field:'itemId',width:10,align:'center',title:'${options.title_field_article}'`
         }).appendTo(tr);
         $('<th></th>', {
             'data-options': `field:'itemName',width:30,align:'center',title:'${options.title_field_name}',
@@ -280,7 +283,8 @@
             'style': "padding: 5px"
         }).appendTo(table);
         let form = $('<form></form>', {
-            'id': "document-form"
+            'id': "document-form",
+            'style': "padding: 5px"
         }).appendTo(toolbar);
         // Номер документа в тулбаре
         $('<input>', {
@@ -291,7 +295,7 @@
             'required': "required",
             'label': `${options.document_type_name} №`,
             'title': "document:",
-            'data-options': "width:250,labelWidth:100,labelPosition:'before',labelAlign:'right'"
+            'data-options': "width:200,labelWidth:100,labelPosition:'before',labelAlign:'right'"
         }).appendTo(form);
         // Дата документа в тулбаре
         $('<input>', {
@@ -302,18 +306,60 @@
             'required': "required",
             'label': `${options.title_dateFrom}:`,
             'title': "From:",
+            'style': "padding: 5px",
             'data-options': `width:220,labelWidth:50,labelPosition:'before',labelAlign:'right',
                             currentText:'${options.title_today}',closeText:'${options.title_close}'
                             `
         }).appendTo(form);
         // Продавец
         $('<select></select>', {
-            'id': "document-receiver-",
+            'id': "document-buyer-",
+            'class': "easyui-combobox",
             'name': "receiver",
             'label': `${options.title_seller}:`,
-            'data-options': `labelPosition:'top'`
+            'data-options': "width:420,labelPosition:'top'"
         }).appendTo(form);
-
+        // Покупатель
+        $('<select></select>', {
+            'id': "document-seller-",
+            'class': "easyui-combobox",
+            'name': "receiver",
+            'label': `${options.title_buyer}:`,
+            'data-options': "width:420,labelPosition:'top'"
+        }).appendTo(form);
+        // Добавить продукт
+        $('<a></a>', {
+            'id': "document-edititem",
+            'class': "easyui-linkbutton",
+            'text': `${options.title_add}`,
+            'href': "javascript:void(0)",
+            'data-options': "iconCls:'icon-add'",
+            'plain': "true"
+        }).appendTo(toolbar);
+        // Редактировать продукт
+        $('<a></a>', {
+            'id': "document-edititem",
+            'class': "easyui-linkbutton",
+            'text': `${options.title_edit}`,
+            'href': "javascript:void(0)",
+            'data-options': "iconCls:'icon-edit'",
+            'plain': "true"
+        }).appendTo(toolbar);
+        // Удалить продукт
+        $('<a></a>', {
+            'id': "document-edititem",
+            'class': "easyui-linkbutton",
+            'text': `${options.title_remove}`,
+            'href': "javascript:void(0)",
+            'data-options': "iconCls:'icon-remove'",
+            'plain': "true"
+        }).appendTo(toolbar);
+        // popupmenu
+        $('<div></div>', {
+            'id': "document-popupmenu",
+            'class': "easyui-menu"
+        }).appendTo(table);
+        // Общее содержимое вкладки
 
         return table;
     }
@@ -697,6 +743,7 @@
         formatter: 'formatDollar',
 
         /* Настройки локализации */
+        title_add: 'Add',
         title_create: 'Create',
         title_edit: 'Edit',
         title_remove: 'Remove',

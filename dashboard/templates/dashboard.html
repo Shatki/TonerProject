@@ -34,7 +34,7 @@
 {% block dashboard %}
     <body>
     <div id="dashboard" class="easyui-layout" fit='true'>
-        <div data-options="region:'north'" style="height:50px;">
+        <div data-options="region:'north'" style="height:50px">
             {% block header %}
             {% endblock header %}
         </div>
@@ -91,15 +91,16 @@
                 $('#easydoc').easydoc({
                     //test:           'dashboard',
                     document_type: 'consignment',
-                    document_type_name: `накладная`,
-                    document_type_name_new: `новая накладная`,
-                    document_type_name_plural: `накладные`,
-                    journal_title: `журнал документов`,
+                    document_type_name: `Накладная`,
+                    document_type_name_new: `Новая накладная`,
+                    document_type_name_plural: `Накладные`,
+                    journal_title: `Журнал документов`,
                     formatter: 'formatDollar',
 
+                    title_add: 'Добавить',
                     title_create: 'Создать',
                     title_edit: 'Редактировать',
-                    title_delete: 'Удалить',
+                    title_remove: 'Удалить',
                     title_copy: 'Копировать',
                     title_paste: 'Вставить',
                     title_dublicate: 'Дублировать',
