@@ -545,7 +545,12 @@
         let opts = easydoc.easydoc('options');
 
         $.ajax({
-            url: opts.getUrl({}),
+            url: opts.getUrl({
+                app: options.app,
+                subject: options.document_type,
+                option: 1,
+                action: options.json
+            }),
             cache: true,
             success: function (html) {
                 alert(html);
