@@ -434,9 +434,11 @@
                     table.datagrid({
                         toolbar: '#journal-toolbar',
                         url: `${options.getUrl({
-                            document_type: options.document_type,
-                            target: options.all,
-                            option: options.json
+                            app: options.app,
+                            subject: options.document_type,
+                            option: options.all,
+                            action: options.json
+                            
                         })}`,
                         loadFilter: function (data) {
                             datefrom.datetimebox('setValue', data.date_from);
@@ -738,11 +740,10 @@
     $.fn.easydoc.defaults = {
         app: 'document',
         option: null,                       // Url параметр запроса {json, ...}
-        json: `json/`,
+        json: `json`,
         all: `all`,
-        edit: `edit/`,
-        new: ``,
-        target: `new`,
+        edit: `edit`,
+        new: `new`,
 
         document_date: `01/01/2001`,
         selector: '.easydoc-journal',
@@ -800,14 +801,42 @@
                 params.document_type_name :
                 `${params.document_type_name_new} от ${params.document_date ? params.document_date : this.document_date }`;
         },
-        getUrl: function (type, target, option) {
+        getUrl: function (params) {
+            /** params:
+             * app  - Приложение адресного пространства (document, system, forms)
+             *
+             * subject - Субъект запроса. Носитель объектов запроса (consignment, invoice)
+             * option - Количество или Индекс субъекта (0, 1, all, ...)  в дальнешем расширим
+             *
+             * object - Объект запроса (item, ..., product)
+             * target - Количество или Индекс объекта (0, 1, all, ...)  в дальнешем расширим
+             *
+             * action - Тип запроса  (json, new, edit, remove, paste)
+             */
             //  /document/consignment/all/json/
             //  /document/consignment/1/edit/
             //  /document/consignment/1/delete/
             //  /document/consignment/new/
             //  /document/consignment/<doc.id>/item/paste/
             //  /catalog/product/json
-            return `/${this.app}/${type}/${target ? target : this.target}/${index > 0 ? this.edit : this.option}`;
+            let app = params.app ? params.app : this.app;
+            let subject = '';
+            let option = '';
+            if (params.subject && params.option) {
+                subject = `${params.subject}/`;
+                option = `${params.option}/`;
+            }
+            let object = '';
+            let target = '';
+            if (params.object && params.target) {
+                subject = '${params.object}/';
+                option = '${params.target}/';
+            }
+
+            if (!params.action) {
+                $.error('getURL: bad action');
+            }
+            return `/${app}/${subject}${option}${object}${target}${params.action}/`;
         }
     }
 })(jQuery);
