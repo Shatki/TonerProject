@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render_to_response, redirect
-from django.http import HttpResponse
-from django.template.context_processors import csrf
-from django.views.decorators.csrf import csrf_protect
-from django.http import JsonResponse
-
-from contractor.models import Contractor
-from system.models import Product, Measure
-from .models import Document, DocumentTable
-from stock.views import item_add, item_edit, item_delete
-from system.datetime import SystemDateTime
 from datetime import datetime, timedelta
 
-from RUSystem.RUClient import send_data
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.shortcuts import render_to_response
+from django.template.context_processors import csrf
+from django.views.decorators.csrf import csrf_protect
+
+from contractor.models import Contractor
+from stock.views import item_add, item_edit, item_delete
+from system.datetime import SystemDateTime
+from system.models import Product, Measure
+from .models import Document, DocumentTable
 
 
 @csrf_protect
@@ -147,6 +146,15 @@ def document_edit(request, doctype, document_id):
 @login_required
 def document_new(request, doctype):
     # добавить проверку на пользователя
+    # Просто для отладки фронтэнда возвращаем одно значение 31
+    response = dict(
+        index=str('31'),
+        date=SystemDateTime.db_today().strftime("%d/%m/%Y %H:%M:%S"),
+    )
+    return JsonResponse(response, safe=False)
+
+
+"""
     try:
         new_document = Document.objects.create(
             date=SystemDateTime.db_today(),
@@ -169,6 +177,8 @@ def document_new(request, doctype):
 
     # Добавление нового документа
     return render_to_response("document.html", args)
+"""
+
 
 # Создание документа по образу и подобию заданного
 @csrf_protect

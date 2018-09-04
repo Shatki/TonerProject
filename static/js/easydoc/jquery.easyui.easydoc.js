@@ -377,7 +377,6 @@
             onAdd: function (title, index) {
                 // Первая вкладка всегда journal с индексом 0
                 let tab = easydoc.tabs('getTab', index);
-                let tabtitle = options.getTitle({index: index});
                 if (index === 0) {
                     // Тут журнал
                     tab.addClass('easydoc-journal');
@@ -385,7 +384,6 @@
                     easydoc.tabs('update', {
                         tab: tab,
                         options: {
-                            title: tabtitle,
                             content: journalCreate(target, options)
                         }
                     });
@@ -396,13 +394,16 @@
 
                     // Привязка событий
                     tab.find('a#journal-createdoc').bind('click.easydoc', function () {
-                        easydoc.easydoc('create')
+                        easydoc.easydoc('create', {
+                            object: options.document_type,
+                            action: options.new
+                        });
                     });
                     tab.find('#journal-editdoc').bind('click.easydoc', function () {
-                        easydoc.easydoc('edit')
+                        easydoc.easydoc('edit');
                     });
                     tab.find('#journal-removedoc').bind('click.easydoc', function () {
-                        easydoc.easydoc('remove')
+                        easydoc.easydoc('remove');
                     });
 
                     datefrom.datetimebox({
@@ -468,7 +469,7 @@
                     easydoc.tabs('update', {
                         tab: tab,
                         options: {
-                            title: tabtitle,
+                            //title: tabtitle,
                             content: documentCreate(target, options)
                         }
                     });
@@ -534,31 +535,32 @@
         }).tabs('add', {
             //Принудительно делаем индекс журнала 0
             index: 0,
+            title: options.getTitle({index: 0}),
             closable: false,
             selected: true
         });
         return easydoc.tabs('getTab', 0);
     }
 
-    function documentOpen(target, params) {
+    function documentSave(target, params) {
         let easydoc = $(target);
         let opts = easydoc.easydoc('options');
 
         $.ajax({
-            url: opts.getUrl({
-                app: options.app,
-                subject: options.document_type,
-                option: 1,
-                action: options.json
-            }),
+            url: opts.getUrl(params),
             cache: true,
-            success: function (html) {
-                alert(html);
+            success: function (data) {
+                alert(data);
             }
         });
+
+    }
+
+    function documentOpen(target, params) {
+        let easydoc = $(target);
+        let opts = easydoc.easydoc('options');
         easydoc.tabs('add', {
-            //index: 1,  //params.index,
-            //title: index,
+            title: opts.getTitle(params),
             closable: true,
             selected: true
         });
@@ -700,9 +702,9 @@
         journal: function (jq) {
             return $.data(jq[0], 'easydoc').table;
         },
-        create: function (jq, params) {
+        create: function (jq) {
             jq.each(function () {
-                documentOpen(this, params);
+                documentOpen(this, {});
             });
         },
         edit: function (jq) {
@@ -745,12 +747,12 @@
     $.fn.easydoc.defaults = {
         app: 'document',
         option: null,                       // Url параметр запроса {json, ...}
-        json: `json`,
-        all: `all`,
-        edit: `edit`,
-        new: `new`,
+        json: 'json',
+        all: 'all',
+        edit: 'edit',
+        new: 'new',
 
-        document_date: `01/01/2001`,
+        document_date: '01/01/2001',
         selector: '.easydoc-journal',
 
         timedelta: 90,     // период журнала в днях
@@ -797,14 +799,13 @@
 
 
         getTitle: function (params) {
-            params = params || {};
+            //params = params || {};
             // Если не пришла дата, то возьмем ее из defaults
             if (params.index === 0) return this.journal_title;
-            // params.date = $.fn.datebox.defaults.formatter(new Date());
             // Если не пришли параметры, то создадим новый документ
-            return params.index ?
-                params.document_type_name :
-                `${params.document_type_name_new} от ${params.document_date ? params.document_date : this.document_date }`;
+            let title = params.index ? `${this.document_type_name} №${params.index}` : this.document_type_name_new;
+            let date = params.document_date ? params.document_date : $.fn.datebox.defaults.formatter(new Date());
+            return `${title} от ${date}`;
         },
         getUrl: function (params) {
             /** params:
@@ -825,19 +826,10 @@
             //  /document/consignment/<doc.id>/item/paste/
             //  /catalog/product/json
             let app = params.app ? params.app : this.app;
-            let subject = '';
-            let option = '';
-            if (params.subject && params.option) {
-                subject = `${params.subject}/`;
-                option = `${params.option}/`;
-            }
-            let object = '';
-            let target = '';
-            if (params.object && params.target) {
-                subject = '${params.object}/';
-                option = '${params.target}/';
-            }
-
+            let subject = params.subject && params.option ? `${params.subject}/` : '';
+            let option = params.subject && params.option ? `${params.option}/` : '';
+            let object = params.object ? `${params.object}/` : '';
+            let target = params.target ? `${params.target}/` : '';
             if (!params.action) {
                 $.error('getURL: bad action');
             }
