@@ -540,6 +540,15 @@
 
     function documentOpen(target, params) {
         let easydoc = $(target);
+        let opts = easydoc.easydoc('options');
+
+        $.ajax({
+            url: opts.getUrl({}),
+            cache: true,
+            success: function (html) {
+                alert(html);
+            }
+        });
         easydoc.tabs('add', {
             //index: 1,  //params.index,
             //title: index,
@@ -727,6 +736,7 @@
     };
 
     $.fn.easydoc.defaults = {
+        app: 'document',
         option: null,                       // Url параметр запроса {json, ...}
         json: `json/`,
         all: `all`,
@@ -790,12 +800,14 @@
                 params.document_type_name :
                 `${params.document_type_name_new} от ${params.document_date ? params.document_date : this.document_date }`;
         },
-        getUrl: function (params) {
-            // Доделать!!!
-            let type = params.document_type;
-            let target = params.target ? params.target : this.target;   // all or number
-            let option = params.index > 0 ? this.edit : this.option;             // json or null
-            return `/document/${type}/${target}/${params.option ? params.option : option}`;
+        getUrl: function (type, target, option) {
+            //  /document/consignment/all/json/
+            //  /document/consignment/1/edit/
+            //  /document/consignment/1/delete/
+            //  /document/consignment/new/
+            //  /document/consignment/<doc.id>/item/paste/
+            //  /catalog/product/json
+            return `/${this.app}/${type}/${target ? target : this.target}/${index > 0 ? this.edit : this.option}`;
         }
     }
 })(jQuery);
