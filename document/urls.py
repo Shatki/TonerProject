@@ -3,7 +3,7 @@ import document.views
 
 urlpatterns = [
     # Examples:
-    url(r'^journal/(?P<doctype>\w+)/$', document.views.journal),
+    # url(r'^journal/(?P<doctype>\w+)/$', document.views.journal),
     url(r'^(?P<doctype>\w+)/(?P<document_id>\d+)/edit/$', document.views.document_edit),
     url(r'^(?P<doctype>\w+)/(?P<document_id>\d+)/save/$', document.views.document_save),
     url(r'^(?P<doctype>\w+)/(?P<document_id>\d+)/delete/$', document.views.document_delete),

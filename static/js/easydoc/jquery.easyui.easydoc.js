@@ -85,7 +85,7 @@
                             autoRowHeight:false,
                             singleSelect:true,
                             columns:[[
-                                    {field: 'id', width: 3, title: 'ID'},
+                                    {field: 'number', width: 3, title: '${options.title_field_number}'},
                                     {field: 'ck', width: 2, checkbox: 'true'},
                                     {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left'},
                                     {field: 'seller', width: 20, title: '${options.title_field_seller}', align: 'left'},
@@ -394,12 +394,10 @@
 
                     // Привязка событий
                     tab.find('a#journal-createdoc').bind('click.easydoc', function () {
-                        easydoc.easydoc('create', {
-                            object: options.document_type,
-                            action: options.new
-                        });
+                        easydoc.easydoc('create');
                     });
                     tab.find('#journal-editdoc').bind('click.easydoc', function () {
+                        //alert(row.toSource());
                         easydoc.easydoc('edit');
                     });
                     tab.find('#journal-removedoc').bind('click.easydoc', function () {
@@ -556,14 +554,38 @@
 
     }
 
+    /**
+     * Функция открытия документа на новой вкладке
+     * @param       target      (object DOM)    DOM объект нашего плагина
+     * @param       params      (object)        Набор параметров
+     *
+     * Функция принимает параметры {params}:
+     * app, subject, option, object, target, action (подробнее в defaults.getUrl)
+     * и открывает документ с этими параметрами
+     */
     function documentOpen(target, params) {
         let easydoc = $(target);
         let opts = easydoc.easydoc('options');
-        easydoc.tabs('add', {
-            title: opts.getTitle(params),
-            closable: true,
-            selected: true
-        });
+        // Если не пришел ID документа
+        if (params.action === opts.new) {
+            easydoc.tabs('add', {
+                title: opts.getTitle(params),
+                closable: true,
+                selected: true
+            });
+        } else if (params.action === opts.edit) {
+            $.ajax({
+                url: opts.getUrl(params),
+                cache: true,
+                success: function (data) {
+                    easydoc.tabs('add', {
+                        title: opts.getTitle(params),
+                        closable: true,
+                        selected: true
+                    });
+                }
+            });
+        }
     }
 
     /**
@@ -700,16 +722,26 @@
             return $.data(jq[0], 'easydoc').easydoc;
         },
         journal: function (jq) {
-            return $.data(jq[0], 'easydoc').table;
+            return $.data(jq[0], 'journal').table;
         },
         create: function (jq) {
             jq.each(function () {
-                documentOpen(this, {});
+                let opts = jq.easydoc('options');
+                documentOpen(this, {
+                    object: opts.document_type,
+                    action: opts.new
+                });
             });
         },
         edit: function (jq) {
             jq.each(function () {
-                alert('edit');
+                let opts = jq.easydoc('options');
+                let row = jq.easydoc('journal').datagrid('getSelected');
+                documentOpen(this, {
+                    object: opts.document_type,
+                    target: row.id,
+                    action: opts.edit
+                });
             })
         },
         remove: function (jq) {
@@ -777,13 +809,19 @@
         title_seller: 'Seller',
         title_buyer: 'Buyer',
 
-        document_type: `all`,
-        document_type_name: `document`,
-        document_type_name_new: `a new document`,
-        document_type_name_plural: `documents`,
-        journal_title: 'documents\'s journal',
+        documents: 'all',
 
+        document_default: {
+            name_new: `a new document`,
+            name_plural: `documents`,
+            name_journal: 'documents\'s journal',
+        },
 
+        document_type: {
+            'all': this.document_default
+        },
+
+        title_field_number: '<p>Number</p>',
         title_field_document: '<p>Kind, number, date of document</p>',
         title_field_seller: '<p>Seller</p>',
         title_field_buyer: '<p>Buyer</p>',
@@ -797,13 +835,23 @@
         title_field_tax: '<p>Tax</p>',
         title_field_total: '<p>Total</p>',
 
+        getNumber(number) {
+            return number;
+        },
 
-        getTitle: function (params) {
+        /**
+         * Функция генерация наименования вкладки согласно шаблону
+         * @param       doc_type            (string)        Тип документа {'all', ' consignment', 'invoce'}
+         * @param       doc_date            (date)          Дата документа
+         * @param       doc_number                          Номер документа или пусто
+         * @return                          {string}        Строка-наименование
+         */
+        getTitle: function (doc_type, doc_date, doc_number) {
             //params = params || {};
             // Если не пришла дата, то возьмем ее из defaults
-            if (params.index === 0) return this.journal_title;
+            if (!number && !date) return this.document_type[doc_type].name_journal;
             // Если не пришли параметры, то создадим новый документ
-            let title = params.index ? `${this.document_type_name} №${params.index}` : this.document_type_name_new;
+            let title = params.index ? `${this.document_type_name} №${this.getNumber(params.index)}` : this.document_type_name_new;
             let date = params.document_date ? params.document_date : $.fn.datebox.defaults.formatter(new Date());
             return `${title} от ${date}`;
         },
@@ -812,10 +860,10 @@
              * app  - Приложение адресного пространства (document, system, forms)
              *
              * subject - Субъект запроса. Носитель объектов запроса (consignment, invoice)
-             * option - Количество или Индекс субъекта (0, 1, all, ...)  в дальнешем расширим
+             * option - Количество или ID субъекта (0, 1, all, ...)  в дальнешем расширим
              *
              * object - Объект запроса (item, ..., product)
-             * target - Количество или Индекс объекта (0, 1, all, ...)  в дальнешем расширим
+             * target - Количество или ID объекта (0, 1, all, ...)  в дальнешем расширим
              *
              * action - Тип запроса  (json, new, edit, remove, paste)
              */

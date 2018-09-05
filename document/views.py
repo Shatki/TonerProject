@@ -14,14 +14,6 @@ from system.datetime import SystemDateTime
 from system.models import Product, Measure
 from .models import Document, DocumentTable
 
-
-@csrf_protect
-@login_required
-def journal(request, doctype):
-    return render_to_response('journal.html')
-
-
-
 # JSON запрос элементов для отображения журнала накладных
 @csrf_protect
 @login_required
@@ -55,6 +47,7 @@ def documents_json(request, doctype):
     for get_one in data:
         obj = dict(
             id=str(get_one.id),
+            number=str(get_one.number),
             name=str(get_one),
             seller=str(get_one.emitter),
             buyer=str(get_one.receiver),
@@ -151,33 +144,32 @@ def document_new(request, doctype):
         index=str('31'),
         date=SystemDateTime.db_today().strftime("%d/%m/%Y %H:%M:%S"),
     )
+    """
+            try:
+                new_document = Document.objects.create(
+                    date=SystemDateTime.db_today(),
+                    creator=request.user,
+                    modificator=request.user,
+                )
+                args = {'user_profile': request.user,
+                        'Document': new_document,
+                        'creator': request.user,
+                        'modificator': request.user,
+                        'contractors': Contractor.objects.all(),
+                        'products': Product.objects.all(),
+                        'measures': Measure.objects.all(),
+                        }
+            except:
+                return HttpResponse(u'Document_new:  DB error', content_type='text/html')
+            if request.user.contractor_id is not None:
+                args["contractor"] = Contractor.objects.get(id=request.user.contractor_id)
+            args.update(csrf(request))
+
+            # Добавление нового документа
+            return render_to_response("document.html", args)
+    """
     return JsonResponse(response, safe=False)
 
-
-"""
-    try:
-        new_document = Document.objects.create(
-            date=SystemDateTime.db_today(),
-            creator=request.user,
-            modificator=request.user,
-        )
-        args = {'user_profile': request.user,
-                'Document': new_document,
-                'creator': request.user,
-                'modificator': request.user,
-                'contractors': Contractor.objects.all(),
-                'products': Product.objects.all(),
-                'measures': Measure.objects.all(),
-                }
-    except:
-        return HttpResponse(u'Document_new:  DB error', content_type='text/html')
-    if request.user.contractor_id is not None:
-        args["contractor"] = Contractor.objects.get(id=request.user.contractor_id)
-    args.update(csrf(request))
-
-    # Добавление нового документа
-    return render_to_response("document.html", args)
-"""
 
 
 # Создание документа по образу и подобию заданного

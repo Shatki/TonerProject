@@ -111,7 +111,7 @@ class Document(models.Model):
         return '{:0>2}/{:0>2}/{:0>2}'.format(str(self.date.day), str(self.date.month), str(self.date.year))
 
     def str_number(self):
-        # Потом доработать для случаем сложных нумераций
+        # Потом доработать для случаев сложных нумераций
         if self.number:
             return '{:0>10}'.format(self.number)
         else:

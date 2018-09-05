@@ -12,7 +12,9 @@ class DocumentTableInline(admin.TabularInline):
 
 
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('__str__',
+    list_display = ('id',
+                    'number',
+                    '__str__',
                     'emitter',
                     'receiver',
                     'enable',
@@ -33,7 +35,9 @@ class DocumentTableAdmin(admin.ModelAdmin):
 
 
 class ContractAdmin(admin.ModelAdmin):
-    list_display = ('__str__',
+    list_display = ('id',
+                    'number',
+                    '__str__',
                     'buyer',
                     'seller',
                     'enable',
