@@ -848,11 +848,14 @@
          */
         getTitle: function (doc_type, doc_date, doc_number) {
             //params = params || {};
+            let type = doc_type ? doc_type : this.document_type[this.documents];
             // Если не пришла дата, то возьмем ее из defaults
-            if (!number && !date) return this.document_type[doc_type].name_journal;
+            if (!doc_number || !doc_date) return this.document_type[type].name_journal;
             // Если не пришли параметры, то создадим новый документ
-            let title = params.index ? `${this.document_type_name} №${this.getNumber(params.index)}` : this.document_type_name_new;
-            let date = params.document_date ? params.document_date : $.fn.datebox.defaults.formatter(new Date());
+            let title = doc_number ?
+                `${this.document_type[type].name} №${this.getNumber(doc_number)}` :
+                this.document_type[type].name_new;
+            let date = doc_date ? doc_date : $.fn.datebox.defaults.formatter(new Date());
             return `${title} от ${date}`;
         },
         getUrl: function (params) {
