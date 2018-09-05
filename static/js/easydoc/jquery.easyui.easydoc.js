@@ -293,7 +293,7 @@
             'class': "easyui-textbox",
             'placeholder': "0000000001",
             'required': "required",
-            'label': `${options.document_type_name} №`,
+            'label': `${options.documents[options.document_type].name} №`,
             'title': "document:",
             'data-options': "width:200,labelWidth:100,labelPosition:'before',labelAlign:'right'"
         }).appendTo(form);
@@ -433,9 +433,8 @@
                     table.datagrid({
                         toolbar: '#journal-toolbar',
                         url: `${options.getUrl({
-                            app: options.app,
-                            subject: options.document_type,
-                            option: options.all,
+                            object: options.document_type,
+                            target: options.all,
                             action: options.json
                             
                         })}`,
@@ -467,7 +466,6 @@
                     easydoc.tabs('update', {
                         tab: tab,
                         options: {
-                            //title: tabtitle,
                             content: documentCreate(target, options)
                         }
                     });
@@ -533,7 +531,7 @@
         }).tabs('add', {
             //Принудительно делаем индекс журнала 0
             index: 0,
-            title: options.getTitle({index: 0}),
+            title: options.getTitle({target: options.all}),
             closable: false,
             selected: true
         });
@@ -569,7 +567,7 @@
         // Если не пришел ID документа
         if (params.action === opts.new) {
             easydoc.tabs('add', {
-                title: opts.getTitle(params),
+                title: opts.getTitle(opts.document_type),
                 closable: true,
                 selected: true
             });
@@ -579,7 +577,10 @@
                 cache: true,
                 success: function (data) {
                     easydoc.tabs('add', {
-                        title: opts.getTitle(params),
+                        title: opts.getTitle($.extend(params, {
+                            number: data.number,
+                            date: data.date
+                        })),
                         closable: true,
                         selected: true
                     });
@@ -809,16 +810,15 @@
         title_seller: 'Seller',
         title_buyer: 'Buyer',
 
-        documents: 'all',
+        document_type: 'all',
 
-        document_default: {
-            name_new: `a new document`,
-            name_plural: `documents`,
-            name_journal: 'documents\'s journal',
-        },
-
-        document_type: {
-            'all': this.document_default
+        documents: {
+            'all': {
+                name: 'document',
+                name_new: `a new document`,
+                name_plural: `documents`,
+                name_journal: 'documents\'s journal'
+            }
         },
 
         title_field_number: '<p>Number</p>',
@@ -835,28 +835,28 @@
         title_field_tax: '<p>Tax</p>',
         title_field_total: '<p>Total</p>',
 
-        getNumber(number) {
+        formatNumber(number) {
             return number;
         },
 
         /**
          * Функция генерация наименования вкладки согласно шаблону
-         * @param       doc_type            (string)        Тип документа {'all', ' consignment', 'invoce'}
-         * @param       doc_date            (date)          Дата документа
-         * @param       doc_number                          Номер документа или пусто
-         * @return                          {string}        Строка-наименование
+         * @param       params      (object)        Параметры запроса
+         * @return                  {string}        Строка-наименование
          */
-        getTitle: function (doc_type, doc_date, doc_number) {
-            //params = params || {};
-            let type = doc_type ? doc_type : this.document_type[this.documents];
-            // Если не пришла дата, то возьмем ее из defaults
-            if (!doc_number || !doc_date) return this.document_type[type].name_journal;
-            // Если не пришли параметры, то создадим новый документ
-            let title = doc_number ?
-                `${this.document_type[type].name} №${this.getNumber(doc_number)}` :
-                this.document_type[type].name_new;
-            let date = doc_date ? doc_date : $.fn.datebox.defaults.formatter(new Date());
-            return `${title} от ${date}`;
+        getTitle: function (params) {
+            params = params || {};
+            let doc = this.documents[this.document_type];
+            //alert(params.toSource());
+            //
+            if (params.target === this.all) return doc.name_journal;
+            // создадим новый документ
+
+            let title = (params.action === this.edit) ?
+                `${doc.name} №${this.formatNumber(params.number)}` : doc.name_new;
+
+            let date = params.date || $.fn.datebox.defaults.formatter(new Date());
+            return `${title} ${this.title_dateFrom} ${date}`;
         },
         getUrl: function (params) {
             /** params:
@@ -876,7 +876,7 @@
             //  /document/consignment/new/
             //  /document/consignment/<doc.id>/item/paste/
             //  /catalog/product/json
-            let app = params.app ? params.app : this.app;
+            let app = params.app || this.app;
             let subject = params.subject && params.option ? `${params.subject}/` : '';
             let option = params.subject && params.option ? `${params.option}/` : '';
             let object = params.object ? `${params.object}/` : '';

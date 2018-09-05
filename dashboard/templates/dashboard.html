@@ -89,12 +89,23 @@
             $(function () {
                 // Запуск easyDoc
                 $('#easydoc').easydoc({
-                    //test:           'dashboard',
+                    // Тип первоначального отображения журнала
                     document_type: 'consignment',
-                    document_type_name: `Накладная`,
-                    document_type_name_new: `Новая накладная`,
-                    document_type_name_plural: `Накладные`,
-                    journal_title: `Журнал документов`,
+                    documents: {
+                        all: {
+                            name: 'Документ',
+                            name_new: `Новый документ`,
+                            name_plural: `Документы`,
+                            name_journal: 'Общий журнал'
+                        },
+                        consignment: {
+                            name: 'Накладная',
+                            name_new: `Новая накладная`,
+                            name_plural: `Накладные`,
+                            name_journal: 'Журнал накладных'
+                        }
+                    },
+
                     formatter: 'formatDollar',
 
                     title_add: 'Добавить',
@@ -127,8 +138,7 @@
                     title_field_tax: '<p>Налог</p>',
                     title_field_total: '<p>Сумма</p>',
 
-
-                });
+                })
                 // Запуск консоли
                 $('#easyconsole').easyconsole({});
             });

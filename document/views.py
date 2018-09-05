@@ -14,6 +14,7 @@ from system.datetime import SystemDateTime
 from system.models import Product, Measure
 from .models import Document, DocumentTable
 
+
 # JSON запрос элементов для отображения журнала накладных
 @csrf_protect
 @login_required
@@ -66,6 +67,73 @@ def documents_json(request, doctype):
     return JsonResponse(response, safe=False)
 
 
+# Отображение представления одной накладной
+@csrf_protect
+@login_required
+def document_edit(request, doctype, document_id):
+    try:
+        document = Document.objects.get(id=document_id)
+    except Document.DoesNotExist:
+        return HttpResponse(u'document_json: Document does not exist', content_type='text/html')
+
+    try:
+        items = DocumentTable.objects.filter(document_id=document_id).all()
+    except DocumentTable.DoesNotExist:
+        return HttpResponse(u'document_json: DocumentTable does not exist', content_type='text/html')
+
+    # Serialize
+    rows = []
+    item_id = 0
+    for get_one in items:
+        item_id += 1
+        obj = dict(
+            itemId=str(item_id),
+            itemName=str(get_one.item),
+            productId=str(get_one.id),
+            measure=str(get_one.measure),
+            quantity=str(get_one.quantity),
+            country=str(get_one.country),
+            cost=str(get_one.cost),
+            tax=str(get_one.tax.value * get_one.cost),
+            total=str(get_one.quantity * get_one.cost),
+        )
+        rows.append(obj)
+    # final preparing
+    response = dict(
+        total=str(items.count()),
+        rows=rows,
+        number=str(document.number),
+        date=document.date,  # .strftime("%d/%m/%Y %H:%M:%S")
+        receiver=document.receiver.id,
+        emiter=document.emitter.id
+    )
+    return JsonResponse(response, safe=False)
+
+
+# Отображение представления одной накладной
+@csrf_protect
+@login_required
+def document_edit_old(request, doctype, document_id):
+    # добавить проверку на пользователя
+    if request.user:
+        try:
+            document = Document.objects.get(id=document_id)
+        except Document.DoesNotExist:
+            document = dict(
+                id='0'
+            )
+        args = {'user_profile': request.user,
+                'document': document,
+                'contractors': Contractor.objects.all(),
+                # 'items': Document.objects.get(id=document_id).items.all(),
+                'measures': Measure.objects.all(),
+                }
+        args.update(csrf(request))
+        # просмотр полного списка накладных
+        return render_to_response('document.html', args)
+    else:
+        return HttpResponse(u'document_edit:  please, login first', content_type='text/html')
+
 # Сохранение накладной  через POST
 @csrf_protect
 @login_required
@@ -108,31 +176,6 @@ def document_delete(request, doctype, document_id):
     # args.update(csrf(request))
     # просмотр полного списка накладных
     return HttpResponse("Ok", content_type='text/html')
-
-
-# Отображение представления одной накладной
-@csrf_protect
-@login_required
-def document_edit(request, doctype, document_id):
-    # добавить проверку на пользователя
-    if request.user:
-        try:
-            document = Document.objects.get(id=document_id)
-        except Document.DoesNotExist:
-            document = dict(
-                id='0'
-            )
-        args = {'user_profile': request.user,
-                'document': document,
-                'contractors': Contractor.objects.all(),
-                #'items': Document.objects.get(id=document_id).items.all(),
-                'measures': Measure.objects.all(),
-                }
-        args.update(csrf(request))
-        # просмотр полного списка накладных
-        return render_to_response('document.html', args)
-    else:
-        return HttpResponse(u'document_edit:  please, login first', content_type='text/html')
 
 # Тестовая версия создания накладной
 @csrf_protect
