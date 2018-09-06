@@ -3115,6 +3115,15 @@
 .tree-node-hidden {
   display: none;
 }
+
+.inputbox {
+    display: inline-block;
+    vertical-align: middle;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0;
+}
 .validatebox-invalid {
   border-color: #ffa8a8;
   background-color: #fff3f3;
@@ -3420,6 +3429,10 @@
   padding: 0;
   margin: 0 -12px;
   border: 0;
+}
+
+.sidemenu-tooltip.tooltip-left {
+    margin: 0 12px;
 }
 .sidemenu-tooltip .tooltip-arrow-outer,
 .sidemenu-tooltip .tooltip-arrow {

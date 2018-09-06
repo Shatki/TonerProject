@@ -117,8 +117,9 @@
     position: relative;
 }
 
-.textbox-text {
+.textbox .textbox-text {
     width: 100%;
+    height: auto;
     overflow: hidden;
 }
 

@@ -1,5 +1,5 @@
 /**
- * EasyUI for jQuery 1.5.5.4
+ * EasyUI for jQuery 1.6.2
  * 
  * Copyright (c) 2009-2018 www.jeasyui.com. All rights reserved.
  *
@@ -271,7 +271,7 @@
                     options: $.extend({}, $.fn.slider.defaults, $.fn.slider.parseOptions(this), _43),
                     slider: _1(this)
                 });
-                $(this).removeAttr("disabled");
+                $(this)._propAttr("disabled", false);
             }
             var _46 = _45.options;
             _46.min = parseFloat(_46.min);
