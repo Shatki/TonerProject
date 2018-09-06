@@ -13,13 +13,12 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
+from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.conf.urls.static import static
-import homepage.views
+
 import authentication.views
-import dashboard.views
-from django.conf import settings
+import homepage.views
 
 urlpatterns = [
     # Examples:
@@ -28,6 +27,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^auth/', include('authentication.urls')),
     url(r'^catalog/', include('system.urls')),
+    url(r'^contractor/', include('contractor.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
     url(r'^document/', include('document.urls')),
     url(r'^form/', include('forms.urls')),

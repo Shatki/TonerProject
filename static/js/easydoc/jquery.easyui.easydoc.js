@@ -86,13 +86,13 @@
                             singleSelect:true,
                             columns:[[
                                     {field: 'number', width: 3, title: '${options.title_field_number}'},
-                                    {field: 'ck', width: 2, checkbox: 'true'},
-                                    {field: 'name', width: 30, title: '${options.title_field_name}', align: 'left'},
-                                    {field: 'seller', width: 20, title: '${options.title_field_seller}', align: 'left'},
-                                    {field: 'buyer', width: 20, title: '${options.title_field_buyer}', align: 'left'},
-                                    {field: 'total', width: 5, title: '${options.title_field_total}',align: 'center'},
-                                    {field: 'enable', width: 5, title: '${options.title_field_active}',
-                                     align: 'center', editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
+                                    {field: 'ck', width: 1, checkbox: 'true'},
+                                    {field: 'name', width: 20, title: '${options.title_field_name}', align: 'left'},
+                                    {field: 'seller', width: 30, title: '${options.title_field_seller}', align: 'left'},
+                                    {field: 'buyer', width: 30, title: '${options.title_field_buyer}', align: 'left'},
+                                    {field: 'total', width: 4, title: '${options.title_field_total}',align: 'center'},
+                                    {field: 'enable', width: 2, align: 'center', 
+                                    editor:"{type:'checkbox',options:{on:'True',off:'False'}}"},                         
                                     ]]`
         });
         // toolbar
@@ -204,6 +204,7 @@
                             animate:true,
                             panelWidth: '50%',
                             loadFilter: function(rows){return productLoadFilter(rows);},
+                            showFooter: true,
                             columns: [[
                                 {field:'itemId',title:'Item ID',width:'10%'},
                                 {field:'itemName',title:'Name',width:'80%'},
@@ -318,6 +319,11 @@
             'class': "easyui-combogrid",
             'name': "receiver",
             'label': `${options.title_seller}:`,
+            'url': `${options.getUrl({
+                app: options.contractor,
+                target: options.all,
+                action: options.json
+            })}`,
             'data-options': "width:460,labelPosition:'top'"
         }).appendTo(form);
         // Покупатель
@@ -437,7 +443,7 @@
                             object: options.document_type,
                             target: options.all,
                             action: options.json
-                            
+
                         })}`,
                         loadFilter: function (data) {
                             datefrom.datetimebox('setValue', data.date_from);
@@ -451,6 +457,10 @@
                                 left: e.pageX,
                                 top: e.pageY
                             });
+                        },
+                        onLoadSuccess: function () {
+                            //  Пернемещение строк - тестовая версия
+                            table.datagrid('enableDnd').datagrid('columnMoving');
                         }
                     });
 
@@ -594,6 +604,20 @@
                 }
 
             });
+            // Запрос всех контрагентов
+            /*
+                        $.ajax({
+                            method: 'post',
+                            url: `${opts.getUrl({
+                                        app: opts.contractor,
+                                        target: opts.all,
+                                        action: opts.json
+                                    })}`,
+                            success: function (data) {
+                                alert(data.toSource());
+                            }
+                        })
+                        */
         }
     }
 
@@ -780,7 +804,7 @@
         },
         reload: function (jq) {
             jq.each(function () {
-                alert('reload');
+                jq.easydoc('journal').datagrid('reload');
             });
         }
     };
@@ -792,6 +816,7 @@
         all: 'all',
         edit: 'edit',
         new: 'new',
+        contractor: 'contractor',
 
         document_date: '01/01/2001',
         selector: '.easydoc-journal',
