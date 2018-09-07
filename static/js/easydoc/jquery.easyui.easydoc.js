@@ -590,6 +590,7 @@
                 url: opts.getUrl(params),
                 cache: true,
                 success: function (data) {
+                    alert('success');
                     easydoc.tabs('add', {
                         title: opts.getTitle($.extend(params, {
                             number: data.number,
@@ -816,6 +817,9 @@
         all: 'all',
         edit: 'edit',
         new: 'new',
+
+        method: 'post',
+
         contractor: 'contractor',
 
         document_date: '01/01/2001',
@@ -922,3 +926,23 @@
     }
 })(jQuery);
 
+/*
+$.ajaxSetup({
+    beforeSend: function(jqXHR, settings){
+
+    },
+    //method: 'post',
+    complete: function (jqXHR, textStatus) {
+        //alert(jqXHR.toSource());
+        //$.data(this, 'ajaxCache',{
+        //    data.url: data.responseText
+        //});
+
+    },
+    dataFilter: function(data, type){
+      alert(data.toSource());
+      return data
+    },
+});
+
+*/
