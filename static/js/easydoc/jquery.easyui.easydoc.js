@@ -318,12 +318,12 @@
             'id': "document-buyer-" + index,
             'class': "easyui-combogrid",
             'name': "receiver",
-            'label': `${options.title_seller}:`,
             'url': `${options.getUrl({
                 app: options.contractor,
                 target: options.all,
                 action: options.json
             })}`,
+            'label': `${options.title_seller}:`,
             'data-options': "width:460,labelPosition:'top'"
         }).appendTo(form);
         // Покупатель
@@ -371,6 +371,27 @@
         return table;
     }
 
+
+    /**
+     * Загрузка контрагентов в data в асинхронном режиме
+     * @param       target      (object DOM)    DOM объект нашего плагина
+     * @param       options     (object)        Настройки плагина
+     */
+    function getContractors(target, options) {
+        // Запрос всех контрагентов
+        $.ajax({
+            url: `${options.getUrl({
+                app: options.contractor,
+                target: options.all,
+                action: options.json
+            })}`,
+            success: function (data) {
+                $.data(target, 'contractors', data);
+                alert(data.toSource());
+            }
+        })
+    }
+
     /**
      * Инициализация вкладок для работы
      * @param       target      (object DOM)    DOM объект нашего плагина
@@ -380,6 +401,7 @@
     function initTabs(target, options) {
         // Обернем DOM объект в jQuery функционал
         let easydoc = $(target);
+        getContractors(target, options);
         easydoc.tabs({
             onAdd: function (title, index) {
                 // Первая вкладка всегда journal с индексом 0
@@ -546,6 +568,8 @@
             closable: false,
             selected: true
         });
+        // Загрузим контрагентов в асинхронном режиме
+
         return easydoc.tabs('getTab', 0);
     }
 
@@ -575,6 +599,7 @@
     function documentOpen(target, params) {
         let easydoc = $(target);
         let opts = easydoc.easydoc('options');
+        // let contractors = $.data(target, 'easydoc').contractors;
         if (params.action === opts.new) {
             // создадим новый, Если не пришел ID документа
             easydoc.tabs('add', {
@@ -586,11 +611,10 @@
         } else if (params.action === opts.edit) {
             // Откроем документ из базы
             $.ajax({
-                method: 'post',
+                method: opts.method,
                 url: opts.getUrl(params),
-                cache: true,
+                async: true,
                 success: function (data) {
-                    alert('success');
                     easydoc.tabs('add', {
                         title: opts.getTitle($.extend(params, {
                             number: data.number,
@@ -605,20 +629,6 @@
                 }
 
             });
-            // Запрос всех контрагентов
-            /*
-                        $.ajax({
-                            method: 'post',
-                            url: `${opts.getUrl({
-                                        app: opts.contractor,
-                                        target: opts.all,
-                                        action: opts.json
-                                    })}`,
-                            success: function (data) {
-                                alert(data.toSource());
-                            }
-                        })
-                        */
         }
     }
 
@@ -926,23 +936,20 @@
     }
 })(jQuery);
 
-/*
-$.ajaxSetup({
-    beforeSend: function(jqXHR, settings){
 
-    },
+$.ajaxSetup({
+    cache: true
+    //beforeSend: function(jqXHR, settings){
+
+    // },
     //method: 'post',
-    complete: function (jqXHR, textStatus) {
+    //complete: function (jqXHR, textStatus) {
         //alert(jqXHR.toSource());
         //$.data(this, 'ajaxCache',{
         //    data.url: data.responseText
         //});
 
-    },
-    dataFilter: function(data, type){
-      alert(data.toSource());
-      return data
-    },
+    //},
+    //dataFilter: function(data, type){alert(data.toSource());return data},
 });
 
-*/

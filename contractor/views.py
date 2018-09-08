@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.http import HttpResponse
 from django.http import JsonResponse
+# import time
 
 from .models import Contractor
 
