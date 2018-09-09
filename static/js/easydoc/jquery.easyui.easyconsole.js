@@ -18,7 +18,7 @@
     $.fn.easyconsole = function (message, params) {
         // Проинициализирован ли плагин?
         let options = $.data(this, 'easyconsole');
-        // 
+        //
         if (options) {
 
         }
