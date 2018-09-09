@@ -15,9 +15,22 @@
         //alert(target.toSource());
     }
 
-    $.fn.easyconsole = function (options, params) {
-        if (typeof options === 'string') {
-            return $.fn.easyconsole.methods[options](this, params);
+    $.fn.easyconsole = function (message, params) {
+        // Проинициализирован ли плагин?
+        let options = $.data(this, 'easyconsole');
+        // 
+        if (options) {
+
+        }
+
+
+        if (typeof message === 'string') {
+            // Выдаем сообщение в консоль
+            let response = $.fn.easyconsole.methods[message](this, message, params);
+            if (response) {
+                return response;
+            }
+
         }
 
         options = options || {};
