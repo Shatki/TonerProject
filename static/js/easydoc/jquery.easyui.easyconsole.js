@@ -26,15 +26,17 @@
 
     $.fn.easyconsole = function (message, params) {
         // Проинициализирован ли плагин?
-        let state = $(this).hasClass('easyconsole');
+        let initial = $(this).hasClass('easyconsole');
         // Проинициализирован, вызываем методы
         if (typeof message === 'string') {
-            // Передаем в метод контекст и настройки
+            params = params || {};
+            // Значит первым параметром пришла строка с текстом ии командой
             if (message in $.fn.easyconsole.methods) {
-                alert('есть');
+                alert('команда');
+            } else {
+                response = $.fn.easyconsole.methods.message(this, message, params);
             }
-            //response = $.fn.easyconsole.methods[options](this, message, params);
-            }
+        }
         //alert(options.toSource());
 
         // Сюда пришел объект с настройками
