@@ -387,7 +387,7 @@
             })}`,
             success: function (data) {
                 $.data(target, 'contractors', data);
-                alert(data.toSource());
+                //alert(data.toSource());
             }
         })
     }

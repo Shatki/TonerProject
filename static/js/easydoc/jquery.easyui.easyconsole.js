@@ -11,42 +11,54 @@
 // Делаем замыкание
 (function ($) {
     function init(target, params) {
-        easyconsole = $(target).empty().append('Пусто');
+        let easyconsole = $(target);
+        easyconsole.addClass('easyconsole');
+        //let easyconsole = $(target).empty().append('Инициализация');
         //alert(target.toSource());
+        // Запишем статус
+
+
+        $.data(target, 'easyconsole', {
+            init: true
+        });
+
     }
 
     $.fn.easyconsole = function (message, params) {
         // Проинициализирован ли плагин?
-        let options = $.data(this, 'easyconsole');
-        //
-        if (options) {
-
-        }
-
-
+        let state = $(this).hasClass('easyconsole');
+        // Проинициализирован, вызываем методы
         if (typeof message === 'string') {
-            // Выдаем сообщение в консоль
-            let response = $.fn.easyconsole.methods[message](this, message, params);
-            if (response) {
-                return response;
+            // Передаем в метод контекст и настройки
+            if (message in $.fn.easyconsole.methods) {
+                alert('есть');
             }
+            //response = $.fn.easyconsole.methods[options](this, message, params);
+            }
+        //alert(options.toSource());
 
-        }
-
-        options = options || {};
+        // Сюда пришел объект с настройками
+        message = message || {};
         return this.each(function () {
             let state = $.data(this, 'easyconsole');
             if (state) {
-                $.extend(state.options, options);
+                $.extend(state.options, message);
             } else {
                 // Инициализируем объект с требуемыми опциями
-                let result = init(this, $.extend({}, $.fn.easyconsole.defaults, options));
+                let result = init(this, $.extend({}, $.fn.easyconsole.defaults, message));
                 return result
             }
         })
     };
 
-    $.fn.easyconsole.methods = {};
+    $.fn.easyconsole.methods = {
+        test: function (jq) {
+            alert('test!!!');
+        },
+        message: function (jq, message, params) {
+            alert(message);
+        }
+    };
 
     $.fn.easyconsole.defaults = {};
 })(jQuery);
