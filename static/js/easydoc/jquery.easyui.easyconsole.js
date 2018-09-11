@@ -1,5 +1,5 @@
 /**
- * easyConsole for jQuery.EasyUI
+ * jQuery.EasyUI.easyConsole
  *
  * Copyright (c) Seliverstov Dmitriy. All rights reserved.
  *
@@ -10,45 +10,62 @@
 
 // Делаем замыкание
 (function ($) {
-    function init(target, params) {
+    function init(target, options) {
         let easyconsole = $(target);
+        easyconsole.datagrid({
+            fit: true,
+            fitColumns: true,
+            idField: 'date',
+            textField: 'message',
+            autoRowHeight: true,
+            singleSelect: true,
+            showFooter: true,
+            columns: [[
+                {field: 'type', title: `${options.title_field_type}`, width: 3},
+                {field: 'date', title: `${options.title_field_date}`, width: 10},
+                {field: 'message', title: `${options.title_field_message}`, width: 100, align: 'left'}
+            ]]
+        });
+
         easyconsole.addClass('easyconsole');
         //let easyconsole = $(target).empty().append('Инициализация');
         //alert(target.toSource());
         // Запишем статус
-
-
-        $.data(target, 'easyconsole', {
-            init: true
-        });
-
+        return easyconsole
     }
 
     $.fn.easyconsole = function (message, params) {
         // Проинициализирован ли плагин?
-        let initial = $(this).hasClass('easyconsole');
+        let initialized = $(this).hasClass('easyconsole');
         // Проинициализирован, вызываем методы
-        if (typeof message === 'string') {
+        if (typeof message === 'string' && initialized) {
             params = params || {};
             // Значит первым параметром пришла строка с текстом ии командой
             if (message in $.fn.easyconsole.methods) {
+                // Пришел запрос ("Команда", параметр)
                 alert('команда');
+                return this;
             } else {
-                response = $.fn.easyconsole.methods.message(this, message, params);
+                // Пришел запрос ("Строка для вывода", параметр)
+                return $.fn.easyconsole.methods.message(this, message, params);
             }
         }
         //alert(options.toSource());
 
-        // Сюда пришел объект с настройками
-        message = message || {};
+        // Пришел запрос ({ настройки })
+        let options = message || {};
         return this.each(function () {
             let state = $.data(this, 'easyconsole');
             if (state) {
-                $.extend(state.options, message);
+                $.extend(state.options, options);
             } else {
                 // Инициализируем объект с требуемыми опциями
-                let result = init(this, $.extend({}, $.fn.easyconsole.defaults, message));
-                return result
+                let r = init(this, $.extend({}, $.fn.easyconsole.defaults, options));
+                alert('init');
+                $.data(this, 'easyconsole', {
+                    options: options,
+                    table: r
+                });
             }
         })
     };
@@ -58,9 +75,15 @@
             alert('test!!!');
         },
         message: function (jq, message, params) {
-            alert(message);
+            return jq.each(function () {
+                alert(message);
+            })
         }
     };
 
-    $.fn.easyconsole.defaults = {};
+    $.fn.easyconsole.defaults = {
+        title_field_date: 'Дата',
+        title_field_type: 'Тип',
+        title_field_message: 'Лог',
+    };
 })(jQuery);

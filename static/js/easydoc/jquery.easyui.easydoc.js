@@ -12,9 +12,9 @@
 (function ($) {
     /**
      * Создание меню журнала плагина EasyDoc
-     * @param       target      (object DOM)    DOM Объект плагина
-     * @param       options     (object)        Настройки плагина
-     * @return      {*}         (object)        HTML объект разметки
+     * @param       target      (object DOM)        DOM Объект плагина
+     * @param       options     (object)            Настройки плагина
+     * @return      {*}         (object)            HTML объект разметки
      * Динамическое создание меню для journal
      */
     function journalMenuCreate(target, options) {
@@ -64,9 +64,9 @@
 
     /**
      * Функция создания панели журнала документов
-     * @param       target      (object DOM)    DOM объект плагина
-     * @param       options     (object)        Настройки плагина
-     * @return      {*}         (object)        HTML объект разметки
+     * @param       target      (object DOM)        DOM объект плагина
+     * @param       options     (object)            Настройки плагина
+     * @return      {*}         (object)            HTML объект разметки
      */
     function journalCreate(target, options) {
         //let easydoc = $(target);
@@ -162,10 +162,10 @@
 
     /**
      * Функция создания панели документа
-     * @param       target      (object DOM)    DOM объект плагина
-     * @param       options     (object)        Настройки плагина
-     * @param       index       (number)        Индекс документа, совпадает с ID в БД
-     * @return      {*}         (object)        HTML объект разметки
+     * @param       target      (object DOM)        DOM объект плагина
+     * @param       options     (object)            Настройки плагина
+     * @param       index       (number)            Индекс документа, совпадает с ID в БД
+     * @return      {*}         (object)            HTML объект разметки
      */
     function documentCreate(target, options, index) {
         let table = $('<table></table>', {
@@ -374,8 +374,8 @@
 
     /**
      * Загрузка контрагентов в data в асинхронном режиме
-     * @param       target      (object DOM)    DOM объект нашего плагина
-     * @param       options     (object)        Настройки плагина
+     * @param       target      (object DOM)        DOM объект нашего плагина
+     * @param       options     (object)            Настройки плагина
      */
     function getContractors(target, options) {
         // Запрос всех контрагентов
@@ -394,9 +394,9 @@
 
     /**
      * Инициализация вкладок для работы
-     * @param       target      (object DOM)    DOM объект нашего плагина
-     * @param       options     (object)        Настройки плагина
-     * @returns     tab         (object DOM)    DOM
+     * @param       target      (object DOM)        DOM объект нашего плагина
+     * @param       options     (object)            Настройки плагина
+     * @returns     tab         (object DOM)        DOM
      */
     function initTabs(target, options) {
         // Обернем DOM объект в jQuery функционал
@@ -634,9 +634,9 @@
 
     /**
      * Функция инициализатор плагина easyDoc
-     * @param      target   (object DOM)        Объект DOM класса easyui-tabs  для активации на нем плагина easyDoc
-     * @param      options  (object)            Объект с настройками плагина
-     * @return              (object)            Объект содержащий {настройки, ициализированные jQuery.easydoc, jQuery.journal}
+     * @param      target       (object DOM)        Объект DOM класса easyui-tabs  для активации на нем плагина easyDoc
+     * @param      options      (object)            Объект с настройками плагина
+     * @return     {*}          (object)            Объект содержащий {настройки, ициализированные jQuery.easydoc, jQuery.journal}
      */
     function init(target, options) {
         // Если options === undefined, сделаем ее просто пустой
@@ -714,9 +714,9 @@
 
     /**
      * Функция "точка" вызова плагина easyDoc
-     * @param      options  (string, необяз)    Имя вызываемого метода
-     * @param      params   (object)            Параметры настройки плагина
-     * @return     this     (object)            Объект экземпляра для поддержки цепочки вызовов
+     * @param      options      (string, необяз)    Имя вызываемого метода
+     * @param      params       (object)            Параметры настройки плагина
+     * @return     this         (object)            Объект экземпляра для поддержки цепочки вызовов
      * */
     $.fn.easydoc = function (options, params) {
         // Если пришло имя функции то string
@@ -937,8 +937,8 @@
 })(jQuery);
 
 
-$.ajaxSetup({
-    cache: true
+//$.ajaxSetup({
+//cache: true
     //beforeSend: function(jqXHR, settings){
 
     // },
@@ -951,5 +951,5 @@ $.ajaxSetup({
 
     //},
     //dataFilter: function(data, type){alert(data.toSource());return data},
-});
+//});
 

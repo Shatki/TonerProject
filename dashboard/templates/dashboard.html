@@ -45,9 +45,7 @@
                     hideCollapsedContent:false,iconCls:'icon-tip',
                     tools: [{iconCls:'icon-clear',handler:function(){alert('clear')}}]" style="height:300px;">
             {% block console %}
-                <div id="easyconsole">
-                    ! 16-10-2017 Запущено приложение
-                </div>
+                <table id="console"></table>
             {% endblock console %}
         </div>
         <div title="Меню" data-options="region:'west',split:true" style="width:300px;">
@@ -143,8 +141,7 @@
 
                 });
                 // Запуск консоли
-                $('#easyconsole').easyconsole('Первое!');
-                $('#easyconsole').easyconsole('test');
+                $('#console').easyconsole({text: 'Пусто'}).easyconsole('Первое!').easyconsole('test');
             });
 
             if (!navigator.cookieEnabled) {
