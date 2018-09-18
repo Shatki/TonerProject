@@ -34,6 +34,16 @@
         return easyconsole
     }
 
+    function consoleMessage(target, message, params) {
+        $(target).datagrid('insertRow', {
+            row: {
+                date: '31-10-1985',
+                age: 30,
+                message: message
+            }
+        });
+    }
+
     $.fn.easyconsole = function (message, params) {
         // Проинициализирован ли плагин?
         let initialized = $(this).hasClass('easyconsole');
@@ -61,7 +71,7 @@
             } else {
                 // Инициализируем объект с требуемыми опциями
                 let r = init(this, $.extend({}, $.fn.easyconsole.defaults, options));
-                alert('init');
+                //alert('init');
                 $.data(this, 'easyconsole', {
                     options: options,
                     table: r
@@ -72,11 +82,13 @@
 
     $.fn.easyconsole.methods = {
         test: function (jq) {
-            alert('test!!!');
+            return jq.each(function () {
+                alert('test');
+            })
         },
         message: function (jq, message, params) {
             return jq.each(function () {
-                alert(message);
+                consoleMessage(this, message, params);
             })
         }
     };
