@@ -53,8 +53,8 @@
             // Значит первым параметром пришла строка с текстом ии командой
             if (message in $.fn.easyconsole.methods) {
                 // Пришел запрос ("Команда", параметр)
-                alert('команда');
-                return this;
+                //alert('команда');
+                return $.fn.easyconsole.methods[message](this, params);
             } else {
                 // Пришел запрос ("Строка для вывода", параметр)
                 return $.fn.easyconsole.methods.message(this, message, params);
@@ -81,9 +81,9 @@
     };
 
     $.fn.easyconsole.methods = {
-        test: function (jq) {
+        comand: function (jq, params) {
             return jq.each(function () {
-                alert('test');
+                alert('comand');
             })
         },
         message: function (jq, message, params) {
