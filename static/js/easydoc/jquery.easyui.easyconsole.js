@@ -21,8 +21,8 @@
             singleSelect: true,
             showFooter: true,
             columns: [[
-                {field: 'type', title: `${options.title_field_type}`, width: 3},
-                {field: 'date', title: `${options.title_field_date}`, width: 10},
+                {field: 'type', title: `${options.title_field_type}`, width: 3, align: 'center'},
+                {field: 'date', title: `${options.title_field_date}`, width: 10, align: 'center'},
                 {field: 'message', title: `${options.title_field_message}`, width: 100, align: 'left'}
             ]]
         });
@@ -34,11 +34,11 @@
         return easyconsole
     }
 
-    function consoleMessage(target, message, params) {
+    function showMessage(target, message, params) {
         $(target).datagrid('insertRow', {
             row: {
-                date: '31-10-1985',
-                age: 30,
+                date: $.fn.datetimebox.defaults.formatter(new Date()),
+                type: '!',
                 message: message
             }
         });
@@ -60,7 +60,6 @@
                 return $.fn.easyconsole.methods.message(this, message, params);
             }
         }
-        //alert(options.toSource());
 
         // Пришел запрос ({ настройки })
         let options = message || {};
@@ -88,7 +87,7 @@
         },
         message: function (jq, message, params) {
             return jq.each(function () {
-                consoleMessage(this, message, params);
+                showMessage(this, message, params);
             })
         }
     };
