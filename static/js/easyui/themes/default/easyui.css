@@ -1,3 +1,10 @@
+* {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
 .panel {
   overflow: hidden;
   text-align: left;
@@ -3115,7 +3122,6 @@
 .tree-node-hidden {
   display: none;
 }
-
 .inputbox {
     display: inline-block;
     vertical-align: middle;
@@ -3430,7 +3436,6 @@
   margin: 0 -12px;
   border: 0;
 }
-
 .sidemenu-tooltip.tooltip-left {
     margin: 0 12px;
 }

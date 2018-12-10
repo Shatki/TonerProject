@@ -39,7 +39,6 @@
 .sidemenu .accordion-header .panel-tool {
     display: none;
 }
-
 .sidemenu .accordion-header::after,
 .sidemenu .tree-node-nonleaf::after {
     display: inline-block;

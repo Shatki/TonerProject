@@ -935,21 +935,3 @@
         }
     }
 })(jQuery);
-
-
-//$.ajaxSetup({
-//cache: true
-    //beforeSend: function(jqXHR, settings){
-
-    // },
-    //method: 'post',
-    //complete: function (jqXHR, textStatus) {
-        //alert(jqXHR.toSource());
-        //$.data(this, 'ajaxCache',{
-        //    data.url: data.responseText
-        //});
-
-    //},
-    //dataFilter: function(data, type){alert(data.toSource());return data},
-//});
-

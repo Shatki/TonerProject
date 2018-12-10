@@ -1,6 +1,6 @@
 /**
- * EasyUI for jQuery 1.6.2
- *
+ * EasyUI for jQuery 1.6.7
+ * 
  * Copyright (c) 2009-2018 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php

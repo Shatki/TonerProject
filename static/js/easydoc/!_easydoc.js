@@ -439,3 +439,11 @@ $.fn.easydoc.defaults = {
     }
 
 };
+
+/*
+  📂Documents
+  └📁Music
+   └📁 Blink 182
+    └📁 Bad Songs
+     └⚠ This folder is empty.﻿
+ */
