@@ -79,7 +79,7 @@
                     options: options,
                     table: r
                 });
-                showMessage(this, 'Запуск консоли', {type: 'warning'});
+                showMessage(this, options.message_start + options.message_version + options.version, {type: 'warning'});
             }
         })
     };
@@ -101,9 +101,12 @@
     };
 
     $.fn.easyconsole.defaults = {
+        version: '1.0.1',
         title_field_date: 'Дата',
         title_field_type: 'Тип',
         title_field_message: 'Лог',
+        message_version: 'Версия:',
+        message_start: 'Запуск консоли. ',
         icons: {
             'ok': '<img src ="/static/js/easyui/themes/icons/ok.png">',   // ok
             'warning': '<img src ="/static/js/easyui/themes/icons/tip.png">',  // warning

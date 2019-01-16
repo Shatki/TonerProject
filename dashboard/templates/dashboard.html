@@ -8,7 +8,7 @@
         <title>Журнал накладных</title>
 
         {% block theme %}
-            <link rel="stylesheet" type="text/css" href="{% static "js/easyui/themes/material-teal/easyui.css" %}">
+            <link rel="stylesheet" type="text/css" href="{% static "js/easyui/themes/metro/easyui.css" %}">
             <link rel="stylesheet" type="text/css" href="{% static "js/easyui/themes/icon.css" %}">
             <link rel="stylesheet" type="text/css" href="{% static "css/themes/color.css" %}">
             <link rel="stylesheet" type="text/css" href="{% static "css/themes/demo.css" %}">
@@ -88,6 +88,8 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $(function () {
+                // EasyConsole
+                let easyconsole = $('#console').easyconsole();
                 // Запуск easyDoc
                 $('#easydoc').easydoc({
                     // Тип первоначального отображения журнала
@@ -139,7 +141,10 @@
                     title_field_tax: '<p>Налог</p>',
                     title_field_total: '<p>Сумма</p>',
 
-                }).easyconsole('#console').easyconsole('Начало работы').easyconsole('Первая ошибка', {type: 'error'});
+                    console: easyconsole,
+
+                });
+                // $('#console').easyconsole('Начало работы').easyconsole('Первая ошибка', {type: 'error'});
                 // Запуск консоли
                 //$('#easydoc').easyconsole('#console').easyconsole('Начало работы').easyconsole('Первая ошибка', {type:'error'});
             });

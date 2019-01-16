@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'debug_toolbar',
     'authentication',
     'blog',
@@ -47,6 +48,7 @@ INSTALLED_APPS = (
     'document',
     'forms',
     'homepage',
+    'rest_framework',
     'service',
     'stock',
     'system',
@@ -106,6 +108,13 @@ DATABASES = {
     }
 }
 
+# override settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

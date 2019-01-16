@@ -1,7 +1,7 @@
 /**
- * EasyUI for jQuery 1.6.7
- * 
- * Copyright (c) 2009-2018 www.jeasyui.com. All rights reserved.
+ * EasyUI for jQuery 1.7.1
+ *
+ * Copyright (c) 2009-2019 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
  * To use it on other terms please contact us: info@jeasyui.com
@@ -222,12 +222,20 @@
         };
 
         function _2a() {
-            var top = _25.offset().top + _25._outerHeight();
-            if (top + _26._outerHeight() > $(window)._outerHeight() + $(document).scrollTop()) {
-                top = _25.offset().top - _26._outerHeight();
-            }
-            if (top < $(document).scrollTop()) {
-                top = _25.offset().top + _25._outerHeight();
+            if (_27.panelValign == "top") {
+                var top = _25.offset().top - _26._outerHeight();
+            } else {
+                if (_27.panelValign == "bottom") {
+                    var top = _25.offset().top + _25._outerHeight();
+                } else {
+                    var top = _25.offset().top + _25._outerHeight();
+                    if (top + _26._outerHeight() > $(window)._outerHeight() + $(document).scrollTop()) {
+                        top = _25.offset().top - _26._outerHeight();
+                    }
+                    if (top < $(document).scrollTop()) {
+                        top = _25.offset().top + _25._outerHeight();
+                    }
+                }
             }
             return top;
         };
@@ -473,6 +481,7 @@
         panelMinHeight: null,
         panelMaxHeight: null,
         panelAlign: "left",
+        panelValign: "auto",
         reversed: false,
         multiple: false,
         multivalue: true,

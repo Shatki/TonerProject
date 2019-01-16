@@ -573,6 +573,11 @@
         return easydoc.tabs('getTab', 0);
     }
 
+    /**
+     * Сохранение документа
+     * @param       target      (object DOM)        DOM объект нашего плагина
+     * @param       params      (object)            Набор параметров
+     */
     function documentSave(target, params) {
         let easydoc = $(target);
         let opts = easydoc.easydoc('options');
@@ -589,8 +594,8 @@
 
     /**
      * Функция открытия документа на новой вкладке
-     * @param       target      (object DOM)    DOM объект нашего плагина
-     * @param       params      (object)        Набор параметров
+     * @param       target      (object DOM)        DOM объект нашего плагина
+     * @param       params      (object)            Набор параметров
      *
      * Функция принимает параметры {params}:
      * app, subject, option, object, target, action (подробнее в defaults.getUrl)
@@ -600,6 +605,7 @@
         let easydoc = $(target);
         let opts = easydoc.easydoc('options');
         // let contractors = $.data(target, 'easydoc').contractors;
+        // Creating a new document
         if (params.action === opts.new) {
             // создадим новый, Если не пришел ID документа
             easydoc.tabs('add', {
@@ -607,7 +613,7 @@
                 closable: true,
                 selected: true
             });
-
+            // Opening an existing document
         } else if (params.action === opts.edit) {
             // Откроем документ из базы
             $.ajax({
@@ -746,10 +752,12 @@
                     // Берем для easyDoc настройки по-умолчанию и дополняем их полученными
                     options: result.options,
                     // При инициализации создается и журнал, сохраним его jQuery объект
-                    journal: result.journal
+                    journal: result.journal,
                 });
                 $(this).removeAttr('disabled');
+                result.options.log('Плагин easyDoc подключен');
             }
+            //alert($(this).html().toSource());
             /*  Тут алгоритм активации функций EasyDoc */
             //setDisabled(this, state.options.disabled);
             //Активация кнопок
@@ -786,6 +794,7 @@
                     target: row.id,
                     action: opts.edit
                 });
+
             })
         },
         remove: function (jq) {
@@ -881,13 +890,14 @@
         title_field_cost: '<p>Cost of<br>piece</p>',
         title_field_tax: '<p>Tax</p>',
         title_field_total: '<p>Total</p>',
+        console: null,
 
-        formatNumber(number) {
+        formatNumber: function (number) {
             return number;
         },
 
         /**
-         * Функция генерация наименования вкладки согласно шаблону
+         * Генератор имен вкладок согласно шаблону
          * @param       params      (object)        Параметры запроса
          * @return                  {string}        Строка-наименование
          */
@@ -905,18 +915,21 @@
             let date = params.date || $.fn.datebox.defaults.formatter(new Date());
             return `${title} ${this.title_dateFrom} ${date}`;
         },
+
+        /**
+         * Генератор URLов
+         * params:
+         * app  - Приложение адресного пространства (document, system, forms)
+         *
+         * subject - Субъект запроса. Носитель объектов запроса (consignment, invoice)
+         * option - Количество или ID субъекта (0, 1, all, ...)  в дальнешем расширим
+         *
+         * object - Объект запроса (item, ..., product)
+         * target - Количество или ID объекта (0, 1, all, ...)  в дальнешем расширим
+         *
+         * action - Тип запроса  (json, new, edit, remove, paste)
+         */
         getUrl: function (params) {
-            /** params:
-             * app  - Приложение адресного пространства (document, system, forms)
-             *
-             * subject - Субъект запроса. Носитель объектов запроса (consignment, invoice)
-             * option - Количество или ID субъекта (0, 1, all, ...)  в дальнешем расширим
-             *
-             * object - Объект запроса (item, ..., product)
-             * target - Количество или ID объекта (0, 1, all, ...)  в дальнешем расширим
-             *
-             * action - Тип запроса  (json, new, edit, remove, paste)
-             */
             //  /document/consignment/all/json/
             //  /document/consignment/1/edit/
             //  /document/consignment/1/delete/
@@ -932,6 +945,19 @@
                 $.error('getURL: bad action');
             }
             return `/${app}/${subject}${option}${object}${target}${params.action}/`;
+        },
+
+        /**
+         * Вывод логов в консоль или в easyConsole, если она активирована
+         * @param       message   {string}          Сообщение
+         * @param       params    (object)          Набор параметров
+         */
+        log: function (message, params) {
+            if (this.console) {
+                this.console.easyconsole(message, params);
+            } else {
+                console.log(message);
+            }
         }
-    }
+    };
 })(jQuery);
